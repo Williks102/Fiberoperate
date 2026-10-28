@@ -1,18 +1,9 @@
-# Backend — Lot 1 (fondations des données)
+# Backend — API Laravel
 
-Fichiers de départ Laravel : enums, migrations, modèles, seeders, tests. À copier dans un projet Laravel 11/12 neuf.
+Lot 0 (squelette, Sanctum, PostgreSQL) et lot 1 (enums, migrations, modèles, seeders, tests).
 
 ## Installation
-```bash
-composer create-project laravel/laravel backend && cd backend
-php artisan install:api                 # Sanctum
-# Dans la migration personal_access_tokens : remplacer morphs('tokenable') par uuidMorphs('tokenable')
-rm database/migrations/0001_01_01_000000_create_users_table.php database/factories/UserFactory.php
-# copier ici app/, database/, tests/ de ce dossier (remplacer app/Models/User.php)
-# configurer PostgreSQL dans .env
-php artisan migrate --seed
-php artisan test
-```
+Le squelette Laravel est en place (lot 0). Voir le `README.md` à la racine pour lancer l'API, les migrations et les tests.
 
 ## Choix de conception
 - UUID partout, suppression logique, index uniques partiels (`WHERE deleted_at IS NULL`) : un code supprimé peut être recréé.
@@ -23,4 +14,4 @@ php artisan test
 - DevSeeder : uniquement en environnement `local`.
 
 ## État de vérification
-Syntaxe PHP vérifiée (`php -l`) et `CodeNormalizer` exécuté. **Migrations et tests non exécutés** (installation de Laravel impossible dans l'environnement de préparation) : à lancer au premier `php artisan test`.
+Migrations, seeders et tests exécutés sur PostgreSQL 16 (`php artisan test`, Pint).
