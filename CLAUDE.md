@@ -82,5 +82,13 @@ Toute requête est filtrée par rôle **et** périmètre (plaque pour le supervi
 5. Reporting coordinateur, export de la fiche de suivi, tableaux de bord.
 6. Matériel/stock, incidents, suivi du déploiement (tirage, soudure).
 
+## Méthode de travail (comme sur ETAM)
+- **Petites tranches verticales** : une branche = un sujet visible (ex. « écran de connexion », « liste des plaques »). Une PR vise moins de 400 lignes hors tests et fichiers générés ; au-delà, on découpe.
+- **Chaque fusion fait apparaître une fonctionnalité** utilisable, avec son API, son écran et ses tests. Pas de lot livré d'un bloc.
+- Branches `feat/…`, `fix/…`, `refactor/…`, `chore/…` ; commits en Conventional Commits ; fusion en **squash** vers `main`.
+- **Pas de CI** : `./scripts/check.sh` avant chaque push, résultat dans la PR.
+- Tests écrits avec le code (permissions par rôle et périmètre pour toute nouvelle route).
+- Fin de tranche : résumé de ce qui est visible, de ce qui reste, des hypothèses à valider.
+
 ## Points ouverts (ne pas trancher seul)
 Sens des deux colonnes « État ligne », du préfixe `*` et du « F » des codes ; statuts normalisés du PCO et motifs de blocage ; fichier de déploiement remplacé ou seulement importé ; types de poteaux comptés dans la distance par défaut ; valeurs de l'état de ligne opérateur ; photos/signature obligatoires.
