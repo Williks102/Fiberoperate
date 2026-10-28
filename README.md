@@ -32,8 +32,9 @@ cp .env.example .env.local
 npm install && npm run dev
 ```
 
-## Contrôles (identiques à la CI, `.github/workflows/ci.yml`)
+## Contrôles (pas de CI GitHub Actions)
+La CI est désactivée (facturation Actions non souscrite). Les contrôles se lancent en local avant chaque push, et leur résultat est collé dans la PR :
 ```bash
-cd backend  && vendor/bin/pint --test && php artisan test
-cd frontend && npm run lint && npm run typecheck && npm run build
+./scripts/check.sh        # tout ; ou ./scripts/check.sh api | web
 ```
+Pour réactiver une CI plus tard, l'ancien workflow est dans l'historique git : `git show 0fd54aa:.github/workflows/ci.yml`.
