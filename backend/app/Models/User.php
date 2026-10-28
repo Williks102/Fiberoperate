@@ -27,6 +27,10 @@ class User extends Authenticatable
         'is_active',
     ];
 
+    protected $attributes = [
+        'is_active' => true,
+    ];
+
     protected $hidden = [
         'password',
     ];

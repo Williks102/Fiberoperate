@@ -15,3 +15,16 @@ Le squelette Laravel est en place (lot 0). Voir le `README.md` à la racine pour
 
 ## État de vérification
 Migrations, seeders et tests exécutés sur PostgreSQL 16 (`php artisan test`, Pint).
+
+## API v1 (lot 1)
+Préfixe `/api/v1`, jetons Sanctum Bearer (`SANCTUM_TOKEN_EXPIRATION`, 12 h par défaut), CORS limité à `FRONTEND_URL`.
+
+- `POST auth/login` (5 essais/min par e-mail + IP), `POST auth/logout`, `GET auth/me`
+- `users` (admin ; DG et DT en lecture), `teams`, `olts`, `plaques`, `zones`, `jdvs`, `pcos`, `GET block-reasons`
+
+**Périmètre** (scope `visibleTo` des modèles, repris par les Policies) :
+- admin, DG, DT, coordinateur : tout le réseau ; superviseur : sa plaque et ses zones, JDV, PCO ; technicien : la plaque de son supérieur (technicien déploiement) ; OLT masqués aux techniciens.
+- équipes : le coordinateur voit les siennes ; admin et DT les gèrent, DG lecture.
+- écriture du réseau et des utilisateurs : administrateur seul.
+
+Hypothèse à valider : le schéma n'a pas de lien équipe ↔ zone, donc le coordinateur lit tout le réseau (utile pour choisir un PCO à l'étude).

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\EnsureUserIsActive;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,9 +15,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias(['active' => EnsureUserIsActive::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // Les index uniques partiels (codes, e-mails) signalent un doublon : message clair en 422.
+        $exceptions->render(function (UniqueConstraintViolationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json(['message' => 'Cette valeur existe déjà.', 'code' => 'DUPLICATE'], 422);
+            }
+        });
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );

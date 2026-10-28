@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\PcoStatus;
 use App\Support\CodeNormalizer;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -114,5 +115,10 @@ class Pco extends Model
                 'device' => $device,
             ]);
         });
+    }
+
+    public function scopeVisibleTo(Builder $query, User $user): Builder
+    {
+        return $query->whereIn('zone_id', Zone::query()->visibleTo($user)->select('id'));
     }
 }
