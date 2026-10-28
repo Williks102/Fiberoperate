@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\Zone;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Tests\TestCase;
 
@@ -56,7 +57,8 @@ class HierarchyTest extends TestCase
         $zone = $this->zone('FAY03');
 
         try {
-            $this->zone('FAY003');
+            // Savepoint : sous PostgreSQL, une erreur SQL annule toute la transaction du test.
+            DB::transaction(fn () => $this->zone('FAY003'));
             $this->fail('Duplicate expected');
         } catch (QueryException) {
             $this->assertTrue(true);
@@ -69,7 +71,8 @@ class HierarchyTest extends TestCase
     public function test_change_status_writes_history(): void
     {
         $zone = $this->zone();
-        $pco = Pco::create(['zone_id' => $zone->id, 'code' => 'FAY03_PCO001']);
+        $jdv = Jdv::create(['zone_id' => $zone->id, 'code' => 'SPL001']);
+        $pco = Pco::create(['jdv_id' => $jdv->id, 'code' => 'FAY03_PCO001']);
         $user = User::create(['name' => 'T', 'email' => 't@x.test', 'password' => 'secret123', 'role' => Role::Technician]);
 
         $pco->changeStatus(PcoStatus::Pulled, $user, 'tirage ok', 'phone-1');
@@ -85,7 +88,8 @@ class HierarchyTest extends TestCase
     public function test_unmapped_raw_status_keeps_null_status(): void
     {
         $zone = $this->zone();
-        $pco = Pco::create(['zone_id' => $zone->id, 'code' => 'FAY03_PCO002', 'status_raw' => 'En attente BE']);
+        $jdv = Jdv::create(['zone_id' => $zone->id, 'code' => 'SPL001']);
+        $pco = Pco::create(['jdv_id' => $jdv->id, 'code' => 'FAY03_PCO002', 'status_raw' => 'En attente BE']);
 
         $this->assertNull($pco->fresh()->status);
         $this->assertSame('En attente BE', $pco->status_raw);

@@ -21,10 +21,15 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('password');
             $table->string('role')->index();
-            $table->foreignUuid('manager_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->uuid('manager_id')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();
+        });
+
+        // Clé étrangère auto-référente : ajoutée après la création, quand la clé primaire existe.
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreign('manager_id')->references('id')->on('users')->nullOnDelete();
         });
 
         // Unicité limitée aux lignes non supprimées (suppression logique).
