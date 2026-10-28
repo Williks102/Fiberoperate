@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Vendor;
 use App\Enums\ZoneStatus;
 use App\Support\CodeNormalizer;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -56,5 +57,10 @@ class Zone extends Model
     public function accessPointLabel(): ?string
     {
         return $this->vendor?->accessPointLabel();
+    }
+
+    public function scopeVisibleTo(Builder $query, User $user): Builder
+    {
+        return $query->whereIn('plaque_id', Plaque::query()->visibleTo($user)->select('id'));
     }
 }

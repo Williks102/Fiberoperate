@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\CodeNormalizer;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -33,5 +34,10 @@ class Jdv extends Model
     public function pcos(): HasMany
     {
         return $this->hasMany(Pco::class);
+    }
+
+    public function scopeVisibleTo(Builder $query, User $user): Builder
+    {
+        return $query->whereIn('zone_id', Zone::query()->visibleTo($user)->select('id'));
     }
 }

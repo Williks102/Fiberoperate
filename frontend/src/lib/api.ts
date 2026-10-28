@@ -11,7 +11,7 @@ export class ApiError extends Error {
 
 /** Appel JSON vers l'API Laravel (jeton Sanctum Bearer, ajouté au lot 1). */
 export async function apiFetch<T>(path: string, init: RequestInit = {}, token?: string): Promise<T> {
-  const response = await fetch(`${API_URL}/api${path}`, {
+  const response = await fetch(`${API_URL}/api/v1${path}`, {
     ...init,
     headers: {
       Accept: "application/json",
