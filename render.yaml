@@ -1,0 +1,44 @@
+# Blueprint Render — API Laravel + worker de files + Redis (Key Value).
+# Base de données : Neon. Front-end : Vercel. Photos : Cloudinary (tous externes).
+services:
+  - type: web
+    name: ftth-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    region: frankfurt          # région la plus proche d'Abidjan parmi celles de Render
+    plan: starter              # évite la mise en veille du plan gratuit (important pour la synchro terrain)
+    healthCheckPath: /up
+    envVars: &env
+      - { key: APP_ENV, value: production }
+      - { key: APP_DEBUG, value: "false" }
+      - { key: APP_KEY, sync: false }
+      - { key: APP_URL, sync: false }
+      - { key: DB_CONNECTION, value: pgsql }
+      - { key: DB_URL, sync: false }          # Neon, URL « pooled » (…-pooler…)
+      - { key: DB_URL_DIRECT, sync: false }   # Neon, URL directe (migrations)
+      - { key: REDIS_URL, fromService: { type: keyvalue, name: ftth-redis, property: connectionString } }
+      - { key: CACHE_STORE, value: redis }
+      - { key: QUEUE_CONNECTION, value: redis }
+      - { key: SESSION_DRIVER, value: redis }
+      - { key: CLOUDINARY_URL, sync: false }   # cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+      - { key: CLOUDINARY_UPLOAD_FOLDER, value: ftth }
+      - { key: FRONTEND_URL, sync: false }    # https://… du projet Vercel (CORS)
+      - { key: LOG_CHANNEL, value: stderr }
+      - { key: RUN_MIGRATIONS, value: "true" }
+
+  - type: worker
+    name: ftth-queue
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    region: frankfurt
+    plan: starter
+    dockerCommand: php artisan queue:work --tries=3 --timeout=300 --max-time=3600
+    envVars: *env
+
+  - type: keyvalue
+    name: ftth-redis
+    region: frankfurt
+    plan: free
+    ipAllowList: []            # accès interne Render uniquement
