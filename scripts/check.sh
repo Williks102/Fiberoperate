@@ -12,8 +12,8 @@ api() {
 }
 
 web() {
-  echo "== Web : lint + typecheck + build =="
-  (cd frontend && npm run lint && npm run typecheck && npm run build)
+  echo "== Web : lint + typecheck + tests + build =="
+  (cd frontend && npm run lint && npm run typecheck && npm run test && npm run build)
 }
 
 case "${1:-all}" in
