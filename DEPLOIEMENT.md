@@ -35,6 +35,16 @@ Ouvrez l'adresse Vercel, connectez-vous avec le compte créé, ouvrez *Utilisate
 - **L'API ne démarre pas** : journaux de `ftth-api` ; vérifiez `APP_KEY`, `DB_URL` et `DB_URL_DIRECT`.
 - **Première requête lente** : la base Neon gratuite se réveille après une période d'inactivité.
 
+### Variante gratuite (démonstration) : `render.free.yaml`
+Pour tester sans payer Render. **Jamais pour le terrain** : le service s'endort après environ 15 minutes d'inactivité et il n'y a ni worker ni Redis.
+
+1. Étapes 1 (Neon) et 3 (Vercel) identiques.
+2. Sur Render, *New → Blueprint*, puis choisissez le fichier **`render.free.yaml`** (champ *Blueprint file path*) : un seul service, `ftth-api-demo`, en plan gratuit.
+3. Variables à saisir : `APP_KEY`, `APP_URL`, `DB_URL`, `DB_URL_DIRECT` (vous pouvez mettre la même URL Neon directe dans les deux), `FRONTEND_URL`, et le premier administrateur : `ADMIN_EMAIL`, `ADMIN_NAME`, `ADMIN_PASSWORD` (8 caractères, une lettre et un chiffre).
+4. Il n'y a pas de Shell en plan gratuit : l'administrateur est créé **au démarrage**, une seule fois (s'il en existe déjà un, rien n'est touché et le mot de passe n'est jamais réinitialisé).
+5. Une fois connecté, **supprimez la variable `ADMIN_PASSWORD`** de Render et changez votre mot de passe dans l'application (*Utilisateurs* → votre compte).
+6. Si Render n'offre pas le plan gratuit à votre compte, il refusera ce fichier comme l'autre : utilisez alors `render.yaml` (payant).
+
 ---
 
 ## Architecture

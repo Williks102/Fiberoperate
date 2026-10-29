@@ -1,0 +1,34 @@
+# Blueprint Render GRATUIT : démonstration et essais uniquement (jamais pour le terrain).
+# Un seul service web, sans worker ni Redis. Limites du plan gratuit :
+#  - le service s'endort après environ 15 min d'inactivité (première requête lente) ;
+#  - pas de Shell : le premier administrateur est créé au démarrage depuis ADMIN_* ;
+#  - la mise en veille coupe aussi les files : aucun job de fond n'est utilisé avant le lot 2.
+# Cache et limitation de débit passent par la base (table `cache`), les files sont synchrones.
+# Base : Neon. Front : Vercel. Production : voir render.yaml.
+services:
+  - type: web
+    name: ftth-api-demo
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    region: frankfurt
+    plan: free
+    healthCheckPath: /up
+    envVars:
+      - { key: APP_ENV, value: production }
+      - { key: APP_DEBUG, value: "false" }
+      - { key: APP_KEY, sync: false }
+      - { key: APP_URL, sync: false }
+      - { key: DB_CONNECTION, value: pgsql }
+      - { key: DB_URL, sync: false }          # Neon, URL directe ou pooled : une seule suffit ici
+      - { key: DB_URL_DIRECT, sync: false }   # Neon, URL directe (migrations)
+      - { key: CACHE_STORE, value: database }
+      - { key: QUEUE_CONNECTION, value: sync }
+      - { key: SESSION_DRIVER, value: array }   # l'API n'utilise pas de session (jetons Bearer)
+      - { key: FRONTEND_URL, sync: false }    # https://… du projet Vercel (CORS)
+      - { key: LOG_CHANNEL, value: stderr }
+      - { key: RUN_MIGRATIONS, value: "true" }
+      - { key: CREATE_ADMIN_ON_BOOT, value: "true" }
+      - { key: ADMIN_EMAIL, sync: false }
+      - { key: ADMIN_NAME, sync: false }
+      - { key: ADMIN_PASSWORD, sync: false }  # à supprimer une fois connecté, puis changer le mot de passe dans l'application
