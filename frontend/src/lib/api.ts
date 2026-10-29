@@ -20,7 +20,8 @@ interface ErrorBody {
 export function errorMessage(status: number, body: ErrorBody | null): string {
   if (status === 429) return "Trop de tentatives. Réessayez dans une minute.";
   if (status === 401) return "Votre session a expiré. Reconnectez-vous.";
-  if (status === 403 && body?.message) return body.message;
+  // Seuls les refus métier de l'API (avec un code) sont déjà rédigés en français.
+  if (status === 403 && body?.code && body.message) return body.message;
   if (status === 403) return "Vous n'avez pas le droit d'effectuer cette action.";
   const firstValidation = body?.errors ? Object.values(body.errors)[0]?.[0] : undefined;
   if (firstValidation) return firstValidation;

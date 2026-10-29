@@ -10,7 +10,7 @@ export interface User {
   role_label: string;
   manager_id: string | null;
   is_active: boolean;
-  skills?: string[];
+  skills?: MissionType[];
 }
 
 export interface Paged<T> {
@@ -54,3 +54,5 @@ export interface Pco {
   status_raw: string | null;
   is_blocked: boolean;
 }
+
+export type MissionType = "deployment" | "customer_connection" | "maintenance" | "study";

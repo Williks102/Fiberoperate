@@ -14,6 +14,10 @@ describe("errorMessage", () => {
     expect(errorMessage(403, { message: "Ce compte est désactivé.", code: "ACCOUNT_DISABLED" })).toBe("Ce compte est désactivé.");
   });
 
+  it("remplace le refus générique de Laravel (anglais) par un message français", () => {
+    expect(errorMessage(403, { message: "This action is unauthorized." })).toBe("Vous n'avez pas le droit d'effectuer cette action.");
+  });
+
   it("reste compréhensible sur une erreur serveur", () => {
     expect(errorMessage(500, null)).toContain("serveur");
   });
