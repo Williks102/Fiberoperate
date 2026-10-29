@@ -21,8 +21,7 @@ services:
       - { key: CACHE_STORE, value: redis }
       - { key: QUEUE_CONNECTION, value: redis }
       - { key: SESSION_DRIVER, value: redis }
-      - { key: CLOUDINARY_URL, sync: false }   # cloudinary://API_KEY:API_SECRET@CLOUD_NAME
-      - { key: CLOUDINARY_UPLOAD_FOLDER, value: ftth }
+      # Cloudinary (photos) : à ajouter au lot 4, avec CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
       - { key: FRONTEND_URL, sync: false }    # https://… du projet Vercel (CORS)
       - { key: LOG_CHANNEL, value: stderr }
       - { key: RUN_MIGRATIONS, value: "true" }

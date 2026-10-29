@@ -5,12 +5,15 @@ PORT="${PORT:-10000}"
 sed -ri "s/Listen 80/Listen ${PORT}/" /etc/apache2/ports.conf
 sed -ri "s/<VirtualHost \*:80>/<VirtualHost *:${PORT}>/" /etc/apache2/sites-available/000-default.conf
 
+# Seul le service web (Apache) migre, avec la connexion directe Neon (variable RUN_MIGRATIONS=true).
+# À faire AVANT config:cache : une configuration en cache ignorerait DB_URL_DIRECT.
+if [ "${RUN_MIGRATIONS:-false}" = "true" ] && [ "$1" = "apache2-foreground" ]; then
+  DB_URL="${DB_URL_DIRECT:-$DB_URL}" php artisan migrate --force
+  # Référentiel de départ (idempotent). Aucune donnée de démonstration en production.
+  DB_URL="${DB_URL_DIRECT:-$DB_URL}" php artisan db:seed --class=BlockReasonSeeder --force
+fi
+
 php artisan config:cache
 php artisan route:cache
-
-# Seul le service web migre (variable RUN_MIGRATIONS=true), avec la connexion directe Neon.
-if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
-  DB_URL="${DB_URL_DIRECT:-$DB_URL}" php artisan migrate --force
-fi
 
 exec "$@"
