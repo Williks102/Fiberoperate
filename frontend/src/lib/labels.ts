@@ -1,4 +1,4 @@
-import type { Pco, ZoneStatus } from "@/lib/types";
+import type { MissionType, Pco, Role, ZoneStatus } from "@/lib/types";
 
 export const ZONE_STATUS_LABELS: Record<ZoneStatus, string> = {
   planned: "Planifiée",
@@ -22,3 +22,19 @@ export function pcoStatusLabel(pco: Pick<Pco, "status" | "status_raw">): string 
   if (pco.status) return PCO_STATUS_LABELS[pco.status];
   return pco.status_raw?.trim() || "Non renseigné";
 }
+
+export const ROLE_LABELS: Record<Role, string> = {
+  admin: "Administrateur",
+  dg: "Directeur général",
+  dt: "Directeur technique",
+  supervisor: "Superviseur",
+  coordinator: "Coordinateur",
+  technician: "Technicien",
+};
+
+export const MISSION_LABELS: Record<MissionType, string> = {
+  deployment: "Déploiement",
+  customer_connection: "Raccordement client",
+  maintenance: "Maintenance",
+  study: "Étude",
+};
