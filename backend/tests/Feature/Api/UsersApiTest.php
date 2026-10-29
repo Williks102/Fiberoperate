@@ -96,4 +96,16 @@ class UsersApiTest extends TestCase
 
         $this->postJson('/api/v1/users', $this->payload())->assertStatus(422)->assertJsonValidationErrors('email');
     }
+
+    public function test_validation_messages_are_in_french(): void
+    {
+        $this->login(Role::Admin);
+
+        $response = $this->postJson('/api/v1/users', $this->payload(['email' => 'x@x.test', 'password' => 'abc']))->assertStatus(422);
+
+        $message = $response->json('errors.password.0');
+        $this->assertStringNotContainsString('validation.', $message);
+        $this->assertStringContainsString('mot de passe', $message);
+        $this->assertStringContainsString('au moins', $message);
+    }
 }
