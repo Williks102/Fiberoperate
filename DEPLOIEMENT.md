@@ -1,5 +1,42 @@
 # Déploiement : Render (API) · Neon (PostgreSQL) · Vercel (front)
 
+## Guide pas à pas (premier déploiement)
+
+À faire dans cet ordre. **Ne partagez jamais** les mots de passe ni les URL de base de données (dans un message, un ticket ou le dépôt) : saisissez-les uniquement dans les réglages de Render et de Vercel.
+
+### 1. Neon (base de données)
+1. Créez un projet, base `ftth`, région Europe (Francfort).
+2. Dans *Connection details*, copiez **deux** URL (elles se terminent par `?sslmode=require`) :
+   - **pooled** (l'hôte contient `-pooler`) → servira de `DB_URL` ;
+   - **directe** (sans `-pooler`) → servira de `DB_URL_DIRECT` (migrations).
+
+### 2. Render (API et worker)
+1. Générez la clé d'application sur votre poste : `cd backend && php artisan key:generate --show`.
+2. *New → Blueprint*, choisissez le dépôt `Fiberoperate` (fichier `render.yaml`). Trois services sont créés : `ftth-api`, `ftth-queue`, `ftth-redis`.
+3. Renseignez les variables demandées : `APP_KEY` (étape 1), `APP_URL` (l'adresse `https://ftth-api….onrender.com` du service, visible après création), `DB_URL`, `DB_URL_DIRECT`, `FRONTEND_URL` (mettez `http://localhost:3000` pour l'instant, vous la changerez à l'étape 4).
+4. Au premier démarrage, le service `ftth-api` applique les migrations (connexion directe) et charge les motifs de blocage. Le worker ne migre pas.
+5. Vérifiez : `https://<votre-api>/up` répond OK.
+6. Créez le **premier administrateur** : onglet *Shell* du service `ftth-api` (plan payant) :
+   `php artisan users:create-admin vous@exemple.ci "Votre Nom"` (le mot de passe est saisi de façon masquée).
+
+### 3. Vercel (front)
+1. *Add New → Project*, importez le dépôt, **Root Directory = `frontend`**.
+2. Variable `NEXT_PUBLIC_API_URL` = l'adresse de l'API Render **sans `/` final** (Production et Preview).
+3. Déployez et notez l'adresse `https://….vercel.app`.
+
+### 4. Relier le front à l'API
+Sur Render, remplacez `FRONTEND_URL` par l'adresse Vercel (sans `/` final) et laissez `ftth-api` redémarrer (sinon le navigateur bloque les appels : erreur CORS).
+
+### 5. Vérification finale
+Ouvrez l'adresse Vercel, connectez-vous avec le compte créé, ouvrez *Utilisateurs* et créez un deuxième compte. Aucune donnée de démonstration n'existe en production.
+
+### Dépannage rapide
+- **« Impossible de joindre le serveur »** à la connexion : `NEXT_PUBLIC_API_URL` incorrecte, ou `FRONTEND_URL` ne correspond pas exactement à l'adresse Vercel.
+- **L'API ne démarre pas** : journaux de `ftth-api` ; vérifiez `APP_KEY`, `DB_URL` et `DB_URL_DIRECT`.
+- **Première requête lente** : la base Neon gratuite se réveille après une période d'inactivité.
+
+---
+
 ## Architecture
 ```
 Navigateur / PWA ──► Vercel (Next.js) ──HTTPS──► Render : ftth-api (Laravel)
@@ -19,7 +56,7 @@ PWA ──envoi direct (signature fournie par l'API)──► Cloudinary
 ## 2. Render
 1. Pousser le dépôt (racine : `render.yaml`, dossier `backend/`), puis *New → Blueprint*.
 2. Renseigner les variables marquées `sync: false` : `APP_KEY` (`php artisan key:generate --show`), `APP_URL`, `DB_URL`, `DB_URL_DIRECT`, clés du stockage, `FRONTEND_URL`.
-3. Render n'a pas de PHP natif : l'image Docker fournie est utilisée. Le service web exécute les migrations au démarrage ; le worker non.
+3. Render n'a pas de PHP natif : l'image Docker fournie est utilisée. Le service web exécute les migrations au démarrage (avant la mise en cache de la configuration, pour utiliser `DB_URL_DIRECT`) ; le worker non.
 4. Éviter le plan gratuit pour l'API et le worker (mise en veille = synchro terrain lente, jobs d'import interrompus).
 5. **Photos** : voir §3 bis (Cloudinary). Render n'a pas de stockage d'objets et son disque est éphémère.
 
