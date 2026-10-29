@@ -81,4 +81,12 @@ class AuthTest extends TestCase
     {
         $this->getJson('/api/v1/plaques')->assertUnauthorized();
     }
+
+    public function test_unauthenticated_browser_request_gets_401_json_not_500(): void
+    {
+        // Un navigateur n'envoie pas « Accept: application/json » : l'ancien code cherchait une route « login » absente.
+        $this->get('/api/v1/auth/me')
+            ->assertStatus(401)
+            ->assertJsonPath('message', 'Unauthenticated.');
+    }
 }

@@ -16,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Derrière le proxy de Render : sinon les URL générées sont en http.
         $middleware->trustProxies(at: '*');
+        // API seule : pas de page de connexion côté serveur, un visiteur non connecté reçoit toujours un 401 JSON.
+        $middleware->redirectGuestsTo(fn () => null);
         $middleware->alias(['active' => EnsureUserIsActive::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
