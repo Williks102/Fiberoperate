@@ -14,6 +14,9 @@ class TeamResource extends JsonResource
             'name' => $this->name,
             'leader_id' => $this->leader_id,
             'coordinator_id' => $this->coordinator_id,
+            'leader' => $this->whenLoaded('leader', fn () => $this->leader?->only(['id', 'name'])),
+            'coordinator' => $this->whenLoaded('coordinator', fn () => $this->coordinator?->only(['id', 'name'])),
+            'members' => $this->whenLoaded('members', fn () => $this->members->map(fn ($m) => $m->only(['id', 'name']))->values()),
             'member_ids' => $this->whenLoaded('members', fn () => $this->members->pluck('id')),
         ];
     }

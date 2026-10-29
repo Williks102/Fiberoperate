@@ -8,10 +8,13 @@ use App\Models\Team;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TeamController extends ApiResourceController
 {
+    private const RELATIONS = ['leader:id,name', 'coordinator:id,name', 'members:id,name'];
+
     protected function modelClass(): string
     {
         return Team::class;
@@ -27,9 +30,14 @@ class TeamController extends ApiResourceController
         $query->orderBy('name');
     }
 
+    protected function filters(Request $request, Builder $query): void
+    {
+        $query->with(self::RELATIONS);
+    }
+
     protected function load(Model $model): Model
     {
-        return $model->load('members:id');
+        return $model->load(self::RELATIONS);
     }
 
     public function store(TeamRequest $request): JsonResponse
