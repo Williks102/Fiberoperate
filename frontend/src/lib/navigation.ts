@@ -13,7 +13,7 @@ export interface NavItem {
  */
 export const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Accueil" },
-  { href: "/plaques", label: "Plaques" },
+  { href: "/reseau", label: "Réseau" },
 ];
 
 export function navFor(role: Role): NavItem[] {
