@@ -57,4 +57,44 @@ class CreateAdminCommandTest extends TestCase
 
         $this->assertSame(1, User::count());
     }
+
+    public function test_from_env_creates_the_first_admin_once_and_never_overwrites(): void
+    {
+        putenv('ADMIN_EMAIL=demo@ftth.test');
+        putenv('ADMIN_NAME=Démo');
+        putenv('ADMIN_PASSWORD=motdepasse1');
+
+        try {
+            $this->artisan('users:create-admin', ['--from-env' => true])->assertSuccessful();
+            $admin = User::where('email', 'demo@ftth.test')->firstOrFail();
+            $this->assertSame(Role::Admin, $admin->role);
+            $hash = $admin->password;
+
+            // Redémarrage du conteneur : aucun doublon, mot de passe inchangé même si la variable change.
+            putenv('ADMIN_PASSWORD=autrechose2');
+            $this->artisan('users:create-admin', ['--from-env' => true])->assertSuccessful();
+            $this->assertSame(1, User::count());
+            $this->assertSame($hash, $admin->fresh()->password);
+        } finally {
+            putenv('ADMIN_EMAIL');
+            putenv('ADMIN_NAME');
+            putenv('ADMIN_PASSWORD');
+        }
+    }
+
+    public function test_from_env_fails_on_weak_password_without_creating_anything(): void
+    {
+        putenv('ADMIN_EMAIL=demo@ftth.test');
+        putenv('ADMIN_NAME=Démo');
+        putenv('ADMIN_PASSWORD=abc');
+
+        try {
+            $this->artisan('users:create-admin', ['--from-env' => true])->assertFailed();
+            $this->assertSame(0, User::count());
+        } finally {
+            putenv('ADMIN_EMAIL');
+            putenv('ADMIN_NAME');
+            putenv('ADMIN_PASSWORD');
+        }
+    }
 }
