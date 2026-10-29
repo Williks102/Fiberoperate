@@ -56,3 +56,14 @@ export interface Pco {
 }
 
 export type MissionType = "deployment" | "customer_connection" | "maintenance" | "study";
+
+export interface Team {
+  id: string;
+  name: string;
+  leader_id: string | null;
+  coordinator_id: string | null;
+  leader: { id: string; name: string } | null;
+  coordinator: { id: string; name: string } | null;
+  members: { id: string; name: string }[];
+  member_ids: string[];
+}
