@@ -1,0 +1,58 @@
+<?php
+
+return [
+    'array' => 'Le champ :attribute doit être une liste.',
+    'between' => [
+        'numeric' => 'Le champ :attribute doit être compris entre :min et :max.',
+        'string' => 'Le champ :attribute doit contenir entre :min et :max caractères.',
+    ],
+    'boolean' => 'Le champ :attribute doit être vrai ou faux.',
+    'distinct' => 'Le champ :attribute contient une valeur en double.',
+    'email' => 'Le champ :attribute doit être une adresse e-mail valide.',
+    'enum' => 'La valeur choisie pour :attribute n\'est pas valide.',
+    'exists' => 'La valeur choisie pour :attribute n\'existe pas.',
+    'integer' => 'Le champ :attribute doit être un nombre entier.',
+    'max' => [
+        'numeric' => 'Le champ :attribute ne doit pas dépasser :max.',
+        'string' => 'Le champ :attribute ne doit pas dépasser :max caractères.',
+    ],
+    'min' => [
+        'numeric' => 'Le champ :attribute doit être d\'au moins :min.',
+        'string' => 'Le champ :attribute doit contenir au moins :min caractères.',
+    ],
+    'numeric' => 'Le champ :attribute doit être un nombre.',
+    'password' => [
+        'letters' => 'Le champ :attribute doit contenir au moins une lettre.',
+        'numbers' => 'Le champ :attribute doit contenir au moins un chiffre.',
+        'mixed' => 'Le champ :attribute doit contenir une majuscule et une minuscule.',
+        'symbols' => 'Le champ :attribute doit contenir au moins un symbole.',
+        'uncompromised' => 'Ce :attribute apparaît dans une fuite de données. Choisissez-en un autre.',
+    ],
+    'required' => 'Le champ :attribute est obligatoire.',
+    'string' => 'Le champ :attribute doit être du texte.',
+    'unique' => 'La valeur saisie pour :attribute est déjà utilisée.',
+    'uuid' => 'Le champ :attribute n\'est pas un identifiant valide.',
+
+    'attributes' => [
+        'name' => 'nom',
+        'email' => 'adresse e-mail',
+        'password' => 'mot de passe',
+        'phone' => 'téléphone',
+        'role' => 'rôle',
+        'manager_id' => 'supérieur',
+        'is_active' => 'compte actif',
+        'skills' => 'missions',
+        'code' => 'code',
+        'status' => 'statut',
+        'plaque_id' => 'plaque',
+        'zone_id' => 'zone',
+        'jdv_id' => 'JDV',
+        'olt_id' => 'OLT',
+        'supervisor_id' => 'superviseur',
+        'leader_id' => 'chef d\'équipe',
+        'coordinator_id' => 'coordinateur',
+        'member_ids' => 'membres',
+        'latitude' => 'latitude',
+        'longitude' => 'longitude',
+    ],
+];

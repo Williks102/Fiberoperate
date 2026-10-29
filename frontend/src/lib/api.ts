@@ -5,6 +5,8 @@ export class ApiError extends Error {
     public status: number,
     message: string,
     public code?: string,
+    /** Erreurs de validation par champ (422). */
+    public errors: Record<string, string[]> = {},
   ) {
     super(message);
   }
@@ -51,7 +53,7 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}, token?: 
   const body = (await response.json().catch(() => null)) as (T & ErrorBody) | null;
 
   if (!response.ok) {
-    throw new ApiError(response.status, errorMessage(response.status, body), body?.code);
+    throw new ApiError(response.status, errorMessage(response.status, body), body?.code, body?.errors);
   }
 
   return body as T;

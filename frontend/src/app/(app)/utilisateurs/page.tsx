@@ -1,14 +1,18 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { AsyncList } from "@/components/async-list";
 import { Pager } from "@/components/pager";
+import { useAuth } from "@/lib/auth/auth-context";
 import { MISSION_LABELS, ROLE_LABELS } from "@/lib/labels";
 import type { Paged, Role, User } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
 import { useDebounced } from "@/lib/use-debounced";
 
 export default function UtilisateursPage() {
+  const { user: me } = useAuth();
+  const canManage = me?.role === "admin";
   const [search, setSearch] = useState("");
   const [role, setRole] = useState<"" | Role>("");
   const [page, setPage] = useState(1);
@@ -22,7 +26,14 @@ export default function UtilisateursPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold">Utilisateurs</h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-xl font-semibold">Utilisateurs</h1>
+        {canManage && (
+          <Link href="/utilisateurs/nouveau" className="flex h-11 items-center rounded-lg bg-slate-900 px-4 text-sm font-medium text-white">
+            Nouvel utilisateur
+          </Link>
+        )}
+      </div>
 
       <div className="flex flex-col gap-2 sm:flex-row">
         <div className="flex-1 space-y-1">
@@ -73,7 +84,15 @@ export default function UtilisateursPage() {
                   key={user.id}
                   className="grid gap-1 rounded-xl border border-zinc-200 bg-white p-4 md:grid-cols-[2fr_2fr_1.2fr_auto] md:items-center md:gap-4"
                 >
-                  <span className="font-medium">{user.name}</span>
+                  <span className="font-medium">
+                    {canManage ? (
+                      <Link href={`/utilisateurs/${user.id}`} className="underline-offset-2 hover:underline">
+                        {user.name}
+                      </Link>
+                    ) : (
+                      user.name
+                    )}
+                  </span>
                   <span className="break-all text-sm text-zinc-600">{user.email}</span>
                   <span className="text-sm">
                     {user.role_label}
