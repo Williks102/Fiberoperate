@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { BottomBar } from "@/components/bottom-bar";
 import { useAuth } from "@/lib/auth/auth-context";
-import { isActive, navFor } from "@/lib/navigation";
+import { groupsFor, HOME, isActive, isGroupActive } from "@/lib/navigation";
 
 /** Mise en page connectée : barre latérale sur PC et tablette, barre du bas sur téléphone. */
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -25,24 +25,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const items = navFor(user.role);
+  const groups = groupsFor(user.role);
+  const linkClass = (active: boolean) => `flex h-11 items-center rounded-lg px-3 text-sm font-medium ${active ? "bg-slate-900 text-white" : "text-zinc-700 hover:bg-zinc-100"}`;
 
   return (
     <div className="flex min-h-screen flex-1 flex-col md:flex-row">
-      <aside className="hidden w-20 shrink-0 flex-col border-r border-zinc-200 bg-white md:flex lg:w-56">
-        <div className="p-4 text-sm font-semibold lg:text-lg">FTTH Gestion</div>
-        <nav aria-label="Menu principal" className="flex flex-1 flex-col gap-1 p-2">
-          {items.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={isActive(pathname, item.href) ? "page" : undefined}
-              className={`flex h-11 items-center rounded-lg px-3 text-sm font-medium ${
-                isActive(pathname, item.href) ? "bg-slate-900 text-white" : "text-zinc-700 hover:bg-zinc-100"
-              }`}
-            >
-              {item.label}
-            </Link>
+      <aside className="hidden w-56 shrink-0 flex-col border-r border-zinc-200 bg-white md:flex">
+        <div className="p-4 text-lg font-semibold">FTTH Gestion</div>
+        <nav aria-label="Menu principal" className="flex flex-1 flex-col gap-4 overflow-y-auto p-2">
+          <Link href={HOME.href} aria-current={isActive(pathname, HOME.href) ? "page" : undefined} className={linkClass(isActive(pathname, HOME.href))}>
+            {HOME.label}
+          </Link>
+          {groups.map((group) => (
+            <div key={group.href} className="space-y-1">
+              <Link href={group.href} className={`block px-3 text-xs font-semibold uppercase tracking-wide ${isGroupActive(pathname, group) ? "text-slate-900" : "text-zinc-700"}`}>
+                {group.label}
+              </Link>
+              {group.items.map((item) => (
+                <Link key={item.href} href={item.href} aria-current={isActive(pathname, item.href) ? "page" : undefined} className={linkClass(isActive(pathname, item.href))}>
+                  {item.label}
+                </Link>
+              ))}
+            </div>
           ))}
         </nav>
       </aside>
