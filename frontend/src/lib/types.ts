@@ -123,7 +123,16 @@ export interface ProjectHistoryLine {
 export interface ProjectNetwork {
   olt: { id: string; name: string } | null;
   supervisor: { id: string; name: string } | null;
-  zones: { id: string; code: string; status: ZoneStatus; sro: string | null; splitters: number; pcos: number }[];
+  zones: {
+    id: string;
+    code: string;
+    status: ZoneStatus;
+    sro: string | null;
+    splitters: number;
+    pcos: number;
+    /** Avancement des PCO du plan : par statut, et positions relevées sur le terrain. */
+    progress: { to_pull: number; pulled: number; spliced: number; activated: number; measured: number };
+  }[];
 }
 
 export interface Project {

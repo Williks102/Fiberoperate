@@ -2,12 +2,13 @@
 
 namespace Tests\Feature\Api;
 
+use App\Enums\PcoStatus;
 use App\Enums\ProjectPhase;
 use App\Enums\Role;
+use App\Models\Pco;
 use App\Models\Plaque;
 use App\Models\Project;
 use App\Models\User;
-use App\Models\Zone;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -167,8 +168,31 @@ class ProjectsApiTest extends TestCase
         $this->getJson('/api/v1/projects/'.Project::firstOrFail()->id)
             ->assertOk()
             ->assertJsonPath('data.network.olt.name', 'OLT-1')
-            ->assertJsonPath('data.network.zones.0', ['id' => Zone::where('code', 'ABB01')->value('id'), 'code' => 'ABB01', 'status' => 'planned', 'sro' => 'ABB456', 'splitters' => 2, 'pcos' => 16])
+            ->assertJsonPath('data.network.zones.0.sro', 'ABB456')
+            ->assertJsonPath('data.network.zones.0.splitters', 2)
+            ->assertJsonPath('data.network.zones.0.pcos', 16)
+            ->assertJsonPath('data.network.zones.0.progress', ['to_pull' => 16, 'pulled' => 0, 'spliced' => 0, 'activated' => 0, 'measured' => 0])
             ->assertJsonPath('data.network.zones.1.splitters', 0)
             ->assertJsonPath('data.network.zones.1.sro', null);
+    }
+
+    public function test_the_sheet_compares_the_plan_with_the_progress_per_zone(): void
+    {
+        $this->login(Role::BeManager);
+        $this->postJson('/api/v1/projects', [
+            'plaque_name' => 'ABOBO',
+            'zones' => [['code' => 'ABB01', 'pco_count' => 4, 'sro_code' => 'ABB456']],
+        ])->assertCreated();
+
+        $pcos = Pco::orderBy('code')->get();
+        $pcos[0]->changeStatus(PcoStatus::Pulled);
+        $pcos[1]->changeStatus(PcoStatus::Spliced);
+        $pcos[2]->changeStatus(PcoStatus::Activated);
+        $pcos[2]->forceFill(['measured_at' => now(), 'measured_latitude' => 5.36, 'measured_longitude' => -4.0])->save();
+
+        $this->getJson('/api/v1/projects/'.Project::firstOrFail()->id)
+            ->assertOk()
+            ->assertJsonPath('data.network.zones.0.pcos', 4)
+            ->assertJsonPath('data.network.zones.0.progress', ['to_pull' => 1, 'pulled' => 1, 'spliced' => 1, 'activated' => 1, 'measured' => 1]);
     }
 }

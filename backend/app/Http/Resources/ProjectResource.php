@@ -24,6 +24,14 @@ class ProjectResource extends JsonResource
                     'sro' => $zone->sro?->code,
                     'splitters' => $zone->jdvs_count,
                     'pcos' => $zone->pcos_count,
+                    // Prévu (le plan) et réel (l'avancement) : PCO par statut et PCO dont la position a été relevée.
+                    'progress' => [
+                        'to_pull' => $zone->pcos_to_pull_count,
+                        'pulled' => $zone->pcos_pulled_count,
+                        'spliced' => $zone->pcos_spliced_count,
+                        'activated' => $zone->pcos_activated_count,
+                        'measured' => $zone->pcos_measured_count,
+                    ],
                 ])->values(),
             ] : null),
             'phase' => $this->phase->value,
