@@ -57,6 +57,10 @@ export interface Pco {
   status: PcoStatus | null;
   status_raw: string | null;
   is_blocked: boolean;
+  latitude?: string | null;
+  longitude?: string | null;
+  jdv?: { id: string; code: string } | null;
+  zone?: { id: string; code: string; plaque: { id: string; name: string } | null } | null;
 }
 
 export type MissionType = "deployment" | "customer_connection" | "maintenance" | "study" | "drawing" | "survey";

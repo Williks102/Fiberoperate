@@ -12,7 +12,7 @@ describe("menu par activité", () => {
 
   it("range les écrans du réseau dans Déploiement et les comptes dans Administration", () => {
     const names = (label: string) => NAV_GROUPS.find((g) => g.label === label)!.items.map((i) => i.href);
-    expect(names("Déploiement")).toEqual(expect.arrayContaining(["/reseau", "/plaques", "/sous-plaques", "/splitters", "/olt", "/importer"]));
+    expect(names("Déploiement")).toEqual(expect.arrayContaining(["/reseau", "/plaques", "/sous-plaques", "/splitters", "/pco", "/olt", "/importer"]));
     expect(names("Administration")).toEqual(expect.arrayContaining(["/equipes", "/utilisateurs"]));
   });
 
