@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Domain\Network\GenerateZoneNetwork;
+use App\Http\Requests\GenerateZoneNetworkRequest;
 use App\Http\Requests\ZoneRequest;
 use App\Http\Resources\ZoneResource;
 use App\Models\Zone;
@@ -54,5 +56,19 @@ class ZoneController extends ApiResourceController
         $model->update($request->validated());
 
         return new ZoneResource($this->load($model));
+    }
+
+    /** Génère la SRO, les splitters et les PCO standard d'une sous-plaque (nombre de PCO libre). */
+    public function generate(GenerateZoneNetworkRequest $request, string $zone, GenerateZoneNetwork $generator): JsonResponse
+    {
+        $result = $generator->run(
+            Zone::query()->findOrFail($zone),
+            $request->integer('pco_count'),
+            $request->input('sro_code'),
+            $request->integer('splitter_size', GenerateZoneNetwork::DEFAULT_SPLITTER_SIZE),
+            $request->user(),
+        );
+
+        return response()->json(['data' => $result], 201);
     }
 }

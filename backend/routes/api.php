@@ -25,6 +25,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('teams', TeamController::class);
         Route::apiResource('olts', OltController::class);
         Route::apiResource('plaques', PlaqueController::class);
+        Route::post('zones/{zone}/generate', [ZoneController::class, 'generate']);
         Route::apiResource('zones', ZoneController::class);
         Route::apiResource('sros', SroController::class);
         Route::apiResource('jdvs', JdvController::class);
