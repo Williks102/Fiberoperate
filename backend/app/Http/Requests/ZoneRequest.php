@@ -22,7 +22,10 @@ class ZoneRequest extends ManagesResource
     public function rules(): array
     {
         return [
-            'plaque_id' => [$this->req(), 'uuid', Rule::exists('plaques', 'id')->whereNull('deleted_at')],
+            // Une sous-plaque ne change pas de plaque.
+            'plaque_id' => $this->ignoreId() === null
+                ? ['required', 'uuid', Rule::exists('plaques', 'id')->whereNull('deleted_at')]
+                : ['missing'],
             'code' => [$this->req(), 'string', 'max:40'],
             'name' => ['nullable', 'string', 'max:120'],
             'vendor' => ['nullable', Rule::enum(Vendor::class)],

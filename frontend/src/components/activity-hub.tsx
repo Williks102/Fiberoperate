@@ -7,7 +7,7 @@ import { groupsFor } from "@/lib/navigation";
 /** Page d'accueil d'une activité : la liste de ses écrans, en grandes cartes (pratique au doigt). */
 export function ActivityHub({ href }: { href: string }) {
   const { user } = useAuth();
-  const group = user ? groupsFor(user.role).find((g) => g.href === href) : undefined;
+  const group = user ? groupsFor(user.role, user.skills).find((g) => g.href === href) : undefined;
 
   if (!group) {
     return <p className="rounded-xl border border-dashed border-zinc-300 p-6 text-center text-zinc-700">Aucun écran de cette activité n&apos;est disponible pour votre rôle.</p>;

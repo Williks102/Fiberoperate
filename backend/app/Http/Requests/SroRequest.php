@@ -29,7 +29,7 @@ class SroRequest extends ManagesResource
             // Une SRO par sous-plaque, et elle n'en change pas.
             'zone_id' => $id === null
                 ? ['required', 'uuid', Rule::exists('zones', 'id')->whereNull('deleted_at'), Rule::unique('sros', 'zone_id')->whereNull('deleted_at')]
-                : ['prohibited'],
+                : ['missing'],
             'code' => [$this->req(), 'string', 'max:40', new UniqueSroCode($id)],
             'latitude' => ['nullable', 'required_with:longitude', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'required_with:latitude', 'numeric', 'between:-180,180'],

@@ -27,6 +27,7 @@ Application de gestion pour une entreprise sous-traitante qui installe la fibre 
 `admin`, `dg`, `dt`, `supervisor`, `coordinator`, `technician`, et `be_manager` (chef du BE, créé le 30/10/2026 : lecture du réseau et des OLT ; ses écrans viendront avec le lot 1B).
 Habilitations technicien : `deployment`, `customer_connection`, `maintenance`, `study`, et `drawing` (dessin, AVP) et `survey` (relevés), créées le 30/10/2026.
 Hiérarchie : technicien déploiement → superviseur → DT ; technicien raccordement ou maintenance → coordinateur → DT ; technicien du BE → chef du BE → DT (le coordinateur reçoit les résultats d'étude, sans être leur supérieur).
+**Écriture du réseau** (plaque, sous-plaques, SRO, splitters, PCO, génération) : le BE (chef du BE et techniciens du BE, habilitation `drawing`) et l'administrateur, **sans limite de phase du projet** (décision du 30/10). Une plaque est une zone géographique ; une sous-plaque ne change jamais de plaque. L'OLT d'une plaque est celui que le client envoie (saisi par le BE ou l'administrateur) ; **seul le DT désigne le superviseur** du déploiement (`PlaqueRequest`). Les techniciens `drawing` voient toutes les plaques. Suppression d'une plaque et gestion des OLT : administrateur.
 Toute requête est filtrée par rôle **et** périmètre (plaque pour le superviseur, équipes pour le coordinateur). Policies Laravel obligatoires, jamais de contrôle uniquement côté front.
 
 ## Flux métier

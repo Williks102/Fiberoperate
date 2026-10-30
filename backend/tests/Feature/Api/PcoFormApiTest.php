@@ -127,7 +127,7 @@ class PcoFormApiTest extends TestCase
     {
         $jdv = $this->jdv();
 
-        foreach ([Role::Dg, Role::Dt, Role::Supervisor, Role::Coordinator, Role::Technician, Role::BeManager] as $role) {
+        foreach ([Role::Dg, Role::Dt, Role::Supervisor, Role::Coordinator, Role::Technician] as $role) {
             $this->login($role);
             $this->postJson('/api/v1/pcos', ['jdv_id' => $jdv->id, 'code' => 'FAY03_PCO001'])->assertForbidden();
         }

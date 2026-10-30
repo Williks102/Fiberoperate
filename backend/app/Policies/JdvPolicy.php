@@ -2,4 +2,4 @@
 
 namespace App\Policies;
 
-class JdvPolicy extends NetworkPolicy {}
+class JdvPolicy extends NetworkEditPolicy {}

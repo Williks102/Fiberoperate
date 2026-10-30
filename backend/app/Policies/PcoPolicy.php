@@ -2,4 +2,4 @@
 
 namespace App\Policies;
 
-class PcoPolicy extends NetworkPolicy {}
+class PcoPolicy extends NetworkEditPolicy {}

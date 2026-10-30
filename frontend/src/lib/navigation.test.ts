@@ -16,6 +16,16 @@ describe("menu par activité", () => {
     expect(names("Administration")).toEqual(expect.arrayContaining(["/equipes", "/utilisateurs"]));
   });
 
+  it("montre les écrans de dessin au chef du BE et aux techniciens habilités « dessin » seulement", () => {
+    const hrefs = (role: Role, skills: Parameters<typeof groupsFor>[1] = []) => groupsFor(role, skills).find((g) => g.label === "Déploiement")!.items.map((i) => i.href);
+    const drawing = ["/plaques", "/sous-plaques", "/sro", "/splitters", "/pco"];
+
+    expect(hrefs("technician", ["drawing"])).toEqual(drawing);
+    expect(hrefs("technician", ["survey"])).toEqual(["/plaques"]);
+    expect(hrefs("technician")).toEqual(["/plaques"]);
+    expect(hrefs("be_manager")).toEqual([...drawing, "/olt"]);
+  });
+
   it("limite chaque rôle aux activités et écrans auxquels il a droit", () => {
     expect(labels("admin")).toEqual(["Projet", "Déploiement", "Administration"]);
     expect(labels("supervisor")).toEqual(["Projet", "Déploiement"]);
@@ -24,7 +34,7 @@ describe("menu par activité", () => {
     expect(groupsFor("supervisor")[1].items.map((i) => i.href)).toEqual(["/plaques", "/olt"]);
     expect(groupsFor("technician")[0].items.map((i) => i.href)).toEqual(["/plaques"]);
     expect(labels("be_manager")).toEqual(["Projet", "Déploiement"]);
-    expect(groupsFor("be_manager")[1].items.map((i) => i.href)).toEqual(["/plaques", "/olt"]);
+    expect(groupsFor("be_manager")[1].items.map((i) => i.href)).toEqual(["/plaques", "/sous-plaques", "/sro", "/splitters", "/pco", "/olt"]);
     expect(groupsFor("coordinator").find((g) => g.label === "Administration")!.items.map((i) => i.href)).toEqual(["/equipes"]);
   });
 

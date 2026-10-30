@@ -2,4 +2,4 @@
 
 namespace App\Policies;
 
-class ZonePolicy extends NetworkPolicy {}
+class ZonePolicy extends NetworkEditPolicy {}

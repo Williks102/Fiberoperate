@@ -2,4 +2,4 @@
 
 namespace App\Policies;
 
-class SroPolicy extends NetworkPolicy {}
+class SroPolicy extends NetworkEditPolicy {}

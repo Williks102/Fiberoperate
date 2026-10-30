@@ -117,6 +117,8 @@ function Zones({ plaqueId }: { plaqueId: string }) {
 /** Plaque → sous-plaques (zones) → splitters (JDV) → PCO, en lecture, dans le périmètre du rôle. */
 export function NetworkTree() {
   const { user } = useAuth();
+  // Administrateur, DT (superviseur), chef du BE et techniciens du BE ouvrent la fiche de modification.
+  const canEditPlaque = user?.role === "admin" || user?.role === "dt" || user?.role === "be_manager" || (user?.role === "technician" && user.skills?.includes("drawing") === true);
   const { reload, ...state } = useApi<Paged<Plaque>>(`/plaques?per_page=${PER_PAGE}`);
 
   return (
@@ -129,7 +131,7 @@ export function NetworkTree() {
                 <span>
                   OLT : {plaque.olt?.name ?? "non renseigné"} · Superviseur : {plaque.supervisor?.name ?? "non désigné"}
                 </span>
-                {user?.role === "admin" && (
+                {canEditPlaque && (
                   <Link href={`/plaques/${plaque.id}`} className="inline-flex h-11 items-center rounded-lg border border-zinc-300 px-4 font-medium text-zinc-900">
                     Modifier la plaque
                   </Link>
