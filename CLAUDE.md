@@ -59,7 +59,8 @@ Toute requête est filtrée par rôle **et** périmètre (plaque pour le supervi
 
 ## Import du suivi de déploiement
 - Une feuille = une plaque ; ignorer et signaler les feuilles vides.
-- Colonnes : OLT, plaque, sous-plaque (code de plaque), splitter, PCO, latitude/longitude, slot, port, brin de fibre, statut, commentaire. Slot, port et brin sont souvent vides : ne pas les exiger.
+- **Import sous un projet** (v1.9, plus d'import global) : un fichier = **une plaque, celle du projet** (colonne plaque facultative, une autre plaque = ligne refusée) ; colonne SRO (numéro donné par l'opérateur) qui crée la SRO de la sous-plaque si elle n'en a pas.
+- Colonnes : OLT, plaque, sous-plaque (code de plaque), SRO, splitter, PCO, latitude/longitude, slot, port, brin de fibre, statut, commentaire. Slot, port et brin sont souvent vides : ne pas les exiger.
 - Normaliser les codes avant comparaison (`ACA03_PCO-001` / `ACA003` / `FAY03_PCO001` : tiret et zéros variables) ; signaler les doublons sans fusion automatique.
 - Statuts en texte libre avec variantes d'écriture : table de correspondance (cahier §3.6), libellé d'origine toujours conservé, libellé inconnu proposé à la correspondance, jamais ignoré.
 - Export dans le même format de feuilles.

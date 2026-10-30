@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { NetworkImportPanel } from "@/components/network-import-panel";
+import { useAuth } from "@/lib/auth/auth-context";
 import { formatDateTime } from "@/lib/format";
 import { DECISION_LABELS, phaseProgress, ZONE_STATUS_LABELS } from "@/lib/labels";
 import type { Project } from "@/lib/types";
@@ -28,12 +30,14 @@ export default function ProjetPage() {
         </div>
       )}
 
-      {result.status === "ok" && <ProjectDetail project={result.data.data} />}
+      {result.status === "ok" && <ProjectDetail project={result.data.data} reload={result.reload} />}
     </div>
   );
 }
 
-function ProjectDetail({ project }: { project: Project }) {
+function ProjectDetail({ project, reload }: { project: Project; reload: () => void }) {
+  const { user } = useAuth();
+  const canImport = user?.role === "admin" || user?.role === "be_manager";
   const steps = phaseProgress(project.phase);
   const history = [...(project.history ?? [])].reverse();
 
@@ -47,6 +51,7 @@ function ProjectDetail({ project }: { project: Project }) {
       </header>
 
       <Characteristics project={project} />
+      {canImport && <NetworkImportPanel projectId={project.id} onImported={reload} />}
 
       <section aria-labelledby="phases" className="space-y-2">
         <h2 id="phases" className="text-lg font-semibold">
