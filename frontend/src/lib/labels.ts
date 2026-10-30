@@ -40,6 +40,17 @@ export const PROJECT_PHASES: { value: ProjectPhase; label: string }[] = [
   { value: "in_operation", label: "Exploitation" },
 ];
 
+export type PhaseStep = { value: ProjectPhase; label: string; state: "done" | "current" | "todo" };
+
+/** La frise des phases : celles déjà passées, la phase courante, celles à venir. */
+export function phaseProgress(current: ProjectPhase): PhaseStep[] {
+  const index = PROJECT_PHASES.findIndex((p) => p.value === current);
+
+  return PROJECT_PHASES.map((p, i) => ({ ...p, state: i < index ? "done" : i === index ? "current" : "todo" }));
+}
+
+export const DECISION_LABELS = { approved: "Validé", rejected: "Refusé" } as const;
+
 export const ROLE_LABELS: Record<Role, string> = {
   admin: "Administrateur",
   dg: "Directeur général",

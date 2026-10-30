@@ -82,6 +82,18 @@ export type ProjectPhase =
   | "as_built_survey"
   | "in_operation";
 
+export interface ProjectHistoryLine {
+  id: string;
+  from_phase: ProjectPhase | null;
+  from_phase_label: string | null;
+  to_phase: ProjectPhase;
+  to_phase_label: string;
+  decision: "approved" | "rejected" | null;
+  reason: string | null;
+  author: { id: string; name: string } | null;
+  created_at: string | null;
+}
+
 export interface Project {
   id: string;
   plaque_id: string;
@@ -89,6 +101,8 @@ export interface Project {
   phase: ProjectPhase;
   phase_label: string;
   phase_changed_at: string | null;
+  /** Présent sur la fiche d'un projet seulement. */
+  history?: ProjectHistoryLine[];
 }
 
 export interface Olt {

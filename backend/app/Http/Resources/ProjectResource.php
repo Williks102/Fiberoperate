@@ -16,6 +16,17 @@ class ProjectResource extends JsonResource
             'phase' => $this->phase->value,
             'phase_label' => $this->phase->label(),
             'phase_changed_at' => $this->phase_changed_at?->toIso8601String(),
+            'history' => $this->whenLoaded('history', fn () => $this->history->map(fn ($line) => [
+                'id' => $line->id,
+                'from_phase' => $line->from_phase?->value,
+                'from_phase_label' => $line->from_phase?->label(),
+                'to_phase' => $line->to_phase->value,
+                'to_phase_label' => $line->to_phase->label(),
+                'decision' => $line->decision,
+                'reason' => $line->reason,
+                'author' => $line->author?->only(['id', 'name']),
+                'created_at' => $line->created_at?->toIso8601String(),
+            ])->values()),
         ];
     }
 }

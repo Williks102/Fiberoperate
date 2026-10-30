@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MISSION_LABELS, pcoStatusLabel, ROLE_LABELS, VENDOR_LABELS, ZONE_STATUS_LABELS } from "./labels";
+import { MISSION_LABELS, pcoStatusLabel, phaseProgress, PROJECT_PHASES, ROLE_LABELS, VENDOR_LABELS, ZONE_STATUS_LABELS } from "./labels";
 
 describe("pcoStatusLabel", () => {
   it("traduit un statut normalisé", () => {
@@ -31,5 +31,20 @@ describe("libellés des sous-plaques", () => {
 
   it("couvrent les quatre statuts d'une sous-plaque", () => {
     expect(Object.keys(ZONE_STATUS_LABELS).sort()).toEqual(["closed", "deploying", "in_operation", "planned"]);
+  });
+});
+
+describe("phaseProgress", () => {
+  it("marque les phases passées, la courante et celles à venir", () => {
+    const steps = phaseProgress("client_review");
+    expect(steps.map((s) => s.state)).toEqual(["done", "done", "done", "current", "todo", "todo", "todo", "todo"]);
+  });
+
+  it("garde l'ordre du parcours et les huit phases", () => {
+    expect(PROJECT_PHASES).toHaveLength(8);
+    expect(PROJECT_PHASES[0].value).toBe("pre_project");
+    expect(PROJECT_PHASES[7].value).toBe("in_operation");
+    expect(phaseProgress("pre_project").filter((s) => s.state === "current")).toHaveLength(1);
+    expect(phaseProgress("in_operation").every((s) => s.state !== "todo")).toBe(true);
   });
 });
