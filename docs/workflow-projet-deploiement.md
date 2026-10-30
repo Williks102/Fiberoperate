@@ -52,12 +52,12 @@ Après la pose des splitters puis des PCO, le déploiement se termine par la **m
 `implantation_survey` (survey d'implantation), `as_built_survey` (relevé final), `metal_pole_installation` (pose de poteaux métalliques demandée après l'étude avant raccordement).
 
 ### Menu
-Activités : **Avant-projet** (BE), **Déploiement**, **Études** (avant raccordement), **Raccordement**, **Suivi Rac**, **Administration**.
+Activités : **Projet** (le BE y prépare l'avant-projet ; l'avant-projet est une **phase** du projet), **Déploiement**, **Études** (avant raccordement), **Raccordement**, **Suivi Rac**, **Administration**.
 
 ## 3. Ordre de réalisation
 Décision du client : **l'avant-projet passe avant l'import des clients**, qui ne se fait que lorsque la structure de l'activité est maîtrisée.
 
-Nouveau **lot 1B — Avant-projet et bureau d'études**, en petites tranches visibles :
+Nouveau **lot 1B — Projet de déploiement et bureau d'études**, en petites tranches visibles :
 1. Rôle chef du BE et habilitations `drawing` et `survey` (formulaire utilisateur).
 2. Projet par plaque : liste, fiche, phase courante et historique.
 3. Documents versionnés (après le choix du stockage).

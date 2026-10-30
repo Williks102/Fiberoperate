@@ -79,7 +79,7 @@ Toute requête est filtrée par rôle **et** périmètre (plaque pour le supervi
 
 ## Ordre de développement
 1. Auth, rôles, habilitations, équipes, référentiels (OLT, plaques, zones/sous-plaques, JDV, PCO).
-1B. **Avant-projet et bureau d'études** (décision du 30/10/2026 : avant l'import des clients, qui se fait quand la structure de l'activité est maîtrisée). Le formulaire PCO s'y rattache.
+1B. **Projet de déploiement et bureau d'études** (décision du 30/10/2026 : avant l'import des clients, qui se fait quand la structure de l'activité est maîtrisée). Le formulaire PCO s'y rattache.
 2. Import de la liste des clients et commandes.
 3. Études et planning.
 4. PWA technicien hors-ligne (études, installation, photos, signature).
@@ -96,7 +96,7 @@ Toute requête est filtrée par rôle **et** périmètre (plaque pour le supervi
 
 ## Navigation par activité (décision du 30/10/2026)
 Le menu est regroupé par activité du métier, pas par table (`frontend/src/lib/navigation.ts`, `NAV_GROUPS`). Ce regroupement est une décision de présentation : il ne change le contenu d'aucun lot.
-- **Avant-projet** (lot 1B) : projets par plaque, documents versionnés, AVP et devis, circuit de validation (BE, chef du BE, DT).
+- **Projet** (lot 1B) : projets par plaque et leurs phases (l'avant-projet n'en est qu'une), documents versionnés, AVP et devis, circuit de validation (BE, chef du BE, DT).
 - **Déploiement** : Réseau, Plaques, Sous-plaques, Splitters, PCO, OLT, import du réseau (superviseur, DT, DG, administrateur).
 - **Études** (lot 3) : clients à étudier, formulaire d'étude, résultats (coordinateur, techniciens habilités « étude »).
 - **Raccordement** (lots 2 et 3) : clients et commandes, programmation et résultat de l'installation, attribution de la box (SN ONT et numéro fixe) (coordinateur, techniciens habilités « raccordement client »).

@@ -26,8 +26,8 @@ export const HOME: NavItem = { href: "/", label: "Accueil" };
  */
 export const NAV_GROUPS: NavGroup[] = [
   {
-    href: "/avant-projet",
-    label: "Avant-projet",
+    href: "/projet",
+    label: "Projet",
     description: "Les projets de déploiement, de l'avant-projet à l'exploitation.",
     items: [
       { href: "/projets", label: "Projets", description: "Un projet par plaque et sa phase.", roles: ["admin", "dg", "dt", "be_manager", "supervisor"] },
