@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { AsyncList } from "@/components/async-list";
 import { inputClass } from "@/components/field";
@@ -31,7 +32,12 @@ export default function PcoPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold">PCO</h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-xl font-semibold">PCO</h1>
+        <Link href="/pco/nouveau" className="flex h-11 items-center rounded-lg bg-slate-900 px-4 text-sm font-medium text-white">
+          Nouveau PCO
+        </Link>
+      </div>
 
       <div className="grid gap-2 sm:grid-cols-3">
         <div className="space-y-1">
@@ -76,14 +82,18 @@ export default function PcoPage() {
         </div>
       </div>
 
-      <AsyncList state={state} reload={reload} empty={q || plaqueId || status ? "Aucun PCO ne correspond à votre recherche." : "Aucun PCO. Ils sont créés à l'import du réseau."}>
+      <AsyncList state={state} reload={reload} empty={q || plaqueId || status ? "Aucun PCO ne correspond à votre recherche." : "Aucun PCO. Ils sont créés à l'import du réseau, ou ici."}>
         {(pcos) => (
           <>
             <ul className="space-y-2">
               {pcos.map((pco) => (
                 <li key={pco.id} className="space-y-1 rounded-xl border border-zinc-200 bg-white p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="font-medium">{pco.code}</p>
+                    <p className="font-medium">
+                      <Link href={`/pco/${pco.id}`} className="underline-offset-2 hover:underline">
+                        {pco.code}
+                      </Link>
+                    </p>
                     <span className="flex items-center gap-2">
                       {pco.is_blocked && <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-900">Bloqué</span>}
                       <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-900">{pcoStatusLabel(pco)}</span>

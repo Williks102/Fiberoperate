@@ -59,6 +59,10 @@ export interface Pco {
   is_blocked: boolean;
   latitude?: string | null;
   longitude?: string | null;
+  olt_slot?: string | null;
+  olt_port?: string | null;
+  fiber_strand?: string | null;
+  comment?: string | null;
   jdv?: { id: string; code: string } | null;
   zone?: { id: string; code: string; plaque: { id: string; name: string } | null } | null;
 }
