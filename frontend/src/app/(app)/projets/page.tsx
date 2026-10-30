@@ -87,7 +87,11 @@ export default function ProjetsPage() {
               {projects.map((project) => (
                 <li key={project.id} className="space-y-1 rounded-xl border border-zinc-200 bg-white p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="font-medium">Plaque {project.plaque?.name ?? "—"}</p>
+                    <p className="font-medium">
+                      <Link href={`/projets/${project.id}`} className="underline-offset-2 hover:underline">
+                        Plaque {project.plaque?.name ?? "—"}
+                      </Link>
+                    </p>
                     <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-900">{project.phase_label}</span>
                   </div>
                   <p className="text-sm text-zinc-700">Phase depuis le {formatDateTime(project.phase_changed_at)}</p>

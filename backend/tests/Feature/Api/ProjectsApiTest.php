@@ -112,4 +112,46 @@ class ProjectsApiTest extends TestCase
         $this->assertSame(2, $this->getJson('/api/v1/projects?per_page=1')->json('meta.total'));
         $this->assertCount(2, $this->getJson('/api/v1/projects?phase=inconnue')->json('data'));
     }
+
+    public function test_the_detail_returns_the_history_with_authors_and_labels(): void
+    {
+        $author = $this->login(Role::BeManager, 'chef@x.test');
+        $project = Project::startFor(Plaque::create(['name' => 'FAYA']), $author);
+        $project->history()->create([
+            'from_phase' => ProjectPhase::PreProject,
+            'to_phase' => ProjectPhase::BeManagerReview,
+            'decision' => 'approved',
+            'reason' => 'Dossier complet',
+            'changed_by' => $author->id,
+        ]);
+
+        $response = $this->getJson("/api/v1/projects/{$project->id}")->assertOk();
+
+        $response->assertJsonPath('data.plaque.name', 'FAYA')->assertJsonCount(2, 'data.history');
+        $first = $response->json('data.history.0');
+        $this->assertNull($first['from_phase']);
+        $this->assertSame('Avant-projet', $first['to_phase_label']);
+        $this->assertSame($author->name, $first['author']['name']);
+        $second = $response->json('data.history.1');
+        $this->assertSame('Validation du chef du BE', $second['to_phase_label']);
+        $this->assertSame('approved', $second['decision']);
+        $this->assertSame('Dossier complet', $second['reason']);
+    }
+
+    public function test_the_detail_respects_the_plaque_perimeter(): void
+    {
+        $owner = User::create(['name' => 'SA', 'email' => 'sa@x.test', 'password' => 'secret123', 'role' => Role::Supervisor]);
+        $other = User::create(['name' => 'SB', 'email' => 'sb@x.test', 'password' => 'secret123', 'role' => Role::Supervisor]);
+        $project = Project::startFor(Plaque::create(['name' => 'FAYA', 'supervisor_id' => $owner->id]), $owner);
+
+        Sanctum::actingAs($owner);
+        $this->getJson("/api/v1/projects/{$project->id}")->assertOk();
+
+        Sanctum::actingAs($other);
+        $this->getJson("/api/v1/projects/{$project->id}")->assertForbidden();
+
+        $this->login(Role::Coordinator);
+        $this->getJson("/api/v1/projects/{$project->id}")->assertForbidden();
+        $this->getJson('/api/v1/projects/019a0000-0000-7000-8000-000000000000')->assertNotFound();
+    }
 }

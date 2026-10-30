@@ -27,7 +27,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('zones', ZoneController::class);
         Route::apiResource('jdvs', JdvController::class);
         Route::apiResource('pcos', PcoController::class);
-        Route::apiResource('projects', ProjectController::class)->only(['index', 'store']);
+        Route::apiResource('projects', ProjectController::class)->only(['index', 'show', 'store']);
         Route::post('imports/network/preview', [NetworkImportController::class, 'preview']);
         Route::post('imports/network', [NetworkImportController::class, 'store']);
         Route::get('block-reasons', [BlockReasonController::class, 'index']);
