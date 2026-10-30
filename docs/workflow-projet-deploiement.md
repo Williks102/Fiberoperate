@@ -45,6 +45,9 @@ Ensuite, quand le **client envoie la liste des personnes à raccorder** : les te
 - Chaque PCO a des **coordonnées prévues** (survey d'implantation) et des **coordonnées mesurées** (relevé final), avec la date et l'auteur du relevé.
 - Un tableau compare le **prévu** (dimensionnement) et le **réel** (ce qui existe) par sous-plaque.
 
+### Mise sous tension (précisé le 30/10/2026)
+Après la pose des splitters puis des PCO, le déploiement se termine par la **mise sous tension à l'OLT**, faite par les **techniciens** et qui concerne la **sous-plaque entière**. Elle est marquée « OK » avec la **prise des puissances**. *À confirmer : les puissances relevées doivent-elles être enregistrées dans l'application (valeurs, date, auteur) ? Et à quel niveau (sous-plaque, splitter, PCO) ?*
+
 ### Types de travail nouveaux
 `implantation_survey` (survey d'implantation), `as_built_survey` (relevé final), `metal_pole_installation` (pose de poteaux métalliques demandée après l'étude avant raccordement).
 
