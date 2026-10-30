@@ -35,11 +35,13 @@ export function errorMessage(status: number, body: ErrorBody | null): string {
 export async function apiFetch<T>(path: string, init: RequestInit = {}, token?: string | null): Promise<T> {
   let response: Response;
   try {
+    // Un envoi de fichier (FormData) fixe lui-même son Content-Type, avec la frontière du multipart.
+    const isForm = typeof FormData !== "undefined" && init.body instanceof FormData;
     response = await fetch(`${API_URL}/api/v1${path}`, {
       ...init,
       headers: {
         Accept: "application/json",
-        "Content-Type": "application/json",
+        ...(isForm ? {} : { "Content-Type": "application/json" }),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...init.headers,
       },

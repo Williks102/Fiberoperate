@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { errorMessage } from "./api";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { apiFetch, errorMessage } from "./api";
 
 describe("errorMessage", () => {
   it("préfère le premier message de validation", () => {
@@ -20,5 +20,29 @@ describe("errorMessage", () => {
 
   it("reste compréhensible sur une erreur serveur", () => {
     expect(errorMessage(500, null)).toContain("serveur");
+  });
+});
+
+describe("apiFetch", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("laisse le navigateur fixer le Content-Type d'un envoi de fichier", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await apiFetch("/imports/network", { method: "POST", body: new FormData() }, "jeton");
+
+    const headers = fetchMock.mock.calls[0][1].headers as Record<string, string>;
+    expect(headers["Content-Type"]).toBeUndefined();
+    expect(headers.Authorization).toBe("Bearer jeton");
+  });
+
+  it("envoie du JSON par défaut", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response("{}", { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await apiFetch("/users", { method: "POST", body: "{}" });
+
+    expect((fetchMock.mock.calls[0][1].headers as Record<string, string>)["Content-Type"]).toBe("application/json");
   });
 });

@@ -28,3 +28,13 @@ Préfixe `/api/v1`, jetons Sanctum Bearer (`SANCTUM_TOKEN_EXPIRATION`, 12 h par 
 - écriture du réseau et des utilisateurs : administrateur seul.
 
 Hypothèse à valider : le schéma n'a pas de lien équipe ↔ zone, donc le coordinateur lit tout le réseau (utile pour choisir un PCO à l'étude).
+
+## Import du réseau (administrateur)
+`POST imports/network/preview` (vérification, rien n'est écrit) puis `POST imports/network`. Fichier CSV de 2 Mo et 5 000 lignes au plus, une ligne par PCO ; modèle : `frontend/public/modeles-import/reseau.csv`.
+
+- Colonnes : `olt; plaque; sous_plaque; fabricant; splitter; pco; latitude; longitude; slot; port; brin; statut; commentaire` (obligatoires : plaque, sous_plaque, splitter, pco).
+- Séparateur `;`, `,` ou tabulation ; UTF-8 ou Windows-1252 (CSV d'Excel). Les fichiers Excel multi-feuilles (suivi de déploiement) viendront au lot 6.
+- Création seulement : un élément connu est réutilisé sans être modifié ; un PCO déjà présent est compté et laissé tel quel. Codes comparés après normalisation (`FAY03_PCO-001` = `FAY003_PCO001`).
+- Ligne refusée et listée : colonne obligatoire vide, PCO en double dans le fichier (jamais fusionné). Avertissement : GPS suspect (inversé, hors Côte d'Ivoire), fabricant inconnu, code PCO sans rapport avec la sous-plaque. Rien n'est corrigé en silence.
+- Le statut du fichier est gardé tel quel dans `status_raw` (statuts normalisés à valider avec le client).
+- Mesuré : 2 688 lignes en environ 3 s ; un ré-import du même fichier ne crée rien.

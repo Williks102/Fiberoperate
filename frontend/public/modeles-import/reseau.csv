@@ -1,0 +1,4 @@
+olt;plaque;sous_plaque;fabricant;splitter;pco;latitude;longitude;slot;port;brin;statut;commentaire
+OLT-EXEMPLE;FAYA;FAY03;nokia;SPL001;FAY03_PCO001;5.3600;-4.0083;1;2;3;En attente BE;
+OLT-EXEMPLE;FAYA;FAY03;nokia;SPL001;FAY03_PCO002;;;;;;Posé;Exemple de commentaire
+OLT-EXEMPLE;FAYA;FAY03;nokia;SPL002;FAY03_PCO-003;;;;;;;
