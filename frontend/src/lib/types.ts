@@ -23,6 +23,8 @@ export interface Plaque {
   name: string;
   olt_id: string | null;
   supervisor_id: string | null;
+  olt?: { id: string; name: string } | null;
+  supervisor?: { id: string; name: string } | null;
 }
 
 export type ZoneStatus = "planned" | "deploying" | "in_operation" | "closed";
