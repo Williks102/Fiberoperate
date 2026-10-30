@@ -28,6 +28,7 @@ return [
         'symbols' => 'Le champ :attribute doit contenir au moins un symbole.',
         'uncompromised' => 'Ce :attribute apparaît dans une fuite de données. Choisissez-en un autre.',
     ],
+    'prohibited' => 'Le champ :attribute ne peut pas être modifié.',
     'required' => 'Le champ :attribute est obligatoire.',
     'string' => 'Le champ :attribute doit être du texte.',
     'unique' => 'La valeur saisie pour :attribute est déjà utilisée.',
