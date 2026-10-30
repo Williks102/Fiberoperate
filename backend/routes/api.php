@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\NetworkImportController;
 use App\Http\Controllers\Api\V1\OltController;
 use App\Http\Controllers\Api\V1\PcoController;
 use App\Http\Controllers\Api\V1\PlaqueController;
+use App\Http\Controllers\Api\V1\ProjectController;
 use App\Http\Controllers\Api\V1\TeamController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\ZoneController;
@@ -26,6 +27,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('zones', ZoneController::class);
         Route::apiResource('jdvs', JdvController::class);
         Route::apiResource('pcos', PcoController::class);
+        Route::apiResource('projects', ProjectController::class)->only(['index', 'store']);
         Route::post('imports/network/preview', [NetworkImportController::class, 'preview']);
         Route::post('imports/network', [NetworkImportController::class, 'store']);
         Route::get('block-reasons', [BlockReasonController::class, 'index']);
