@@ -84,7 +84,7 @@ export default function SousPlaquesPage() {
                       {zone.name ? `${zone.code} · ${zone.name}` : zone.code}
                     </Link>
                   </p>
-                  <p className="text-sm text-zinc-600">
+                  <p className="text-sm text-zinc-700">
                     Plaque {zone.plaque?.name ?? "—"} · {zone.vendor ? VENDOR_LABELS[zone.vendor] : "Fabricant non renseigné"} · {ZONE_STATUS_LABELS[zone.status]}
                   </p>
                 </li>

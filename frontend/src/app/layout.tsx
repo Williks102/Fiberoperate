@@ -6,6 +6,8 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "FTTH Gestion",
   description: "Gestion des déploiements et raccordements fibre optique",
+  // Thème clair uniquement : empêche aussi l'assombrissement automatique de certains navigateurs mobiles.
+  other: { "color-scheme": "light" },
 };
 
 export const viewport: Viewport = {

@@ -93,11 +93,11 @@ export default function UtilisateursPage() {
                       user.name
                     )}
                   </span>
-                  <span className="break-all text-sm text-zinc-600">{user.email}</span>
+                  <span className="break-all text-sm text-zinc-700">{user.email}</span>
                   <span className="text-sm">
                     {user.role_label}
                     {user.skills && user.skills.length > 0 && (
-                      <span className="block text-xs text-zinc-600">
+                      <span className="block text-xs text-zinc-700">
                         {user.skills.map((skill) => MISSION_LABELS[skill]).join(", ")}
                       </span>
                     )}

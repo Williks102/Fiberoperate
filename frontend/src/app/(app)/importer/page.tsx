@@ -74,7 +74,7 @@ export default function ImporterPage() {
     <div className="max-w-2xl space-y-4">
       <div className="space-y-1">
         <h1 className="text-xl font-semibold">Importer le réseau</h1>
-        <p className="text-sm text-zinc-600">
+        <p className="text-sm text-zinc-700">
           Un fichier CSV, une ligne par PCO : OLT, plaque, sous-plaque, splitter, PCO… Les éléments déjà connus ne sont jamais modifiés.{" "}
           <a href="/modeles-import/reseau.csv" download className="underline">
             Télécharger le modèle
@@ -103,7 +103,7 @@ export default function ImporterPage() {
       <button
         onClick={() => send("preview")}
         disabled={!file || busy !== null}
-        className="h-11 rounded-lg border border-zinc-300 px-4 font-medium disabled:opacity-50"
+        className="h-11 rounded-lg border border-zinc-300 px-4 font-medium disabled:opacity-60"
       >
         {busy === "preview" ? "Vérification…" : "Vérifier le fichier"}
       </button>
@@ -142,7 +142,7 @@ export default function ImporterPage() {
                 Vous allez créer {report.created.pcos} PCO et leur structure. Cette opération ne peut pas être annulée depuis l&apos;application.
               </p>
               <div className="flex gap-3">
-                <button onClick={() => send("import")} disabled={busy !== null} className="h-11 rounded-lg bg-slate-900 px-6 font-medium text-white disabled:opacity-50">
+                <button onClick={() => send("import")} disabled={busy !== null} className="h-11 rounded-lg bg-slate-900 px-6 font-medium text-white disabled:opacity-60">
                   {busy === "import" ? "Import en cours…" : "Oui, importer"}
                 </button>
                 <button onClick={() => setConfirming(false)} disabled={busy !== null} className="h-11 rounded-lg border border-zinc-300 px-4 font-medium">
@@ -152,7 +152,7 @@ export default function ImporterPage() {
             </div>
           )}
 
-          {!imported && toCreate === 0 && <p className="text-sm text-zinc-600">Rien à créer avec ce fichier.</p>}
+          {!imported && toCreate === 0 && <p className="text-sm text-zinc-700">Rien à créer avec ce fichier.</p>}
 
           {imported && (
             <Link href="/reseau" className="inline-flex h-11 items-center rounded-lg bg-slate-900 px-6 font-medium text-white">

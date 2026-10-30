@@ -35,7 +35,7 @@ function Node({
         <span className="font-medium">{title}</span>
         <span className="flex flex-wrap items-center justify-end gap-2">
           {badges}
-          <span aria-hidden="true" className="text-zinc-500">
+          <span aria-hidden="true" className="text-zinc-700">
             {open ? "▾" : "▸"}
           </span>
         </span>

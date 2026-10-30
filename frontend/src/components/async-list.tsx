@@ -36,7 +36,7 @@ export function AsyncList<T>({
   }
 
   if (state.data.data.length === 0) {
-    return <p className="rounded-lg border border-dashed border-zinc-300 p-3 text-sm text-zinc-600">{empty}</p>;
+    return <p className="rounded-lg border border-dashed border-zinc-300 p-3 text-sm text-zinc-700">{empty}</p>;
   }
 
   return <>{children(state.data.data)}</>;

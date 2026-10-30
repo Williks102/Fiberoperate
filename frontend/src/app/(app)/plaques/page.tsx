@@ -55,7 +55,7 @@ export default function PlaquesPage() {
                       {plaque.name}
                     </Link>
                   </p>
-                  <p className="text-sm text-zinc-600">
+                  <p className="text-sm text-zinc-700">
                     OLT : {plaque.olt?.name ?? "non renseigné"} · Superviseur : {plaque.supervisor?.name ?? "non défini"}
                   </p>
                 </li>

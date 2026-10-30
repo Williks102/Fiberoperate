@@ -63,7 +63,7 @@ export default function OltPage() {
                       olt.name
                     )}
                   </p>
-                  {olt.notes && <p className="text-sm text-zinc-600">{olt.notes}</p>}
+                  {olt.notes && <p className="text-sm text-zinc-700">{olt.notes}</p>}
                 </li>
               ))}
             </ul>

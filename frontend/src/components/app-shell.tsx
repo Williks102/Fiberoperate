@@ -49,7 +49,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between gap-3 border-b border-zinc-200 bg-white px-4 py-2 sm:px-6">
           <span className="font-semibold md:hidden">FTTH Gestion</span>
-          <span className="hidden text-sm text-zinc-600 md:block">
+          <span className="hidden text-sm text-zinc-700 md:block">
             {user.name} · {user.role_label}
           </span>
           <button
@@ -73,7 +73,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             href={item.href}
             aria-current={isActive(pathname, item.href) ? "page" : undefined}
             className={`flex h-14 flex-1 items-center justify-center text-sm font-medium ${
-              isActive(pathname, item.href) ? "text-slate-900 underline underline-offset-4" : "text-zinc-600"
+              isActive(pathname, item.href) ? "text-slate-900 underline underline-offset-4" : "text-zinc-700"
             }`}
           >
             {item.label}
