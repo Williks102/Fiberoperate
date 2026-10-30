@@ -27,6 +27,12 @@ class PcoResource extends JsonResource
             'capacity' => $this->capacity,
             'comment' => $this->comment,
             'observation' => $this->observation,
+            'jdv' => $this->whenLoaded('jdv', fn () => $this->jdv?->only(['id', 'code'])),
+            'zone' => $this->whenLoaded('zone', fn () => $this->zone === null ? null : [
+                'id' => $this->zone->id,
+                'code' => $this->zone->code,
+                'plaque' => $this->zone->relationLoaded('plaque') ? $this->zone->plaque?->only(['id', 'name']) : null,
+            ]),
         ];
     }
 }
