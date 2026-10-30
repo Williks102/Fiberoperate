@@ -18,8 +18,8 @@ describe("pcoStatusLabel", () => {
 
 describe("libellés des rôles et missions", () => {
   it("couvrent tous les rôles et toutes les habilitations", () => {
-    expect(Object.keys(ROLE_LABELS).sort()).toEqual(["admin", "coordinator", "dg", "dt", "supervisor", "technician"]);
-    expect(Object.keys(MISSION_LABELS).sort()).toEqual(["customer_connection", "deployment", "maintenance", "study"]);
+    expect(Object.keys(ROLE_LABELS).sort()).toEqual(["admin", "be_manager", "coordinator", "dg", "dt", "supervisor", "technician"]);
+    expect(Object.keys(MISSION_LABELS).sort()).toEqual(["customer_connection", "deployment", "drawing", "maintenance", "study", "survey"]);
   });
 });
 

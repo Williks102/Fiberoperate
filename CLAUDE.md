@@ -23,8 +23,8 @@ Application de gestion pour une entreprise sous-traitante qui installe la fibre 
 - **RAB** = référence de commande opérateur (clé d'import). **FT** = numéro de ligne FTTH. Ne pas supposer une longueur fixe : les données réelles varient.
 
 ## Rôles (un seul rôle `technician` avec habilitations)
-`admin`, `dg`, `dt`, `supervisor`, `coordinator`, `technician`, et (v1.8, à créer) `be_manager` (chef du BE).
-Habilitations technicien : `deployment`, `customer_connection`, `maintenance`, `study`, et (v1.8, à créer) `drawing` (dessin, AVP) et `survey` (relevés).
+`admin`, `dg`, `dt`, `supervisor`, `coordinator`, `technician`, et `be_manager` (chef du BE, créé le 30/10/2026 : lecture du réseau et des OLT ; ses écrans viendront avec le lot 1B).
+Habilitations technicien : `deployment`, `customer_connection`, `maintenance`, `study`, et `drawing` (dessin, AVP) et `survey` (relevés), créées le 30/10/2026.
 Hiérarchie : technicien déploiement → superviseur → DT ; technicien raccordement ou maintenance → coordinateur → DT ; technicien du BE → chef du BE → DT (le coordinateur reçoit les résultats d'étude, sans être leur supérieur).
 Toute requête est filtrée par rôle **et** périmètre (plaque pour le superviseur, équipes pour le coordinateur). Policies Laravel obligatoires, jamais de contrôle uniquement côté front.
 

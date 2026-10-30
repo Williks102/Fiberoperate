@@ -30,6 +30,13 @@ class DevSeeder extends Seeder
         $dt = $make('Directeur technique', 'dt@example.test', Role::Dt);
         $make('Admin', 'admin@example.test', Role::Admin);
         $make('DG', 'dg@example.test', Role::Dg);
+        $beManager = $make('Chef du BE', 'chef.be@example.test', Role::BeManager, $dt);
+        $drafter = $make('Dessinateur BE', 'dessinateur@example.test', Role::Technician, $beManager);
+        $drafter->skills()->firstOrCreate(['mission_type' => MissionType::Drawing->value]);
+        $surveyor = $make('Technicien réseau BE', 'technicien.be@example.test', Role::Technician, $beManager);
+        foreach ([MissionType::Survey, MissionType::Study] as $mission) {
+            $surveyor->skills()->firstOrCreate(['mission_type' => $mission->value]);
+        }
         $supervisor = $make('Superviseur Faya', 'superviseur@example.test', Role::Supervisor, $dt);
         $coordinator = $make('Coordinateur', 'coordinateur@example.test', Role::Coordinator, $dt);
 

@@ -12,6 +12,8 @@ enum MissionType: string
     case CustomerConnection = 'customer_connection';
     case Maintenance = 'maintenance';
     case Study = 'study';
+    case Drawing = 'drawing';
+    case Survey = 'survey';
 
     public function label(): string
     {
@@ -20,6 +22,8 @@ enum MissionType: string
             self::CustomerConnection => 'Raccordement client',
             self::Maintenance => 'Maintenance',
             self::Study => 'Étude',
+            self::Drawing => 'Dessin et avant-projet',
+            self::Survey => 'Relevés (survey)',
         };
     }
 }

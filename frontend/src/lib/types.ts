@@ -1,4 +1,4 @@
-export type Role = "admin" | "dg" | "dt" | "supervisor" | "coordinator" | "technician";
+export type Role = "admin" | "dg" | "dt" | "supervisor" | "coordinator" | "technician" | "be_manager";
 
 /** Reflet de App\Http\Resources\UserResource. */
 export interface User {
@@ -59,7 +59,7 @@ export interface Pco {
   is_blocked: boolean;
 }
 
-export type MissionType = "deployment" | "customer_connection" | "maintenance" | "study";
+export type MissionType = "deployment" | "customer_connection" | "maintenance" | "study" | "drawing" | "survey";
 
 export interface Team {
   id: string;

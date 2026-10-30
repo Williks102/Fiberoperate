@@ -10,6 +10,7 @@ enum Role: string
     case Supervisor = 'supervisor';
     case Coordinator = 'coordinator';
     case Technician = 'technician';
+    case BeManager = 'be_manager';
 
     public function label(): string
     {
@@ -20,6 +21,7 @@ enum Role: string
             self::Supervisor => 'Superviseur',
             self::Coordinator => 'Coordinateur',
             self::Technician => 'Technicien',
+            self::BeManager => 'Chef du bureau d\'études',
         };
     }
 }

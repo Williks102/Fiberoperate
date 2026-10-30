@@ -75,7 +75,7 @@ class ZonesApiTest extends TestCase
     {
         $plaque = Plaque::create(['name' => 'FAYA']);
 
-        foreach ([Role::Dg, Role::Dt, Role::Supervisor, Role::Coordinator, Role::Technician] as $role) {
+        foreach ([Role::Dg, Role::Dt, Role::Supervisor, Role::Coordinator, Role::Technician, Role::BeManager] as $role) {
             $this->login($role);
             $this->postJson('/api/v1/zones', ['plaque_id' => $plaque->id, 'code' => 'FAY03'])->assertForbidden();
         }
