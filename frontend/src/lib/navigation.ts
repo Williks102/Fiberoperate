@@ -42,11 +42,12 @@ export const NAV_GROUPS: NavGroup[] = [
     href: "/deploiement",
     label: "Déploiement",
     icon: "network",
-    description: "Le réseau : plaques, sous-plaques, splitters, PCO et OLT.",
+    description: "Le réseau : plaques, sous-plaques, SRO, splitters, PCO et OLT.",
     items: [
       { href: "/reseau", label: "Réseau", description: "Parcourir plaques, sous-plaques, splitters et PCO." },
       { href: "/plaques", label: "Plaques", description: "Ajouter ou corriger une plaque.", roles: ["admin"] },
       { href: "/sous-plaques", label: "Sous-plaques", description: "Ajouter ou corriger une sous-plaque.", roles: ["admin"] },
+      { href: "/sro", label: "SRO", description: "Ajouter ou corriger une SRO : son numéro, son GPS et son départ de l'OLT.", roles: ["admin"] },
       { href: "/splitters", label: "Splitters", description: "Ajouter ou corriger un splitter (JDV).", roles: ["admin"] },
       { href: "/pco", label: "PCO", description: "Les boîtiers : chercher un PCO, voir son statut et ses coordonnées.", roles: ["admin"] },
       { href: "/olt", label: "OLT", description: "Les équipements de tête.", roles: ["admin", "dg", "dt", "supervisor", "coordinator", "be_manager"] },
