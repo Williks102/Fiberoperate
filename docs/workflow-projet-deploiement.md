@@ -5,7 +5,7 @@ Document de cadrage du 30/10/2026, issu des explications du client. Il décrit l
 Vocabulaire : **BE** = bureau d'études ; **AVP** = avant-projet (dossier avec devis) ; **KMZ** = fichier de plan lisible dans Google Earth ; **survey** = relevé de terrain ; **DT** = directeur technique.
 
 ## 1. Le parcours
-Un **projet** porte sur **une plaque**, subdivisée en sous-plaques. Chaîne réseau (v1.9) : projet → plaque → sous-plaque → **SRO** → splitter → PCO → client.
+Un **projet** porte sur **une plaque**, subdivisée en sous-plaques. Chaîne réseau (v1.9) : projet → plaque → sous-plaque → **SRO** → splitter → PCO → client. L'**OLT** est la source du signal et alimente toute la plaque ; la **SRO** part de l'OLT et alimente les splitters d'**une** sous-plaque.
 
 | # | Phase | Qui | Ce qui est produit |
 |---|---|---|---|

@@ -92,10 +92,10 @@ Les périmètres limitent la visibilité : la **plaque** pour le superviseur, le
 Hiérarchie précisée le 30/10 (schéma du client), qui remplace celle de la v1.7 :
 
 - **Projet** : porte sur **une plaque** et la fait naître (§3.7).
-- **OLT** : équipement de tête, qui dessert une ou plusieurs plaques. On le choisit ou on le crée à la création du projet ; il peut aussi être renseigné plus tard.
+- **OLT** : **source du signal**, il alimente toute la plaque. On le choisit ou on le crée à la création du projet ; il peut aussi être renseigné plus tard.
 - **Plaque** : grande zone géographique (par ex. FAYA, ARCADE, ATTOBAN). Un **superviseur couvre une plaque entière**. Une plaque n'existe que sous un projet.
 - **Sous-plaque, ou zone** : subdivision d'une plaque, avec un code (`FAY03` pour FAYA 03, `ABB01`…). C'est l'unité de suivi du déploiement. Le mot « zone » du brief initial désigne la sous-plaque.
-- **SRO** (sous-répartiteur optique) : **une par sous-plaque**, c'est l'équipement auquel les splitters sont raccordés. Son nom dépend du fabricant : « hub » chez Huawei, « SRO » chez Nokia ; l'application stocke le fabricant et affiche le libellé correspondant. *Les informations propres à la SRO (code ou nom, GPS, fabricant, raccordement à l'OLT) restent à préciser (§9).*
+- **SRO** (sous-répartiteur optique) : **une par sous-plaque**. Elle **part de l'OLT** et **alimente les splitters d'une sous-plaque précise** : c'est le maillon entre la source du signal (l'OLT, commun à la plaque) et les splitters de sa sous-plaque. Le slot, le port et le brin de fibre de départ de l'OLT sont donc portés par la SRO. Son nom dépend du fabricant : « hub » chez Huawei, « SRO » chez Nokia ; l'application stocke le fabricant et affiche le libellé correspondant. *Le rôle de la SRO est confirmé (30/10). Restent à préciser son code ou nom, son GPS et le détail du raccordement à l'OLT (§9).*
 - **JDV** (aussi appelé **splitter**, convention de nommage `SPL001`, `SPL002`…) : raccordé à la SRO, regroupe des PCO.
 - **PCO** (point de concentration optique, par ex. `FAY03_PCO001`) = **PBO**, le « boîtier ». Un client est rattaché à un PCO après l'étude.
 - **Chaîne complète** : Projet → plaque → sous-plaque → SRO → JDV (splitter) → PCO → client.
@@ -296,7 +296,7 @@ Confirmé le 28/10 : le fichier d'études est bien la liste envoyée par l'opér
 
 Confirmé le 30/10 (v1.9) : Projet → plaque → sous-plaque → SRO → splitter → PCO ; la plaque naît avec le projet (et n'existe que sous un projet) ; import CSV sous un projet ; standard 8 splitters par SRO, 8 PCO par splitter, 16 ports et 8 clients par PCO (valeurs par défaut modifiables) ; saturation à 8 clients puis désaturation par un autre PCO ; génération à la création d'une sous-plaque (nombre de PCO libre, 32 et 64 suggérés) ; convention `SPL` pour les splitters ; le technicien du BE ajuste le réseau généré ; les techniciens du BE saisissent les relevés et voient le réseau ; mise sous tension par les techniciens, sur la sous-plaque entière.
 
-8. **(v1.9) SRO** : informations à enregistrer (code ou nom, GPS, fabricant, raccordement à l'OLT : slot, port, brin) et nom donné à la SRO créée automatiquement.
+8. **(v1.9) SRO** : rôle confirmé le 30/10 (part de l'OLT, alimente les splitters d'une sous-plaque). À préciser : code ou nom (et nom donné à la SRO créée automatiquement), GPS, fabricant, et si le raccordement à l'OLT (slot, port, brin) est saisi à la SRO ou aux splitters.
 9. **(v1.9) Fichier « Suivi raccordement »** : à quel niveau correspondent « ZONE PCO (SRO, OLT…) » (`DBA01`) et « JDV/HUB » (`HUB001` à `HUB004`, plusieurs par zone) ?
 10. **(v1.9) Création d'un projet** : qui peut le créer (chef du BE, DT, administrateur) ; nom de la plaque (saisi ou pris dans le fichier) ; un seul projet par fichier ; réimport sous un même projet (à quelles phases) ; droits du BE sur la création de la plaque, de l'OLT et des sous-plaques.
 11. **(v1.9) Modification du réseau par le BE** : jusqu'à quelle phase le technicien du BE peut-il ajuster le réseau (avant-projet, survey d'implantation) ; après, corrections par le DT ou l'administrateur ?
