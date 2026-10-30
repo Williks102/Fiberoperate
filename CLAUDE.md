@@ -91,5 +91,15 @@ Toute requête est filtrée par rôle **et** périmètre (plaque pour le supervi
 - Tests écrits avec le code (permissions par rôle et périmètre pour toute nouvelle route).
 - Fin de tranche : résumé de ce qui est visible, de ce qui reste, des hypothèses à valider.
 
+## Navigation par activité (décision du 30/10/2026)
+Le menu est regroupé par activité du métier, pas par table (`frontend/src/lib/navigation.ts`, `NAV_GROUPS`). Ce regroupement est une décision de présentation : il ne change le contenu d'aucun lot.
+- **Déploiement** : Réseau, Plaques, Sous-plaques, Splitters, PCO, OLT, import du réseau (superviseur, DT, DG, administrateur).
+- **Études** (lot 3) : clients à étudier, formulaire d'étude, résultats (coordinateur, techniciens habilités « étude »).
+- **Raccordement** (lots 2 et 3) : clients et commandes, programmation et résultat de l'installation, attribution de la box (SN ONT et numéro fixe) (coordinateur, techniciens habilités « raccordement client »).
+- **Suivi Rac** (lot 5) : fiche de suivi du raccordement, état de ligne opérateur, export Excel (coordinateur, DT, DG).
+- **Administration** : Équipes, Utilisateurs.
+- Maintenance : pas d'écran avant le lot 7 ; à ranger quand elle existera (activité propre à confirmer).
+- Chaque activité a une page d'accueil qui liste ses écrans ; une activité sans écran accessible au rôle n'apparaît pas ; le menu n'affiche un écran qu'une fois livré. Téléphone : barre du bas = Accueil + activités (4 au plus), le reste et le menu complet dans « Plus ».
+
 ## Points ouverts (ne pas trancher seul)
 Sens des deux colonnes « État ligne », du préfixe `*` et du « F » des codes ; statuts normalisés du PCO et motifs de blocage ; fichier de déploiement remplacé ou seulement importé ; types de poteaux comptés dans la distance par défaut ; valeurs de l'état de ligne opérateur ; photos/signature obligatoires.
