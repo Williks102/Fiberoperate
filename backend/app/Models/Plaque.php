@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\MissionType;
 use App\Enums\Role;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -50,7 +49,7 @@ class Plaque extends Model
         return match ($user->role) {
             Role::Admin, Role::Dg, Role::Dt, Role::Coordinator, Role::BeManager => $query,
             Role::Supervisor => $query->where('supervisor_id', $user->id),
-            Role::Technician => $user->hasSkill(MissionType::Drawing) ? $query : ($user->manager_id
+            Role::Technician => $user->seesWholeNetwork() ? $query : ($user->manager_id
                 ? $query->where('supervisor_id', $user->manager_id)
                 : $query->whereRaw('1 = 0')),
         };

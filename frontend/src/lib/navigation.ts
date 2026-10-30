@@ -10,8 +10,8 @@ export interface NavItem {
   description?: string;
   /** Rôles qui voient l'entrée ; absent = tous. */
   roles?: Role[];
-  /** Pour un technicien, l'entrée n'apparaît qu'avec cette habilitation (ex. « dessin » pour le BE). */
-  skill?: MissionType;
+  /** Pour un technicien, l'entrée n'apparaît qu'avec l'une de ces habilitations (ex. « dessin » ou « relevés » pour le BE). */
+  skills?: MissionType[];
 }
 
 /** Une activité du métier : ses écrans sont regroupés sous une page d'accueil (« hub »). */
@@ -47,10 +47,10 @@ export const NAV_GROUPS: NavGroup[] = [
     description: "Les plaques et leur réseau : sous-plaques, SRO, splitters, PCO et OLT.",
     items: [
       { href: "/plaques", label: "Plaques", description: "Une plaque et tout ce qu'on y déploie : sous-plaques, SRO, splitters et PCO." },
-      { href: "/sous-plaques", label: "Sous-plaques", description: "Ajouter ou corriger une sous-plaque.", roles: ["admin", "be_manager", "technician"], skill: "drawing" },
-      { href: "/sro", label: "SRO", description: "Ajouter ou corriger une SRO : son numéro, son GPS et son départ de l'OLT.", roles: ["admin", "be_manager", "technician"], skill: "drawing" },
-      { href: "/splitters", label: "Splitters", description: "Ajouter ou corriger un splitter (JDV).", roles: ["admin", "be_manager", "technician"], skill: "drawing" },
-      { href: "/pco", label: "PCO", description: "Les boîtiers : chercher un PCO, voir son statut et ses coordonnées.", roles: ["admin", "be_manager", "technician"], skill: "drawing" },
+      { href: "/sous-plaques", label: "Sous-plaques", description: "Ajouter ou corriger une sous-plaque.", roles: ["admin", "be_manager", "technician"], skills: ["drawing"] },
+      { href: "/sro", label: "SRO", description: "Ajouter ou corriger une SRO : son numéro, son GPS et son départ de l'OLT.", roles: ["admin", "be_manager", "technician"], skills: ["drawing"] },
+      { href: "/splitters", label: "Splitters", description: "Ajouter ou corriger un splitter (JDV).", roles: ["admin", "be_manager", "technician"], skills: ["drawing"] },
+      { href: "/pco", label: "PCO", description: "Les boîtiers : chercher un PCO, voir son statut et ses coordonnées.", roles: ["admin", "be_manager", "technician"], skills: ["drawing", "survey"] },
       { href: "/olt", label: "OLT", description: "Les équipements de tête.", roles: ["admin", "dg", "dt", "supervisor", "coordinator", "be_manager"] },
     ],
   },
@@ -68,7 +68,7 @@ export const NAV_GROUPS: NavGroup[] = [
 
 function visible(item: NavItem, role: Role, skills: MissionType[]): boolean {
   if (item.roles && !item.roles.includes(role)) return false;
-  return role !== "technician" || !item.skill || skills.includes(item.skill);
+  return role !== "technician" || !item.skills || item.skills.some((skill) => skills.includes(skill));
 }
 
 /** Les activités du rôle, avec seulement les écrans auxquels il a droit ; une activité vide disparaît. */

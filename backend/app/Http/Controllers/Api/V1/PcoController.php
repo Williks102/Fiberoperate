@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Requests\MeasurePcoRequest;
 use App\Http\Requests\PcoRequest;
 use App\Http\Resources\PcoResource;
 use App\Models\Pco;
@@ -31,7 +32,7 @@ class PcoController extends ApiResourceController
 
     protected function load(Model $model): Model
     {
-        return $model->load(['jdv:id,code', 'zone.plaque:id,name']);
+        return $model->load(['jdv:id,code', 'zone.plaque:id,name', 'measurer:id,name']);
     }
 
     protected function filters(Request $request, Builder $query): void
@@ -51,6 +52,20 @@ class PcoController extends ApiResourceController
     public function store(PcoRequest $request): JsonResponse
     {
         return $this->created(Pco::create($request->validated()));
+    }
+
+    /** Enregistre la position relevée sur le terrain (auteur et date conservés). */
+    public function measure(MeasurePcoRequest $request, string $pco): PcoResource
+    {
+        $model = Pco::query()->visibleTo($request->user())->findOrFail($pco);
+        $model->forceFill([
+            'measured_latitude' => $request->input('latitude'),
+            'measured_longitude' => $request->input('longitude'),
+            'measured_at' => now(),
+            'measured_by' => $request->user()->id,
+        ])->save();
+
+        return new PcoResource($this->load($model));
     }
 
     public function update(PcoRequest $request, string $pco): PcoResource

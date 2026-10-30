@@ -30,6 +30,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('zones', ZoneController::class);
         Route::apiResource('sros', SroController::class);
         Route::apiResource('jdvs', JdvController::class);
+        Route::put('pcos/{pco}/measured-position', [PcoController::class, 'measure']);
         Route::apiResource('pcos', PcoController::class);
         Route::apiResource('projects', ProjectController::class)->only(['index', 'show', 'store']);
         Route::post('projects/{project}/imports/network/preview', [NetworkImportController::class, 'preview']);

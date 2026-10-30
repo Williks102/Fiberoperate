@@ -68,6 +68,9 @@ class Pco extends Model
             'longitude' => 'decimal:7',
             'number' => 'integer',
             'capacity' => 'integer',
+            'measured_latitude' => 'decimal:7',
+            'measured_longitude' => 'decimal:7',
+            'measured_at' => 'datetime',
         ];
     }
 
@@ -79,6 +82,24 @@ class Pco extends Model
     public function jdv(): BelongsTo
     {
         return $this->belongsTo(Jdv::class);
+    }
+
+    public function measurer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'measured_by');
+    }
+
+    /** Écart en mètres entre la position prévue et la position mesurée (formule de haversine), null si l'une manque. */
+    public function deviationMeters(): ?int
+    {
+        if ($this->latitude === null || $this->longitude === null || $this->measured_latitude === null || $this->measured_longitude === null) {
+            return null;
+        }
+
+        [$lat1, $lon1, $lat2, $lon2] = array_map(fn ($v) => deg2rad((float) $v), [$this->latitude, $this->longitude, $this->measured_latitude, $this->measured_longitude]);
+        $a = sin(($lat2 - $lat1) / 2) ** 2 + cos($lat1) * cos($lat2) * sin(($lon2 - $lon1) / 2) ** 2;
+
+        return (int) round(6371000 * 2 * asin(min(1, sqrt($a))));
     }
 
     public function blockReason(): BelongsTo

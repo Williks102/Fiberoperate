@@ -82,6 +82,18 @@ class User extends Authenticatable
         return $this->hasRole(Role::BeManager) || ($this->hasRole(Role::Technician) && $this->hasSkill(MissionType::Drawing));
     }
 
+    /** Voit toutes les plaques : le BE (chef, techniciens « dessin » et « relevés ») consulte le réseau de tous les projets. */
+    public function seesWholeNetwork(): bool
+    {
+        return $this->hasRole(Role::BeManager) || ($this->hasRole(Role::Technician) && ($this->hasSkill(MissionType::Drawing) || $this->hasSkill(MissionType::Survey)));
+    }
+
+    /** Peut enregistrer la position mesurée d'un PCO : administrateur, chef du BE, techniciens « relevés » et « dessin ». */
+    public function canSurvey(): bool
+    {
+        return $this->hasRole(Role::Admin) || $this->isBeMember() || ($this->hasRole(Role::Technician) && $this->hasSkill(MissionType::Survey));
+    }
+
     /** Un technicien n'est planifiable que sur une mission pour laquelle il est habilité. */
     public function hasSkill(MissionType $mission): bool
     {
