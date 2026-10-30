@@ -100,7 +100,7 @@ Toute requête est filtrée par rôle **et** périmètre (plaque pour le supervi
 
 ## Navigation par activité (décision du 30/10/2026)
 Le menu est regroupé par activité du métier, pas par table (`frontend/src/lib/navigation.ts`, `NAV_GROUPS`). Ce regroupement est une décision de présentation : il ne change le contenu d'aucun lot.
-- **Projet** (lot 1B) : projets par plaque et leurs phases (l'avant-projet n'en est qu'une), documents versionnés, AVP et devis, circuit de validation (BE, chef du BE, DT).
+- **Projet** (lot 1B) : projets par plaque et leurs phases (l'avant-projet n'en est qu'une), documents versionnés, AVP et devis, circuit de validation (BE, chef du BE, DT). **Catalogue de prix** (bordereau de l'opérateur, commun à tous les projets, `price_items`) : import CSV par l'administrateur, consultation par la direction et le BE ; une ligne = rubrique + référence + désignation (la référence n'est ni obligatoire ni unique dans le fichier d'origine) ; prix entiers en FCFA ; un devis copie le prix au moment de la saisie.
 - **Déploiement** : Plaques (l'arbre plaque → sous-plaques → SRO → splitters → PCO ; l'ancien écran « Réseau », une plaque se crée avec son projet), Sous-plaques, SRO, Splitters, PCO, OLT (superviseur, DT, DG, administrateur). L'import du réseau se fait depuis la fiche d'un projet.
 - **Études** (lot 3) : clients à étudier, formulaire d'étude, résultats (coordinateur, techniciens habilités « étude »).
 - **Raccordement** (lots 2 et 3) : clients et commandes, programmation et résultat de l'installation, attribution de la box (SN ONT et numéro fixe) (coordinateur, techniciens habilités « raccordement client »).

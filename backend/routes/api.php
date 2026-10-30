@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\NetworkImportController;
 use App\Http\Controllers\Api\V1\OltController;
 use App\Http\Controllers\Api\V1\PcoController;
 use App\Http\Controllers\Api\V1\PlaqueController;
+use App\Http\Controllers\Api\V1\PriceItemController;
 use App\Http\Controllers\Api\V1\ProjectController;
 use App\Http\Controllers\Api\V1\SroController;
 use App\Http\Controllers\Api\V1\TeamController;
@@ -35,6 +36,10 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('projects', ProjectController::class)->only(['index', 'show', 'store']);
         Route::post('projects/{project}/imports/network/preview', [NetworkImportController::class, 'preview']);
         Route::post('projects/{project}/imports/network', [NetworkImportController::class, 'store']);
+        Route::get('price-items/sections', [PriceItemController::class, 'sections']);
+        Route::post('price-items/import/preview', [PriceItemController::class, 'previewImport']);
+        Route::post('price-items/import', [PriceItemController::class, 'import']);
+        Route::get('price-items', [PriceItemController::class, 'index']);
         Route::get('block-reasons', [BlockReasonController::class, 'index']);
     });
 });
