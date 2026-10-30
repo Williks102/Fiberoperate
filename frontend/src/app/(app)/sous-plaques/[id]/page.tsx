@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { GenerateNetworkPanel } from "@/components/generate-network-panel";
 import { ZoneForm } from "@/components/zone-form";
 import type { Zone } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
@@ -24,7 +25,12 @@ export default function ModifierSousPlaquePage() {
         </div>
       )}
 
-      {result.status === "ok" && <ZoneForm zone={result.data.data} />}
+      {result.status === "ok" && (
+        <>
+          <ZoneForm zone={result.data.data} />
+          <GenerateNetworkPanel zone={result.data.data} />
+        </>
+      )}
     </div>
   );
 }

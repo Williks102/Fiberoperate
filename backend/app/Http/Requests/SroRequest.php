@@ -3,8 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Sro;
-use App\Support\CodeNormalizer;
-use Closure;
+use App\Rules\UniqueSroCode;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
@@ -31,14 +30,7 @@ class SroRequest extends ManagesResource
             'zone_id' => $id === null
                 ? ['required', 'uuid', Rule::exists('zones', 'id')->whereNull('deleted_at'), Rule::unique('sros', 'zone_id')->whereNull('deleted_at')]
                 : ['prohibited'],
-            'code' => [$this->req(), 'string', 'max:40', function (string $attribute, mixed $value, Closure $fail) use ($id) {
-                $taken = Sro::query()->where('code_normalized', CodeNormalizer::generic((string) $value))
-                    ->when($id, fn ($q) => $q->whereKeyNot($id))->exists();
-
-                if ($taken) {
-                    $fail('Ce code de SRO existe déjà.');
-                }
-            }],
+            'code' => [$this->req(), 'string', 'max:40', new UniqueSroCode($id)],
             'latitude' => ['nullable', 'required_with:longitude', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'required_with:latitude', 'numeric', 'between:-180,180'],
             'olt_slot' => ['nullable', 'string', 'max:255'],
