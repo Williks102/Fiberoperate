@@ -170,7 +170,7 @@ Le **blocage** est un indicateur indépendant du statut, avec un motif du réfé
 10. **Incidents** : chantier, réseau, HSE ; gravité, statut, résolution.
 11. **Tableaux de bord** (DG, DT, superviseur, coordinateur) : voir §7.
 12. **Notifications** : planning modifié, rapport à valider, incident grave.
-13. **Avant-projet et bureau d'études** (v1.8) : projet par plaque et ses phases, documents versionnés, AVP et devis, circuit de validation (chef du BE, DT, client), surveys d'implantation et final, comparaison prévu et réel.
+13. **Projet de déploiement et bureau d'études** (v1.8) : projet par plaque et ses phases, documents versionnés, AVP et devis, circuit de validation (chef du BE, DT, client), surveys d'implantation et final, comparaison prévu et réel.
 
 ## 5. Formulaires terrain
 
@@ -276,7 +276,7 @@ Confirmé le 28/10 : le fichier d'études est bien la liste envoyée par l'opér
 
 ## 11. Feuille de route
 
-1. **MVP** : utilisateurs/rôles, référentiels (OLT, plaques, zones/sous-plaques, JDV, PCO), **avant-projet et bureau d'études (v1.8, avant l'import des clients)**, **import de la liste clients**, études, planning, installation terrain hors-ligne, reporting coordinateur, **export de la fiche de suivi**, tableaux de bord de base.
+1. **MVP** : utilisateurs/rôles, référentiels (OLT, plaques, zones/sous-plaques, JDV, PCO), **projet de déploiement et bureau d'études (v1.8, avant l'import des clients)**, **import de la liste clients**, études, planning, installation terrain hors-ligne, reporting coordinateur, **export de la fiche de suivi**, tableaux de bord de base.
 2. **V1.1** : matériel et stock, incidents, suivi du déploiement (tirage, soudure) pour superviseurs, avec import et export du fichier de suivi par OLT et plaque.
 3. **V1.2** : cartographie avancée, notifications, indicateurs avancés.
 4. **V2** : API de la plateforme opérateur si elle existe ; étape de recette et facturation si besoin.
