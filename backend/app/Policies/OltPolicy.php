@@ -10,7 +10,7 @@ class OltPolicy extends NetworkPolicy
 {
     public function viewAny(User $user): bool
     {
-        return ! $user->hasRole(Role::Technician) || $user->isBeMember();
+        return ! $user->hasRole(Role::Technician) || $user->seesWholeNetwork();
     }
 
     public function view(User $user, Model $model): bool

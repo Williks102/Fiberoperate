@@ -71,6 +71,12 @@ export interface Pco {
   is_blocked: boolean;
   latitude?: string | null;
   longitude?: string | null;
+  measured_latitude?: string | null;
+  measured_longitude?: string | null;
+  measured_at?: string | null;
+  measured_by?: { id: string; name: string } | null;
+  /** Écart en mètres entre la position prévue et la position mesurée. */
+  deviation_m?: number | null;
   olt_slot?: string | null;
   olt_port?: string | null;
   fiber_strand?: string | null;
