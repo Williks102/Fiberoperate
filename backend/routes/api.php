@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BlockReasonController;
 use App\Http\Controllers\Api\V1\JdvController;
+use App\Http\Controllers\Api\V1\NetworkImportController;
 use App\Http\Controllers\Api\V1\OltController;
 use App\Http\Controllers\Api\V1\PcoController;
 use App\Http\Controllers\Api\V1\PlaqueController;
@@ -25,6 +26,8 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('zones', ZoneController::class);
         Route::apiResource('jdvs', JdvController::class);
         Route::apiResource('pcos', PcoController::class);
+        Route::post('imports/network/preview', [NetworkImportController::class, 'preview']);
+        Route::post('imports/network', [NetworkImportController::class, 'store']);
         Route::get('block-reasons', [BlockReasonController::class, 'index']);
     });
 });
