@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { Menu } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BottomBar } from "@/components/bottom-bar";
+import { MobileDrawer } from "@/components/mobile-drawer";
 import { useAuth } from "@/lib/auth/auth-context";
 import { groupsFor, HOME, isActive, isGroupActive } from "@/lib/navigation";
 
@@ -12,6 +14,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const closeMenu = useCallback(() => {
+    setMenuOpen(false);
+    menuButtonRef.current?.focus();
+  }, []);
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
@@ -53,7 +61,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between gap-3 border-b border-zinc-200 bg-white px-4 py-2 sm:px-6">
-          <span className="font-semibold md:hidden">FTTH Gestion</span>
+          <span className="flex items-center gap-2 md:hidden">
+            <button
+              ref={menuButtonRef}
+              onClick={() => setMenuOpen(true)}
+              aria-label="Ouvrir le menu"
+              aria-haspopup="dialog"
+              aria-expanded={menuOpen}
+              aria-controls="menu-mobile"
+              className="flex h-11 w-11 items-center justify-center rounded-lg border border-zinc-300"
+            >
+              <Menu aria-hidden="true" className="h-5 w-5" />
+            </button>
+            <span className="font-semibold">FTTH Gestion</span>
+          </span>
           <span className="hidden text-sm text-zinc-700 md:block">
             {user.name} · {user.role_label}
           </span>
@@ -72,6 +93,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </div>
 
       <BottomBar role={user.role} pathname={pathname} />
+      <MobileDrawer
+        open={menuOpen}
+        onClose={closeMenu}
+        groups={groups}
+        pathname={pathname}
+        name={user.name}
+        roleLabel={user.role_label}
+        onLogout={async () => {
+          await logout();
+          router.replace("/login");
+        }}
+      />
     </div>
   );
 }

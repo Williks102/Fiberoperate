@@ -1,5 +1,8 @@
 import type { Role } from "@/lib/types";
 
+/** Icône d'une activité (voir `nav-icons.tsx`). */
+export type NavIconName = "home" | "project" | "network" | "admin";
+
 export interface NavItem {
   href: string;
   label: string;
@@ -15,6 +18,7 @@ export interface NavGroup {
   href: string;
   label: string;
   description: string;
+  icon: NavIconName;
   items: NavItem[];
 }
 
@@ -28,6 +32,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     href: "/projet",
     label: "Projet",
+    icon: "project",
     description: "Les projets de déploiement, de l'avant-projet à l'exploitation.",
     items: [
       { href: "/projets", label: "Projets", description: "Un projet par plaque et sa phase.", roles: ["admin", "dg", "dt", "be_manager", "supervisor"] },
@@ -36,6 +41,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     href: "/deploiement",
     label: "Déploiement",
+    icon: "network",
     description: "Le réseau : plaques, sous-plaques, splitters, PCO et OLT.",
     items: [
       { href: "/reseau", label: "Réseau", description: "Parcourir plaques, sous-plaques, splitters et PCO." },
@@ -50,6 +56,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     href: "/administration",
     label: "Administration",
+    icon: "admin",
     description: "Les équipes et les comptes.",
     items: [
       { href: "/equipes", label: "Équipes", description: "Coordinateur, chef d'équipe et membres.", roles: ["admin", "dg", "dt", "coordinator"] },
@@ -81,16 +88,26 @@ export function isGroupActive(pathname: string, group: NavGroup): boolean {
   return isActive(pathname, group.href) || group.items.some((item) => isActive(pathname, item.href));
 }
 
-export const BOTTOM_BAR_MAX = 4;
+/** Une entrée de la barre du bas : une icône, avec son libellé pour les lecteurs d'écran. */
+export interface BarEntry {
+  href: string;
+  label: string;
+  icon: NavIconName;
+}
+
+/** Les icônes sont étroites : cinq entrées tiennent sur un téléphone. Le menu complet est dans le tiroir hamburger. */
+export const BOTTOM_BAR_MAX = 5;
 
 /**
- * Barre du bas sur téléphone : l'accueil et les activités (4 au plus), le reste dans « Plus ».
- * Chaque activité ouvre sa page d'accueil, qui liste ses écrans ; le tiroir « Plus » montre tout le menu.
+ * Barre du bas sur téléphone : l'accueil et les activités, en icônes (5 au plus).
+ * Chaque activité ouvre sa page d'accueil, qui liste ses écrans ; le tiroir hamburger montre tout le menu.
  */
-export function bottomBarFor(role: Role): { main: NavItem[]; groups: NavGroup[]; hasMore: boolean } {
+export function bottomBarFor(role: Role): { main: BarEntry[]; groups: NavGroup[] } {
   const groups = groupsFor(role);
-  const entries: NavItem[] = [HOME, ...groups.map((group) => ({ href: group.href, label: group.label }))];
-  const hasMore = entries.length > BOTTOM_BAR_MAX;
+  const entries: BarEntry[] = [
+    { href: HOME.href, label: HOME.label, icon: "home" },
+    ...groups.map((group) => ({ href: group.href, label: group.label, icon: group.icon })),
+  ];
 
-  return { main: hasMore ? entries.slice(0, BOTTOM_BAR_MAX) : entries, groups, hasMore };
+  return { main: entries.slice(0, BOTTOM_BAR_MAX), groups };
 }
