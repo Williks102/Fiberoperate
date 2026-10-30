@@ -54,6 +54,25 @@ export function ProjectActions({ project, onDone }: { project: Project; onDone: 
     );
   }
 
+  if (project.actions?.advance) {
+    return (
+      <section aria-labelledby="action" className="space-y-3 rounded-xl border border-zinc-300 bg-white p-4">
+        <h2 id="action" className="text-lg font-semibold">
+          Phase suivante
+        </h2>
+        <p className="text-sm text-zinc-700">Le projet passera en « {project.actions.advance_to} ». La décision est enregistrée dans l&apos;historique.</p>
+        {error && (
+          <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">
+            {error}
+          </p>
+        )}
+        <button onClick={() => send("advance")} disabled={busy} className="h-11 rounded-lg bg-slate-900 px-6 font-medium text-white disabled:opacity-60">
+          {busy ? "Envoi…" : `Passer en « ${project.actions.advance_to} »`}
+        </button>
+      </section>
+    );
+  }
+
   if (project.actions?.decide) {
     return (
       <section aria-labelledby="action" className="space-y-3 rounded-xl border border-zinc-300 bg-white p-4">

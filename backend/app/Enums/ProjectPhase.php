@@ -20,8 +20,8 @@ enum ProjectPhase: string
         return match ($this) {
             self::BeManagerReview => [Role::BeManager, Role::Admin],
             self::DtReview => [Role::Dt, Role::Admin],
-            // Le client n'a pas de compte : le DT ou le chef du BE enregistre sa décision.
-            self::ClientReview => [Role::Dt, Role::BeManager, Role::Admin],
+            // Le client n'a pas de compte : le DT enregistre son accord, le BE en est notifié.
+            self::ClientReview => [Role::Dt, Role::Admin],
             default => [],
         };
     }
@@ -33,6 +33,17 @@ enum ProjectPhase: string
             self::BeManagerReview => self::DtReview,
             self::DtReview => self::ClientReview,
             self::ClientReview => self::ImplantationSurvey,
+            default => null,
+        };
+    }
+
+    /** Phase suivante quand le BE fait avancer le projet (les phases de validation passent par une décision). */
+    public function nextOnAdvance(): ?self
+    {
+        return match ($this) {
+            self::ImplantationSurvey => self::Deployment,
+            self::Deployment => self::AsBuiltSurvey,
+            self::AsBuiltSurvey => self::InOperation,
             default => null,
         };
     }

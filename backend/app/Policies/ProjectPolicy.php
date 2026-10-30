@@ -29,6 +29,12 @@ class ProjectPolicy
         return $project->phase === ProjectPhase::PreProject && ($user->hasRole(Role::Admin) || $user->isBeMember());
     }
 
+    /** Fait avancer le projet après l'accord du client (survey, déploiement, relevé final, exploitation) : le BE ou l'administrateur. */
+    public function advance(User $user, Project $project): bool
+    {
+        return $project->phase->nextOnAdvance() !== null && ($user->hasRole(Role::Admin) || $user->isBeMember());
+    }
+
     /** Décision d'une phase de validation : le rôle prévu pour cette phase (chef du BE, DT, ou celui qui enregistre l'accord du client). */
     public function decide(User $user, Project $project): bool
     {

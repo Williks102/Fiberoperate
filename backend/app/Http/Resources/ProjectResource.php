@@ -39,6 +39,8 @@ class ProjectResource extends JsonResource
             'actions' => $this->whenLoaded('history', fn () => [
                 'submit' => $request->user()->can('submit', $this->resource),
                 'decide' => $request->user()->can('decide', $this->resource),
+                'advance' => $request->user()->can('advance', $this->resource),
+                'advance_to' => $this->phase->nextOnAdvance()?->label(),
             ]),
             'phase_label' => $this->phase->label(),
             'phase_changed_at' => $this->phase_changed_at?->toIso8601String(),

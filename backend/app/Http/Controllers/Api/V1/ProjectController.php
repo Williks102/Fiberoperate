@@ -6,6 +6,7 @@ use App\Domain\Project\CreateProject;
 use App\Domain\Project\MoveProject;
 use App\Enums\PcoStatus;
 use App\Enums\ProjectPhase;
+use App\Http\Requests\AdvanceProjectRequest;
 use App\Http\Requests\DecideProjectRequest;
 use App\Http\Requests\ProjectRequest;
 use App\Http\Requests\SubmitProjectRequest;
@@ -78,5 +79,11 @@ class ProjectController extends ApiResourceController
         $moved = $move->decide(Project::query()->findOrFail($project), $request->user(), $request->input('decision') === 'approved', $request->input('reason'));
 
         return new ProjectResource($this->load($moved));
+    }
+
+    /** Fait avancer le projet après l'accord du client (déploiement, relevé final, exploitation). */
+    public function advance(AdvanceProjectRequest $request, string $project, MoveProject $move): ProjectResource
+    {
+        return new ProjectResource($this->load($move->advance(Project::query()->findOrFail($project), $request->user())));
     }
 }
