@@ -13,6 +13,19 @@ class ProjectResource extends JsonResource
             'id' => $this->id,
             'plaque_id' => $this->plaque_id,
             'plaque' => $this->whenLoaded('plaque', fn () => $this->plaque?->only(['id', 'name'])),
+            // Caractéristiques du réseau du projet (fiche seulement).
+            'network' => $this->whenLoaded('plaque', fn () => $this->plaque?->relationLoaded('zones') ? [
+                'olt' => $this->plaque->olt?->only(['id', 'name']),
+                'supervisor' => $this->plaque->supervisor?->only(['id', 'name']),
+                'zones' => $this->plaque->zones->map(fn ($zone) => [
+                    'id' => $zone->id,
+                    'code' => $zone->code,
+                    'status' => $zone->status?->value,
+                    'sro' => $zone->sro?->code,
+                    'splitters' => $zone->jdvs_count,
+                    'pcos' => $zone->pcos_count,
+                ])->values(),
+            ] : null),
             'phase' => $this->phase->value,
             'phase_label' => $this->phase->label(),
             'phase_changed_at' => $this->phase_changed_at?->toIso8601String(),

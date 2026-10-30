@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { formatDateTime } from "@/lib/format";
-import { DECISION_LABELS, phaseProgress } from "@/lib/labels";
+import { DECISION_LABELS, phaseProgress, ZONE_STATUS_LABELS } from "@/lib/labels";
 import type { Project } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
 
@@ -45,6 +45,8 @@ function ProjectDetail({ project }: { project: Project }) {
           Phase actuelle : <span className="font-medium text-zinc-900">{project.phase_label}</span> depuis le {formatDateTime(project.phase_changed_at)}
         </p>
       </header>
+
+      <Characteristics project={project} />
 
       <section aria-labelledby="phases" className="space-y-2">
         <h2 id="phases" className="text-lg font-semibold">
@@ -98,5 +100,53 @@ function ProjectDetail({ project }: { project: Project }) {
         )}
       </section>
     </>
+  );
+}
+
+/** Caractéristiques du réseau du projet : OLT, superviseur, totaux et une ligne par sous-plaque. */
+function Characteristics({ project }: { project: Project }) {
+  const network = project.network;
+  if (!network) return null;
+
+  const total = (key: "splitters" | "pcos") => network.zones.reduce((sum, z) => sum + z[key], 0);
+  const facts: [string, string][] = [
+    ["OLT (source du signal)", network.olt?.name ?? "Non renseigné"],
+    ["Superviseur", network.supervisor?.name ?? "Non désigné"],
+    ["Sous-plaques", String(network.zones.length)],
+    ["Splitters", String(total("splitters"))],
+    ["PCO", String(total("pcos"))],
+  ];
+
+  return (
+    <section aria-labelledby="caracteristiques" className="space-y-3">
+      <h2 id="caracteristiques" className="text-lg font-semibold">
+        Caractéristiques
+      </h2>
+      <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {facts.map(([label, value]) => (
+          <div key={label} className="rounded-xl border border-zinc-200 bg-white p-3">
+            <dt className="text-xs text-zinc-700">{label}</dt>
+            <dd className="font-medium">{value}</dd>
+          </div>
+        ))}
+      </dl>
+      {network.zones.length === 0 ? (
+        <p className="rounded-xl border border-dashed border-zinc-300 p-4 text-sm text-zinc-700">Aucune sous-plaque pour l&apos;instant. Ajoutez-les dans « Sous-plaques ».</p>
+      ) : (
+        <ul className="space-y-2">
+          {network.zones.map((zone) => (
+            <li key={zone.id} className="space-y-1 rounded-xl border border-zinc-200 bg-white p-4 text-sm">
+              <p className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-medium">{zone.code}</span>
+                <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700">{ZONE_STATUS_LABELS[zone.status]}</span>
+              </p>
+              <p className="text-zinc-700">
+                SRO {zone.sro ?? "à créer"} · {zone.splitters} splitters · {zone.pcos} PCO
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }

@@ -7,6 +7,7 @@ use App\Enums\Role;
 use App\Models\Plaque;
 use App\Models\Project;
 use App\Models\User;
+use App\Models\Zone;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -153,5 +154,21 @@ class ProjectsApiTest extends TestCase
         $this->login(Role::Coordinator);
         $this->getJson("/api/v1/projects/{$project->id}")->assertForbidden();
         $this->getJson('/api/v1/projects/019a0000-0000-7000-8000-000000000000')->assertNotFound();
+    }
+
+    public function test_the_project_sheet_gives_the_characteristics_of_its_network(): void
+    {
+        $this->login(Role::BeManager);
+        $this->postJson('/api/v1/projects', [
+            'plaque_name' => 'ABOBO', 'olt_name' => 'OLT-1',
+            'zones' => [['code' => 'ABB01', 'pco_count' => 16, 'sro_code' => 'ABB456'], ['code' => 'ABB02']],
+        ])->assertCreated();
+
+        $this->getJson('/api/v1/projects/'.Project::firstOrFail()->id)
+            ->assertOk()
+            ->assertJsonPath('data.network.olt.name', 'OLT-1')
+            ->assertJsonPath('data.network.zones.0', ['id' => Zone::where('code', 'ABB01')->value('id'), 'code' => 'ABB01', 'status' => 'planned', 'sro' => 'ABB456', 'splitters' => 2, 'pcos' => 16])
+            ->assertJsonPath('data.network.zones.1.splitters', 0)
+            ->assertJsonPath('data.network.zones.1.sro', null);
     }
 }
