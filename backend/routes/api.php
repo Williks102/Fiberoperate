@@ -24,7 +24,8 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('users', UserController::class);
         Route::apiResource('teams', TeamController::class);
         Route::apiResource('olts', OltController::class);
-        Route::apiResource('plaques', PlaqueController::class);
+        // Une plaque naît avec son projet (POST /projects) : pas de création isolée.
+        Route::apiResource('plaques', PlaqueController::class)->except(['store']);
         Route::post('zones/{zone}/generate', [ZoneController::class, 'generate']);
         Route::apiResource('zones', ZoneController::class);
         Route::apiResource('sros', SroController::class);

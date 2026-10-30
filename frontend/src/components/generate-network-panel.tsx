@@ -58,8 +58,8 @@ export function GenerateNetworkPanel({ zone }: { zone: Zone }) {
           Réseau généré : {done.sro_created ? "1 SRO, " : ""}
           {done.splitters} splitters et {done.pcos} PCO.
         </p>
-        <Link href="/reseau" className="inline-flex h-11 items-center rounded-lg border border-green-300 bg-white px-4 font-medium">
-          Voir le réseau
+        <Link href="/plaques" className="inline-flex h-11 items-center rounded-lg border border-green-300 bg-white px-4 font-medium">
+          Voir les plaques
         </Link>
       </section>
     );

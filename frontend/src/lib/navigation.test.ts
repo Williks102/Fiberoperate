@@ -12,7 +12,7 @@ describe("menu par activité", () => {
 
   it("range les écrans du réseau dans Déploiement et les comptes dans Administration", () => {
     const names = (label: string) => NAV_GROUPS.find((g) => g.label === label)!.items.map((i) => i.href);
-    expect(names("Déploiement")).toEqual(expect.arrayContaining(["/reseau", "/plaques", "/sous-plaques", "/sro", "/splitters", "/pco", "/olt"]));
+    expect(names("Déploiement")).toEqual(expect.arrayContaining(["/plaques", "/sous-plaques", "/sro", "/splitters", "/pco", "/olt"]));
     expect(names("Administration")).toEqual(expect.arrayContaining(["/equipes", "/utilisateurs"]));
   });
 
@@ -21,10 +21,10 @@ describe("menu par activité", () => {
     expect(labels("supervisor")).toEqual(["Projet", "Déploiement"]);
     expect(labels("coordinator")).toEqual(["Déploiement", "Administration"]);
     expect(labels("technician")).toEqual(["Déploiement"]);
-    expect(groupsFor("supervisor")[1].items.map((i) => i.href)).toEqual(["/reseau", "/olt"]);
-    expect(groupsFor("technician")[0].items.map((i) => i.href)).toEqual(["/reseau"]);
+    expect(groupsFor("supervisor")[1].items.map((i) => i.href)).toEqual(["/plaques", "/olt"]);
+    expect(groupsFor("technician")[0].items.map((i) => i.href)).toEqual(["/plaques"]);
     expect(labels("be_manager")).toEqual(["Projet", "Déploiement"]);
-    expect(groupsFor("be_manager")[1].items.map((i) => i.href)).toEqual(["/reseau", "/olt"]);
+    expect(groupsFor("be_manager")[1].items.map((i) => i.href)).toEqual(["/plaques", "/olt"]);
     expect(groupsFor("coordinator").find((g) => g.label === "Administration")!.items.map((i) => i.href)).toEqual(["/equipes"]);
   });
 
