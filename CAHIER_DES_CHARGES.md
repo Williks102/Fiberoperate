@@ -58,7 +58,7 @@ Un projet porte sur **une plaque**. Le **bureau d'études (BE)** dimensionne la 
 Chaîne hiérarchique :
 - Technicien déploiement → Superviseur → DT
 - Technicien raccordement / maintenance → Coordinateur → DT
-- Technicien du BE (dessin, survey, étude avant raccordement) → Chef du BE → DT ; le coordinateur reçoit les résultats d'étude (relation fonctionnelle, à confirmer)
+- Technicien du BE (dessin, survey, étude avant raccordement) → Chef du BE → DT ; le coordinateur reçoit les résultats d'étude (relation fonctionnelle, confirmé le 30/10/2026)
 
 ### 2.1 Technicien et missions
 
@@ -123,7 +123,7 @@ Hiérarchie confirmée le 28/10, reprise de la structure du fichier de suivi de 
 
 Un **projet** = une plaque. Phases, dans l'ordre : avant-projet, validation du chef du BE, validation du DT, validation du client, survey d'implantation, déploiement, relevé final, exploitation.
 
-- Chaque changement de phase est historisé (qui, quand, décision, motif). Un refus renvoie le projet en avant-projet avec un motif obligatoire (à confirmer).
+- Chaque changement de phase est historisé (qui, quand, décision, motif). Un refus renvoie le projet en avant-projet avec un motif obligatoire (confirmé le 30/10/2026).
 - **Documents versionnés** (plan des plaques, plan synoptique, KMZ, AVP) : chaque version est conservée, jamais écrasée.
 - Le **devis de l'AVP** est saisi dans l'application (sans facturation) ; le nombre de poteaux y figure, les poteaux ne sont pas suivis un par un.
 - Le client n'a pas de compte : sa décision, sa date et son justificatif sont enregistrés.
@@ -264,7 +264,7 @@ Confirmé le 28/10 : le fichier d'études est bien la liste envoyée par l'opér
 4. Un coordinateur peut-il avoir plusieurs équipes ? Photos et signature obligatoires ?
 5. **Statuts du PCO** : valider la correspondance proposée en §3.6 (libellés du fichier → statuts normalisés) et la liste des motifs de blocage.
 6. Le fichier de suivi de déploiement doit-il être **remplacé par l'application** (saisie par les superviseurs, export identique) ou seulement importé ?
-7. **(v1.8)** Stockage des fichiers du projet (taille d'un KMZ ou d'un plan, service) ; structure du devis de l'AVP (lignes ou totaux) ; retour en cas de refus ; visibilité des projets par rôle ; hiérarchie des techniciens du BE pour l'étude avant raccordement ; qui lance chaque phase ; correspondance entre implanté / posé / mis en réseau et les statuts de PCO. Détail : `docs/workflow-projet-deploiement.md`.
+7. **(v1.8)** Stockage des fichiers du projet (taille d'un KMZ ou d'un plan, service) ; structure du devis de l'AVP (lignes ou totaux) ; visibilité des projets par rôle ; qui lance chaque phase ; correspondance entre implanté / posé / mis en réseau et les statuts de PCO. Détail : `docs/workflow-projet-deploiement.md`.
 
 ## 10. Architecture technique proposée
 

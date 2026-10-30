@@ -25,11 +25,11 @@ Application de gestion pour une entreprise sous-traitante qui installe la fibre 
 ## Rôles (un seul rôle `technician` avec habilitations)
 `admin`, `dg`, `dt`, `supervisor`, `coordinator`, `technician`, et (v1.8, à créer) `be_manager` (chef du BE).
 Habilitations technicien : `deployment`, `customer_connection`, `maintenance`, `study`, et (v1.8, à créer) `drawing` (dessin, AVP) et `survey` (relevés).
-Hiérarchie : technicien déploiement → superviseur → DT ; technicien raccordement ou maintenance → coordinateur → DT ; technicien du BE → chef du BE → DT (le coordinateur reçoit les résultats d'étude ; à confirmer).
+Hiérarchie : technicien déploiement → superviseur → DT ; technicien raccordement ou maintenance → coordinateur → DT ; technicien du BE → chef du BE → DT (le coordinateur reçoit les résultats d'étude, sans être leur supérieur).
 Toute requête est filtrée par rôle **et** périmètre (plaque pour le superviseur, équipes pour le coordinateur). Policies Laravel obligatoires, jamais de contrôle uniquement côté front.
 
 ## Flux métier
-0. **Projet de déploiement** (une plaque) : avant-projet par le BE (plans, KMZ, AVP et devis), validation du chef du BE, puis du DT, puis du client ; survey d'implantation ; déploiement par le superviseur ; relevé final. Détail et phases : `docs/workflow-projet-deploiement.md`. Documents toujours versionnés, jamais écrasés ; un refus renvoie en avant-projet avec un motif (à confirmer).
+0. **Projet de déploiement** (une plaque) : avant-projet par le BE (plans, KMZ, AVP et devis), validation du chef du BE, puis du DT, puis du client ; survey d'implantation ; déploiement par le superviseur ; relevé final. Détail et phases : `docs/workflow-projet-deploiement.md`. Documents toujours versionnés, jamais écrasés ; un refus renvoie en avant-projet avec un motif obligatoire.
 1. Le coordinateur importe la liste des clients (Excel/CSV) → une `customer_order` par ligne.
 2. Mise en étude → intervention `study` → résultat saisi (formulaire terrain ou par le coordinateur).
 3. Programmation de l'installation (équipe, date) → intervention `customer_connection`.

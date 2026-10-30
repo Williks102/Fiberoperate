@@ -23,13 +23,13 @@ Ensuite, quand le **client envoie la liste des personnes à raccorder** : les te
 ### Acteurs et rôles
 - **Chef du BE** : nouveau rôle. Il supervise les activités du BE, valide le dossier d'avant-projet avant le DT.
 - **Techniciens du BE** : dessinateurs ou techniciens réseau. Ce sont des **techniciens avec habilitations** (nouvelles habilitations proposées : `drawing` pour le dessin et l'AVP, `survey` pour les relevés ; `study` existe déjà pour l'étude avant raccordement).
-- Hiérarchie proposée : technicien du BE → chef du BE → DT. Le coordinateur reçoit les résultats d'étude (relation fonctionnelle, pas hiérarchique). *À confirmer.*
+- Hiérarchie (confirmée le 30/10/2026) : technicien du BE → chef du BE → DT. Le coordinateur reçoit les résultats d'étude (relation fonctionnelle, pas hiérarchique).
 - Le **client n'a pas de compte** : l'application enregistre sa décision, sa date et le justificatif (fichier).
 
 ### Projet et phases
 - Un **projet par plaque**, avec une phase courante parmi : avant-projet, validation du chef du BE, validation du DT, validation du client, survey d'implantation, déploiement, relevé final, exploitation.
 - Chaque changement de phase est **historisé** (qui, quand, décision, motif), comme pour les statuts de PCO.
-- Un refus (chef du BE, DT ou client) **renvoie le projet en avant-projet avec un motif obligatoire**. *À confirmer.*
+- Un refus (chef du BE, DT ou client) **renvoie le projet en avant-projet avec un motif obligatoire** (confirmé le 30/10/2026).
 
 ### Documents
 - Plan des plaques, plan synoptique, KMZ, AVP : des **documents versionnés**. Chaque version est conservée, jamais écrasée ni supprimée (qui, quand, commentaire, taille).
@@ -64,10 +64,9 @@ Nouveau **lot 1B — Avant-projet et bureau d'études**, en petites tranches vis
 7. Comparaison prévu et réel par sous-plaque.
 
 ## 4. Questions encore ouvertes
+Confirmé le 30/10/2026 (donc retiré de cette liste) : hiérarchie des techniciens du BE, retour en avant-projet en cas de refus, « prévu » porté par la phase du projet.
 1. **Stockage des fichiers** : taille d'un KMZ ou d'un plan, et service à utiliser (Cloudinary est prévu pour les photos, mais limité en taille pour les fichiers).
 2. **Structure du devis** : des lignes détaillées (désignation, quantité, prix) ou un total par rubrique ?
-3. **Refus** : retour en avant-projet avec motif, ou retour à la phase précédente ?
-4. **Visibilité** : le BE voit-il tous les projets ? Le superviseur ne voit-il que celui de sa plaque ?
-5. **Hiérarchie des techniciens du BE** qui font l'étude avant raccordement : chef du BE (proposé) ou coordinateur ?
-6. **Qui peut lancer chaque phase** (par exemple passer en déploiement après l'accord du client) ?
-7. **Correspondance exacte** entre « implanté / posé / mis en réseau » et les statuts de PCO du cahier.
+3. **Visibilité** : le BE voit-il tous les projets ? Le superviseur ne voit-il que celui de sa plaque ?
+4. **Qui peut lancer chaque phase** (par exemple passer en déploiement après l'accord du client) ?
+5. **Correspondance exacte** entre « implanté / posé / mis en réseau » et les statuts de PCO du cahier.
