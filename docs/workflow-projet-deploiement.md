@@ -40,7 +40,7 @@ Ensuite, quand le **client envoie la liste des personnes à raccorder** : les te
 - Le nombre de poteaux est mentionné dans l'AVP ; les **poteaux ne sont pas suivis un par un**.
 
 ### Réseau : prévu et réel
-- **La plaque naît avec le projet** : on saisit son nom, on choisit ou on crée son OLT, puis on définit ses sous-plaques. Une plaque n'existe que sous un projet ; une plaque existante ne peut être importée que sous un projet (import CSV plaque / sous-plaque / splitter / PCO possible dès la création du projet).
+- **La plaque naît avec le projet**, créé par le **chef du BE ou l'administrateur** : on saisit son nom, on choisit ou on crée son OLT, puis on définit ses sous-plaques. Une plaque n'existe que sous un projet ; une plaque existante ne peut être importée que sous un projet (import CSV plaque / sous-plaque / splitter / PCO possible dès la création du projet).
 - **Sous-plaque générée** : on choisit le nombre de PCO (libre ; 32 et 64 suggérés) ; la SRO, les splitters (`SPL001…`, 8 PCO chacun) et les PCO (`{CODE}_PCO001…`) sont créés automatiquement. Le **technicien du BE ajuste** ensuite selon son plan.
 - **Saturation** : un PCO accueille 8 clients (16 ports physiques) ; au 9ᵉ client, on crée un autre PCO (désaturation, lot 3). Standards 8 splitters par SRO et 8 PCO par splitter : valeurs par défaut, jamais bloquantes.
 - Le dimensionnement du BE **est le réseau lui-même** : sous-plaques, SRO, splitters et PCO sont créés à l'avant-projet (même import CSV, mais sous le projet). Tant que le projet n'a pas atteint le déploiement, ils sont « prévus » (c'est la **phase du projet** qui le dit, sans nouveau statut de PCO).

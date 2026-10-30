@@ -14,7 +14,7 @@ import { useDebounced } from "@/lib/use-debounced";
 
 export default function ProjetsPage() {
   const { user } = useAuth();
-  const canCreate = user?.role === "admin" || user?.role === "dt" || user?.role === "be_manager";
+  const canCreate = user?.role === "admin" || user?.role === "be_manager";
   const [search, setSearch] = useState("");
   const [phase, setPhase] = useState("");
   const [page, setPage] = useState(1);

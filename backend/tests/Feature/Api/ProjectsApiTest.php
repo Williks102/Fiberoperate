@@ -60,13 +60,13 @@ class ProjectsApiTest extends TestCase
     {
         $plaque = Plaque::create(['name' => 'FAYA']);
 
-        foreach ([Role::Dg, Role::Supervisor, Role::Coordinator, Role::Technician] as $role) {
+        foreach ([Role::Dg, Role::Dt, Role::Supervisor, Role::Coordinator, Role::Technician] as $role) {
             $this->login($role);
             $this->postJson('/api/v1/projects', ['plaque_id' => $plaque->id])->assertForbidden();
         }
         $this->assertSame(0, Project::count());
 
-        $this->login(Role::Dt);
+        $this->login(Role::BeManager);
         $this->postJson('/api/v1/projects', ['plaque_id' => $plaque->id])->assertCreated();
     }
 
