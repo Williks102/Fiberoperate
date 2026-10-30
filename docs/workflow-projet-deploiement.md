@@ -5,7 +5,7 @@ Document de cadrage du 30/10/2026, issu des explications du client. Il décrit l
 Vocabulaire : **BE** = bureau d'études ; **AVP** = avant-projet (dossier avec devis) ; **KMZ** = fichier de plan lisible dans Google Earth ; **survey** = relevé de terrain ; **DT** = directeur technique.
 
 ## 1. Le parcours
-Un **projet** porte sur **une plaque**, subdivisée en sous-plaques.
+Un **projet** porte sur **une plaque**, subdivisée en sous-plaques. Chaîne réseau (v1.9) : projet → plaque → sous-plaque → **SRO** → splitter → PCO → client.
 
 | # | Phase | Qui | Ce qui est produit |
 |---|---|---|---|
@@ -40,7 +40,10 @@ Ensuite, quand le **client envoie la liste des personnes à raccorder** : les te
 - Le nombre de poteaux est mentionné dans l'AVP ; les **poteaux ne sont pas suivis un par un**.
 
 ### Réseau : prévu et réel
-- Le dimensionnement du BE **est le réseau lui-même** : sous-plaques, splitters et PCO sont créés à l'avant-projet (même import CSV que l'écran « Importer le réseau »). Tant que le projet n'a pas atteint le déploiement, ils sont « prévus » (c'est la **phase du projet** qui le dit, sans nouveau statut de PCO).
+- **La plaque naît avec le projet** : on saisit son nom, on choisit ou on crée son OLT, puis on définit ses sous-plaques. Une plaque n'existe que sous un projet ; une plaque existante ne peut être importée que sous un projet (import CSV plaque / sous-plaque / splitter / PCO possible dès la création du projet).
+- **Sous-plaque générée** : on choisit le nombre de PCO (libre ; 32 et 64 suggérés) ; la SRO, les splitters (`SPL001…`, 8 PCO chacun) et les PCO (`{CODE}_PCO001…`) sont créés automatiquement. Le **technicien du BE ajuste** ensuite selon son plan.
+- **Saturation** : un PCO accueille 8 clients (16 ports physiques) ; au 9ᵉ client, on crée un autre PCO (désaturation, lot 3). Standards 8 splitters par SRO et 8 PCO par splitter : valeurs par défaut, jamais bloquantes.
+- Le dimensionnement du BE **est le réseau lui-même** : sous-plaques, SRO, splitters et PCO sont créés à l'avant-projet (même import CSV, mais sous le projet). Tant que le projet n'a pas atteint le déploiement, ils sont « prévus » (c'est la **phase du projet** qui le dit, sans nouveau statut de PCO).
 - Les statuts de PCO restent ceux du cahier : à tirer, tiré, soudure faite, activé. L'implantation, la pose et la mise en réseau s'y rattachent.
 - Chaque PCO a des **coordonnées prévues** (survey d'implantation) et des **coordonnées mesurées** (relevé final), avec la date et l'auteur du relevé.
 - Un tableau compare le **prévu** (dimensionnement) et le **réel** (ce qui existe) par sous-plaque.
@@ -59,7 +62,12 @@ Décision du client : **l'avant-projet passe avant l'import des clients**, qui n
 
 Nouveau **lot 1B — Projet de déploiement et bureau d'études**, en petites tranches visibles :
 1. Rôle chef du BE et habilitations `drawing` et `survey` (formulaire utilisateur).
-2. Projet par plaque : liste, fiche, phase courante et historique.
+2. Projet par plaque : liste, fiche, phase courante et historique *(fait)*.
+   - **2c. Niveau SRO** (v1.9) : table, API, écrans Réseau et splitters.
+   - **2d. Création guidée du projet** : nom de la plaque, OLT choisi ou créé, sous-plaques, en une opération.
+   - **2e. Génération d'une sous-plaque** (32 / 64 / libre).
+   - **2f. Import CSV sous un projet** (colonne SRO) ; retrait de l'import global et de la création de plaque isolée.
+   - **2g. Droits du BE** sur le réseau d'un projet.
 3. Documents versionnés (après le choix du stockage).
 4. AVP et devis.
 5. Circuit de validation : chef du BE, puis DT, puis client, avec refus motivé.
@@ -72,4 +80,5 @@ Confirmé le 30/10/2026 (donc retiré de cette liste) : hiérarchie des technici
 2. **Structure du devis** : des lignes détaillées (désignation, quantité, prix) ou un total par rubrique ?
 3. **Visibilité** : le BE voit-il tous les projets ? Le superviseur ne voit-il que celui de sa plaque ?
 4. **Qui peut lancer chaque phase** (par exemple passer en déploiement après l'accord du client) ?
+6. **(v1.9)** Informations de la SRO ; colonnes « ZONE PCO » et « JDV/HUB » du suivi raccordement ; qui crée un projet ; jusqu'à quelle phase le BE ajuste le réseau ; données existantes à conserver ; rattachement du PCO de désaturation. Liste complète : cahier §9 points 8 à 13.
 5. **Correspondance exacte** entre « implanté / posé / mis en réseau » et les statuts de PCO du cahier.

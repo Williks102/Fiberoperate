@@ -1,6 +1,6 @@
 # CLAUDE.md — Application de gestion FTTH (sous-traitant opérateur)
 
-Référence fonctionnelle complète : `CAHIER_DES_CHARGES.md` (v1.8). Parcours d'un projet : `docs/workflow-projet-deploiement.md`. En cas de doute métier, ce document fait foi.
+Référence fonctionnelle complète : `CAHIER_DES_CHARGES.md` (v1.9). Parcours d'un projet : `docs/workflow-projet-deploiement.md`. En cas de doute métier, ce document fait foi.
 
 ## Objectif
 Application de gestion pour une entreprise sous-traitante qui installe la fibre optique : import de la liste des clients, études, plannings (raccordements, déploiements, tirages, maintenance), suivi des zones et des PCO, reporting du coordinateur, matériel, incidents, tableaux de bord. **Opérationnel uniquement** : pas de facturation ni de paie (le **devis de l'AVP** est saisi, sans facturation). **Pas d'intégration technique** avec la plateforme de l'opérateur en v1.
@@ -13,9 +13,10 @@ Application de gestion pour une entreprise sous-traitante qui installe la fibre 
 
 ## Vocabulaire
 - **PCO** (point de concentration optique) = **PBO** = le « boîtier » : table `pcos`, code du type `FAY03_PCO001`.
-- Hiérarchie (structure du fichier de suivi de déploiement, **seule référence de l'architecture**) : **OLT** (`olts`) → **plaque** (`plaques`, ex. FAYA, ARCADE) → **sous-plaque = zone** (`zones` : `FAY03` = FAYA 03, `ACA003` = ARCADE 003) → **JDV = splitter** (`jdvs`, codes `SPL001`…) → **PCO** → `customer_orders`. Le mot « zone » du brief désigne la sous-plaque. Un **superviseur couvre une plaque entière** (toutes ses sous-plaques) : `plaques.supervisor_id`. L'OLT peut être renseigné plus tard (`plaques.olt_id` nullable).
-- **Aucun nombre fixe** : ne jamais coder en dur ni valider un nombre de JDV par zone ou de PCO par JDV (observé : 1 à 16 PCO par splitter, 1 à 11 splitters par sous-plaque).
-- La sous-plaque se dit « hub » chez Huawei et « SRO » chez Nokia : stocker le fabricant (`zones.vendor`) et afficher le libellé correspondant. Pas de table `nodes` séparée.
+- Hiérarchie (structure du fichier de suivi de déploiement, **seule référence de l'architecture**) : **Projet** → **plaque** (`plaques`, ex. FAYA, ARCADE ; n'existe que sous un projet ; desservie par un **OLT**, `olts`) → **sous-plaque = zone** (`zones` : `FAY03` = FAYA 03, `ABB01`) → **SRO** (`sros`, une par sous-plaque, v1.9) → **JDV = splitter** (`jdvs`, convention `SPL001`…) → **PCO** → `customer_orders`. Le mot « zone » du brief désigne la sous-plaque. Un **superviseur couvre une plaque entière** (toutes ses sous-plaques) : `plaques.supervisor_id`. L'OLT peut être renseigné plus tard (`plaques.olt_id` nullable).
+- **Aucun nombre imposé** : standards (v1.9) = 8 splitters par SRO, 8 PCO par splitter, PCO de 16 ports avec 8 clients raccordés au plus. Ce sont des **valeurs par défaut modifiables, jamais bloquantes** : ne jamais valider ni refuser un nombre de JDV par SRO ou de PCO par JDV (observé : 1 à 16 PCO par splitter, 1 à 11 splitters par sous-plaque). Un PCO est saturé à 8 clients ; au 9ᵉ, on le **désature** en créant un autre PCO.
+- **Génération d'une sous-plaque** : code + nombre de PCO libre (32 et 64 suggérés) → SRO, splitters `SPL001…` (8 PCO chacun) et PCO `{CODE}_PCO001…` créés en une transaction, refusée si la sous-plaque a déjà des splitters ou des PCO. Le technicien du BE ajuste ensuite.
+- L'équipement de la sous-plaque se dit « hub » chez Huawei et « SRO » chez Nokia : stocker le fabricant et afficher le libellé correspondant. Depuis la v1.9 la SRO est un niveau à part (table `sros`, 1:1 avec la sous-plaque), ce qui remplace la décision « pas de table `nodes` séparée ».
 - Le « D » des codes (D01…) = **division** : pas exploité pour l'instant, conserver le texte brut. Le « F » (F22, F77…) est peut-être un numéro de fibre : à confirmer, ne pas le coder en dur.
 - **Étude technique initiale** (vocabulaire de l'opérateur, à ne pas inverser) : « **Sans PCO** » = étude **réalisée**, client raccordable ; « **Avec PCO** » = étude **à réaliser**. Stocker le libellé d'origine (`initial_study_status_raw`) et un état normalisé ; afficher des libellés clairs dans l'interface ; reprendre les libellés de l'opérateur dans l'export de la fiche de suivi.
 - **Box (ONT)** : après l'étude, une box est attribuée au client pour son installation ; elle est rattachée à un **SN ONT** (numéro de série) et à un **numéro fixe** (colonne « LIGNE FIXE » du fichier de suivi raccordement). Structure du fichier et pièges d'import : `docs/fichiers-exemples/suivi-raccordement.md`.
@@ -29,7 +30,7 @@ Hiérarchie : technicien déploiement → superviseur → DT ; technicien raccor
 Toute requête est filtrée par rôle **et** périmètre (plaque pour le superviseur, équipes pour le coordinateur). Policies Laravel obligatoires, jamais de contrôle uniquement côté front.
 
 ## Flux métier
-0. **Projet de déploiement** (une plaque) : avant-projet par le BE (plans, KMZ, AVP et devis), validation du chef du BE, puis du DT, puis du client ; survey d'implantation ; déploiement par le superviseur ; relevé final. Détail et phases : `docs/workflow-projet-deploiement.md`. Documents toujours versionnés, jamais écrasés ; un refus renvoie en avant-projet avec un motif obligatoire.
+0. **Projet de déploiement** (la plaque naît avec le projet : parcours guidé nom → OLT choisi ou créé → sous-plaques, ou import CSV rattaché au projet) : avant-projet par le BE (plans, KMZ, AVP et devis), validation du chef du BE, puis du DT, puis du client ; survey d'implantation ; déploiement par le superviseur ; relevé final. Détail et phases : `docs/workflow-projet-deploiement.md`. Documents toujours versionnés, jamais écrasés ; un refus renvoie en avant-projet avec un motif obligatoire.
 1. Le coordinateur importe la liste des clients (Excel/CSV) → une `customer_order` par ligne.
 2. Mise en étude → intervention `study` → résultat saisi (formulaire terrain ou par le coordinateur).
 3. Programmation de l'installation (équipe, date) → intervention `customer_connection`.
@@ -79,7 +80,7 @@ Toute requête est filtrée par rôle **et** périmètre (plaque pour le supervi
 
 ## Ordre de développement
 1. Auth, rôles, habilitations, équipes, référentiels (OLT, plaques, zones/sous-plaques, JDV, PCO).
-1B. **Projet de déploiement et bureau d'études** (décision du 30/10/2026 : avant l'import des clients, qui se fait quand la structure de l'activité est maîtrisée). Le formulaire PCO s'y rattache.
+1B. **Projet de déploiement et bureau d'études** (décision du 30/10/2026 : avant l'import des clients, qui se fait quand la structure de l'activité est maîtrisée). Le formulaire PCO s'y rattache. Cahier v1.9 : niveau SRO, création de projet guidée, import sous un projet, génération des sous-plaques (tranches dans `LOTS_DE_TRAVAIL.md`).
 2. Import de la liste des clients et commandes.
 3. Études et planning.
 4. PWA technicien hors-ligne (études, installation, photos, signature).
