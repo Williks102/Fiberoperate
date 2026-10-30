@@ -1,0 +1,4 @@
+ref;type;rubrique;designation;unite;prix_unitaire
+MGC01;fourniture;MATERIELS DE GENIE CIVIL;Borne de repérage;u;5000
+POT02;prestation;POTEAUX BOIS ET METALLIQUES;Plantation poteau béton;u;35000
+CPT14;prestation;Pose et fixation de câbles FO en aérien;De 06 à 24 FO;ml;180

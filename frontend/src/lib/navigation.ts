@@ -38,6 +38,7 @@ export const NAV_GROUPS: NavGroup[] = [
     description: "Les projets de déploiement, de l'avant-projet à l'exploitation.",
     items: [
       { href: "/projets", label: "Projets", description: "Un projet par plaque et sa phase.", roles: ["admin", "dg", "dt", "be_manager", "supervisor"] },
+      { href: "/catalogue", label: "Catalogue de prix", description: "Le bordereau de l'opérateur : références, unités et prix unitaires des devis.", roles: ["admin", "dg", "dt", "be_manager", "technician"], skills: ["drawing"] },
     ],
   },
   {
