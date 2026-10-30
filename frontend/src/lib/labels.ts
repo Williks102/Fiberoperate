@@ -7,6 +7,11 @@ export const ZONE_STATUS_LABELS: Record<ZoneStatus, string> = {
   closed: "Clôturée",
 };
 
+export const VENDOR_LABELS = {
+  huawei: "Huawei (hub)",
+  nokia: "Nokia (SRO)",
+} as const;
+
 export const PCO_STATUS_LABELS = {
   to_pull: "À tirer",
   pulled: "Tiré",
