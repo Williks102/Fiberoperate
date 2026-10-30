@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { BottomBar } from "@/components/bottom-bar";
 import { useAuth } from "@/lib/auth/auth-context";
 import { isActive, navFor } from "@/lib/navigation";
 
@@ -66,20 +67,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <main className="mx-auto w-full max-w-6xl flex-1 p-4 pb-24 sm:p-6 md:pb-6">{children}</main>
       </div>
 
-      <nav aria-label="Menu principal" className="fixed inset-x-0 bottom-0 z-10 flex border-t border-zinc-200 bg-white md:hidden">
-        {items.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            aria-current={isActive(pathname, item.href) ? "page" : undefined}
-            className={`flex h-14 flex-1 items-center justify-center text-sm font-medium ${
-              isActive(pathname, item.href) ? "text-slate-900 underline underline-offset-4" : "text-zinc-700"
-            }`}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
+      <BottomBar role={user.role} pathname={pathname} />
     </div>
   );
 }
