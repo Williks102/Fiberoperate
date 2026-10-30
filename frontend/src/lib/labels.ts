@@ -1,4 +1,4 @@
-import type { MissionType, Pco, Role, ZoneStatus } from "@/lib/types";
+import type { MissionType, Pco, ProjectPhase, Role, ZoneStatus } from "@/lib/types";
 
 export const ZONE_STATUS_LABELS: Record<ZoneStatus, string> = {
   planned: "Planifiée",
@@ -27,6 +27,18 @@ export function pcoStatusLabel(pco: Pick<Pco, "status" | "status_raw">): string 
   if (pco.status) return PCO_STATUS_LABELS[pco.status];
   return pco.status_raw?.trim() || "Non renseigné";
 }
+
+/** Phases d'un projet de déploiement, dans l'ordre du parcours. */
+export const PROJECT_PHASES: { value: ProjectPhase; label: string }[] = [
+  { value: "pre_project", label: "Avant-projet" },
+  { value: "be_manager_review", label: "Validation du chef du BE" },
+  { value: "dt_review", label: "Validation du DT" },
+  { value: "client_review", label: "Validation du client" },
+  { value: "implantation_survey", label: "Survey d'implantation" },
+  { value: "deployment", label: "Déploiement" },
+  { value: "as_built_survey", label: "Relevé final" },
+  { value: "in_operation", label: "Exploitation" },
+];
 
 export const ROLE_LABELS: Record<Role, string> = {
   admin: "Administrateur",

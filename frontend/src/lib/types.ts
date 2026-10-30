@@ -72,6 +72,25 @@ export interface Team {
   member_ids: string[];
 }
 
+export type ProjectPhase =
+  | "pre_project"
+  | "be_manager_review"
+  | "dt_review"
+  | "client_review"
+  | "implantation_survey"
+  | "deployment"
+  | "as_built_survey"
+  | "in_operation";
+
+export interface Project {
+  id: string;
+  plaque_id: string;
+  plaque: { id: string; name: string } | null;
+  phase: ProjectPhase;
+  phase_label: string;
+  phase_changed_at: string | null;
+}
+
 export interface Olt {
   id: string;
   name: string;
