@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\OltController;
 use App\Http\Controllers\Api\V1\PcoController;
 use App\Http\Controllers\Api\V1\PlaqueController;
 use App\Http\Controllers\Api\V1\ProjectController;
+use App\Http\Controllers\Api\V1\SroController;
 use App\Http\Controllers\Api\V1\TeamController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\ZoneController;
@@ -25,6 +26,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('olts', OltController::class);
         Route::apiResource('plaques', PlaqueController::class);
         Route::apiResource('zones', ZoneController::class);
+        Route::apiResource('sros', SroController::class);
         Route::apiResource('jdvs', JdvController::class);
         Route::apiResource('pcos', PcoController::class);
         Route::apiResource('projects', ProjectController::class)->only(['index', 'show', 'store']);

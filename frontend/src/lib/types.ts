@@ -49,6 +49,18 @@ export interface Jdv {
   zone?: { id: string; code: string; plaque: { id: string; name: string } | null };
 }
 
+export interface Sro {
+  id: string;
+  zone_id: string;
+  code: string;
+  latitude: string | null;
+  longitude: string | null;
+  olt_slot: string | null;
+  olt_port: string | null;
+  fiber_strand: string | null;
+  zone?: { id: string; code: string; plaque: { id: string; name: string } | null };
+}
+
 export interface Pco {
   id: string;
   zone_id: string;

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /** Zone = sous-plaque (zone SRO : « hub » chez Huawei, « SRO » chez Nokia). */
@@ -41,6 +42,11 @@ class Zone extends Model
     public function plaque(): BelongsTo
     {
         return $this->belongsTo(Plaque::class);
+    }
+
+    public function sro(): HasOne
+    {
+        return $this->hasOne(Sro::class);
     }
 
     public function jdvs(): HasMany
