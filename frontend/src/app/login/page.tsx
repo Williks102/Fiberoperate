@@ -36,7 +36,7 @@ export default function LoginPage() {
       <form onSubmit={onSubmit} className="w-full max-w-sm space-y-4 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm" noValidate>
         <div className="space-y-1 text-center">
           <h1 className="text-xl font-semibold">FTTH Gestion</h1>
-          <p className="text-sm text-zinc-600">Connectez-vous pour continuer.</p>
+          <p className="text-sm text-zinc-700">Connectez-vous pour continuer.</p>
         </div>
 
         {error && (
@@ -79,7 +79,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={submitting || !email || !password}
-          className="h-11 w-full rounded-lg bg-slate-900 font-medium text-white disabled:opacity-50"
+          className="h-11 w-full rounded-lg bg-slate-900 font-medium text-white disabled:opacity-60"
         >
           {submitting ? "Connexion…" : "Se connecter"}
         </button>

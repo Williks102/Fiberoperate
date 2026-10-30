@@ -40,10 +40,10 @@ export default function EquipesPage() {
                       team.name
                     )}
                   </p>
-                  <p className="text-sm text-zinc-600">
+                  <p className="text-sm text-zinc-700">
                     Coordinateur : {team.coordinator?.name ?? "non défini"} · Chef d&apos;équipe : {team.leader?.name ?? "non défini"}
                   </p>
-                  <p className="text-sm text-zinc-600">
+                  <p className="text-sm text-zinc-700">
                     {team.members.length === 0
                       ? "Aucun membre"
                       : `${team.members.length} membre${team.members.length > 1 ? "s" : ""} : ${team.members.map((m) => m.name).join(", ")}`}

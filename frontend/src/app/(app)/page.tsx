@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <section className="space-y-1 rounded-xl border border-zinc-200 bg-white p-5">
       <h1 className="text-xl font-semibold">Bonjour {user?.name}</h1>
-      <p className="text-sm text-zinc-600">
+      <p className="text-sm text-zinc-700">
         {user?.role_label} · {user?.email}
       </p>
     </section>

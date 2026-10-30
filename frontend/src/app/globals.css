@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
+/* Thème clair uniquement en V1 : les écrans sont dessinés pour un fond clair.
+   Sans cela, un téléphone en mode sombre affichait du texte clair sur des cartes blanches. */
 :root {
+  color-scheme: light;
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -10,15 +13,14 @@
   --color-foreground: var(--foreground);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Texte d'exemple des champs : lisible, mais distinct d'une valeur saisie. */
+::placeholder {
+  color: #52525b;
+  opacity: 1;
 }
