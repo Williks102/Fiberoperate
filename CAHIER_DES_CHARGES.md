@@ -1,6 +1,8 @@
 # Cahier des charges — Application de gestion d'une entreprise d'installation de fibre optique (FTTH)
 
-Version 1.8 — 30/10/2026
+Version 1.9 — 30/10/2026
+
+**Changements v1.9** : la structure du réseau est précisée par le client (schéma du 30/10) : **Projet → Plaque → Sous-plaque → SRO → Splitter → PCO**. La **SRO** devient un niveau à part (une par sous-plaque), ce qui remplace la décision de la v1.6 « hub et SRO sont deux noms de la sous-plaque » (§3.1). Une **plaque n'existe que sous un projet** : elle naît avec lui, par un parcours guidé (nom, OLT choisi ou créé, sous-plaques) ou par un **import CSV rattaché au projet** (§3.7, §6.1). **Dimensionnement standard** (8 splitters par SRO, 8 PCO par splitter, 16 ports et 8 clients par PCO) et **génération automatique** des splitters et des PCO à la création d'une sous-plaque (§3.8). Un PCO est saturé à 8 clients : au 9ᵉ, on le **désature** en créant un autre PCO.
 
 **Changements v1.8** : le parcours réel d'un projet de déploiement est intégré : phase d'avant-projet menée par le bureau d'études (plans, KMZ, AVP avec devis), validations en chaîne (chef du BE, DT, client), surveys d'implantation et final, documents versionnés (§1.2, §3.7, `docs/workflow-projet-deploiement.md`) ; nouveaux rôle (chef du BE) et habilitations ; l'avant-projet passe avant l'import des clients.
 
@@ -87,16 +89,18 @@ Les périmètres limitent la visibilité : la **plaque** pour le superviseur, le
 
 ### 3.1 Hiérarchie réseau
 
-Hiérarchie confirmée le 28/10, reprise de la structure du fichier de suivi de déploiement, qui est la seule référence :
+Hiérarchie précisée le 30/10 (schéma du client), qui remplace celle de la v1.7 :
 
-- **OLT** : équipement de tête, qui dessert une ou plusieurs plaques. Il peut être renseigné plus tard s'il n'est pas encore connu.
-- **Plaque** : grande zone géographique (par ex. FAYA, ARCADE, ATTOBAN). Un **superviseur couvre une plaque entière**.
-- **Sous-plaque, ou zone** : subdivision d'une plaque, avec un code (`FAY03` pour FAYA 03, `ACA003` pour ARCADE 003). C'est la **zone SRO**, l'unité de suivi du déploiement. Son nom dépend du fabricant : « hub » chez Huawei, « SRO » chez Nokia ; l'application stocke le fabricant et affiche le libellé correspondant. Le mot « zone » du brief initial désigne la sous-plaque.
-- **JDV** (aussi appelé **splitter**, codes `SPL001`, `SPL002`…) : appartient à une sous-plaque et regroupe plusieurs PCO.
-- **PCO** (point de concentration optique, par ex. `FAY03_PCO001`) = **PBO**, c'est-à-dire le « boîtier » du cahier initial. Un client est rattaché à un PCO après l'étude.
-- **Chaîne complète** : OLT → plaque → sous-plaque (zone) → JDV (splitter) → PCO → client.
+- **Projet** : porte sur **une plaque** et la fait naître (§3.7).
+- **OLT** : **source du signal**, il alimente toute la plaque. On le choisit ou on le crée à la création du projet ; il peut aussi être renseigné plus tard.
+- **Plaque** : grande zone géographique (par ex. FAYA, ARCADE, ATTOBAN). Un **superviseur couvre une plaque entière**. Une plaque n'existe que sous un projet.
+- **Sous-plaque, ou zone** : subdivision d'une plaque, avec un code (`FAY03` pour FAYA 03, `ABB01`…). C'est l'unité de suivi du déploiement. Le mot « zone » du brief initial désigne la sous-plaque.
+- **SRO** (sous-répartiteur optique) : **une par sous-plaque**. Elle **part de l'OLT** et **alimente les splitters d'une sous-plaque précise** : c'est le maillon entre la source du signal (l'OLT, commun à la plaque) et les splitters de sa sous-plaque. Le slot, le port et le brin de fibre de départ de l'OLT sont donc **saisis à la SRO** (confirmé le 30/10). Son **nom** est formé des lettres de la sous-plaque suivies d'un **numéro donné par l'opérateur** (par ex. `ABB456`), donc **indépendant** du numéro de la sous-plaque (`ABB01`) : il est **saisi**, jamais déduit. Son nom dépend du fabricant : « hub » chez Huawei, « SRO » chez Nokia ; l'application stocke le fabricant et affiche le libellé correspondant. *Le rôle, le format du nom, l'origine du numéro et le lieu de saisie du raccordement à l'OLT sont confirmés (30/10). Son GPS (facultatif) est enregistré.*
+- **JDV** (aussi appelé **splitter**, convention de nommage `SPL001`, `SPL002`…) : raccordé à la SRO, regroupe des PCO.
+- **PCO** (point de concentration optique, par ex. `FAY03_PCO001`) = **PBO**, le « boîtier ». Un client est rattaché à un PCO après l'étude.
+- **Chaîne complète** : Projet → plaque → sous-plaque → SRO → JDV (splitter) → PCO → client.
 
-**Aucun nombre n'est fixé** : le nombre de JDV par zone et de PCO par JDV est libre et varie d'une zone à l'autre. Le code d'un PCO comporte parfois un « D » suivi d'un numéro (D01 à D04) : il désigne la **division** ; il est conservé tel quel dans l'adresse brute et n'est pas exploité pour l'instant.
+**Nombres standard, jamais bloquants** : voir §3.8. Dans les fichiers réels, le nombre de splitters et de PCO varie d'une zone à l'autre (1 à 16 PCO par splitter, 8 pour la majorité). Le code d'un PCO comporte parfois un « D » suivi d'un numéro (D01 à D04) : il désigne la **division** ; il est conservé tel quel dans l'adresse brute et n'est pas exploité pour l'instant.
 
 ### 3.2 Statuts d'une zone (sous-plaque)
 `planifiée → en déploiement → en exploitation → clôturée` (clôture validée par le DT).
@@ -127,7 +131,9 @@ Un **projet** = une plaque. Phases, dans l'ordre : avant-projet, validation du c
 - **Documents versionnés** (plan des plaques, plan synoptique, KMZ, AVP) : chaque version est conservée, jamais écrasée.
 - Le **devis de l'AVP** est saisi dans l'application (sans facturation) ; le nombre de poteaux y figure, les poteaux ne sont pas suivis un par un.
 - Le client n'a pas de compte : sa décision, sa date et son justificatif sont enregistrés.
-- Le dimensionnement est le réseau lui-même (sous-plaques, splitters, PCO créés à l'avant-projet) ; la phase du projet indique s'il est « prévu » ou posé. Chaque PCO a des coordonnées prévues et des coordonnées mesurées au relevé final.
+- Le dimensionnement est le réseau lui-même (sous-plaques, SRO, splitters, PCO créés à l'avant-projet) ; la phase du projet indique s'il est « prévu » ou posé. Chaque PCO a des coordonnées prévues et des coordonnées mesurées au relevé final, **saisies par les techniciens du BE** (mission « Relevés »), qui voient le réseau.
+- **Création d'un projet (v1.9)** : la plaque naît avec le projet. Deux façons de décrire le réseau : (1) un **parcours guidé** : nom de la plaque, OLT (choisi parmi les existants ou créé), puis les sous-plaques (§3.8) ; (2) l'**import d'un fichier CSV** (plaque, sous-plaque, splitter, PCO…) rattaché au projet (§6.1). Un projet = une plaque : un fichier qui en contient plusieurs, ou dont la plaque ne correspond pas à celle du projet, est refusé *(à confirmer)*. Tout est créé en une seule opération (tout ou rien).
+- **Mise sous tension** : à l'OLT, par les **techniciens**, pour la **sous-plaque entière** ; elle est marquée « OK » avec la prise des puissances *(enregistrement des puissances à confirmer)*.
 - Nouveaux types de travail : survey d'implantation, relevé final, pose de poteaux métalliques.
 
 ### 3.6 Suivi de déploiement (fichier « Nouveaux OLT Nokia »)
@@ -156,6 +162,28 @@ Le fichier de suivi reçu (5 feuilles de données et 1 feuille vide, 2 681 ligne
 
 Le **blocage** est un indicateur indépendant du statut, avec un motif du référentiel. Motifs relevés : blocage du syndic (courrier déposé ou non), pas d'accès à la cité, autorisation de câblage NOK, besoin de jarretière pour l'OLT. Le libellé d'origine est toujours conservé.
 
+### 3.8 Dimensionnement standard et génération d'une sous-plaque (v1.9)
+
+**Valeurs standard**, proposées par défaut et modifiables par projet, **jamais bloquantes** (la réalité s'en écarte) :
+
+| Niveau | Standard |
+|---|---|
+| Sous-plaque | 1 SRO |
+| SRO | 8 splitters |
+| Splitter | 8 PCO |
+| PCO | 16 ports ; **8 clients raccordés au plus** |
+
+Une sous-plaque standard de 64 PCO compte donc 8 splitters et 512 clients raccordés ; de 32 PCO, 4 splitters et 256 clients.
+
+**Saturation et désaturation** : un PCO est **saturé à 8 clients**. Au **9ᵉ client**, on fait une **désaturation** : on crée un autre PCO (rattachement du nouveau PCO : voir §9). Les 16 ports sont la capacité physique, pas le seuil.
+
+**Génération à la création d'une sous-plaque** : on saisit le code de la sous-plaque (par ex. `ABB01`) et le **nombre de PCO**, libre ; la liste **suggère 32 et 64** (modifiables). L'application crée alors automatiquement :
+- la **SRO** de la sous-plaque, dont le **numéro donné par l'opérateur est saisi** à la génération (nom `ABB456` : lettres de la sous-plaque + ce numéro) ;
+- les **splitters** (`SPL001`, `SPL002`…), à raison de 8 PCO chacun (le dernier peut en compter moins) ;
+- les **PCO**, nommés `{code de la sous-plaque}_PCO001`… en continu dans la sous-plaque : le splitter 1 reçoit les PCO 001 à 008, le splitter 2 les PCO 009 à 016, etc. ; statut de départ « À tirer ».
+
+La génération est **atomique** (tout ou rien) et **refusée si la sous-plaque contient déjà** des splitters ou des PCO, pour ne jamais écraser un travail existant. Le **technicien du BE ajuste ensuite** selon son plan (ajout, retrait, renommage, déplacement d'un PCO entre splitters de la même sous-plaque).
+
 ## 4. Modules fonctionnels
 
 1. **Authentification et utilisateurs** : rôles, habilitations, équipes, zones affectées, journal d'audit.
@@ -170,7 +198,7 @@ Le **blocage** est un indicateur indépendant du statut, avec un motif du réfé
 10. **Incidents** : chantier, réseau, HSE ; gravité, statut, résolution.
 11. **Tableaux de bord** (DG, DT, superviseur, coordinateur) : voir §7.
 12. **Notifications** : planning modifié, rapport à valider, incident grave.
-13. **Projet de déploiement et bureau d'études** (v1.8) : projet par plaque et ses phases, documents versionnés, AVP et devis, circuit de validation (chef du BE, DT, client), surveys d'implantation et final, comparaison prévu et réel.
+13. **Projet de déploiement et bureau d'études** (v1.8, précisé en v1.9) : création du projet (la plaque naît avec lui, parcours guidé ou import CSV), sous-plaques générées au standard, phases, documents versionnés, AVP et devis, circuit de validation (chef du BE, DT, client), surveys d'implantation et final, comparaison prévu et réel.
 
 ## 5. Formulaires terrain
 
@@ -218,7 +246,7 @@ Le fichier reçu (107 lignes, colonnes : référence RAB, ligne FT, nom, adresse
 
 ### 6.1 Import du suivi de déploiement
 
-Second type d'import, pour le fichier de suivi des PCO par OLT et plaque :
+**Depuis la v1.9, l'import du réseau se fait sous un projet** (il n'existe plus d'import global) : à la création du projet ou plus tard (réimport : phases autorisées à confirmer, §9). Second type d'import, pour le fichier de suivi des PCO par OLT et plaque :
 1. Une feuille = une plaque ; les feuilles vides sont ignorées et signalées.
 2. Normaliser les codes (tiret, zéros) avant de comparer ; signaler les codes de PCO en double sans les fusionner automatiquement.
 3. Rattacher chaque ligne à son OLT, sa plaque, sa sous-plaque, son splitter (JDV) et son PCO, en créant les éléments manquants après validation du coordinateur ou du superviseur.
@@ -240,7 +268,7 @@ Second type d'import, pour le fichier de suivi des PCO par OLT et plaque :
 ## 8. Modèle de données (principales tables)
 
 - `users` (rôle, supérieur_id, actif) · `technician_skills` · `teams`, `team_members`
-- `olts` (nom) · `plaques` (nom, `olt_id` facultatif, renseigné dès qu'il est connu, `supervisor_id`) · `zones` (= sous-plaques : code, `plaque_id`, `vendor` huawei|nokia, statut) · `jdvs` (splitter : code, `zone_id`) · `pcos` (code, numéro, `jdv_id`, `zone_id`, statut, `status_raw`, `is_blocked`, `block_reason_id`, coordonnées, `olt_slot`, `olt_port`, `fiber_strand`, commentaire, capacité) · `pco_status_history`
+- `olts` (nom) · `plaques` (nom, `olt_id` facultatif, renseigné dès qu'il est connu, `supervisor_id`) · `zones` (= sous-plaques : code, `plaque_id`, statut) · (v1.9) `sros` (une par sous-plaque : `zone_id` unique, code unique du type `ABB456`, latitude/longitude facultatives, `olt_slot`, `olt_port`, `fiber_strand`) · `jdvs` (splitter : code, `zone_id` ; son SRO se déduit de la sous-plaque, sans colonne `sro_id`) · `pcos` (code, numéro, `jdv_id`, `zone_id`, statut, `status_raw`, `is_blocked`, `block_reason_id`, coordonnées, `olt_slot`, `olt_port`, `fiber_strand`, commentaire, capacité en ports (16) et nombre maximal de clients (8, v1.9)) · `pco_status_history`
 - `customer_orders` : réf. RAB, n° compte client, n° ligne FT, nom, contacts normalisés, adresse en champs et adresse brute d'origine, `initial_study_status` (libellé d'origine + état normalisé), GPS déclaré et GPS terrain, dates d'enregistrement et d'envoi au prestataire, `pco_id`, distance, SN ONT, `status`, `operator_line_status` et sa date, `operator_synced_at`, observation · `order_status_history`
 - `interventions` (type, zone, PCO, commande, équipe/technicien, date planifiée, statut, motif, début/fin, observation)
 - `studies` (intervention_id, client présent, PCO, distance (poteaux × 50 m par défaut, modifiable), poteaux béton existants / à installer, poteaux métalliques existants / à installer, faisable, problème, commentaires terrain, commentaires internes)
@@ -264,7 +292,16 @@ Confirmé le 28/10 : le fichier d'études est bien la liste envoyée par l'opér
 4. Un coordinateur peut-il avoir plusieurs équipes ? Photos et signature obligatoires ?
 5. **Statuts du PCO** : valider la correspondance proposée en §3.6 (libellés du fichier → statuts normalisés) et la liste des motifs de blocage.
 6. Le fichier de suivi de déploiement doit-il être **remplacé par l'application** (saisie par les superviseurs, export identique) ou seulement importé ?
-7. **(v1.8)** Stockage des fichiers du projet (taille d'un KMZ ou d'un plan, service) ; structure du devis de l'AVP (lignes ou totaux) ; visibilité des projets par rôle ; qui lance chaque phase ; correspondance entre implanté / posé / mis en réseau et les statuts de PCO. Détail : `docs/workflow-projet-deploiement.md`.
+7. **(v1.8)** Stockage des fichiers du projet (taille d'un KMZ ou d'un plan, service) ; structure du devis de l'AVP (un exemple sera fourni) ; visibilité des projets par rôle ; qui lance chaque phase ; correspondance entre implanté / posé / mis en réseau et les statuts de PCO. Détail : `docs/workflow-projet-deploiement.md`.
+
+Confirmé le 30/10 (v1.9) : Projet → plaque → sous-plaque → SRO → splitter → PCO ; la plaque naît avec le projet (et n'existe que sous un projet) ; import CSV sous un projet ; standard 8 splitters par SRO, 8 PCO par splitter, 16 ports et 8 clients par PCO (valeurs par défaut modifiables) ; saturation à 8 clients puis désaturation par un autre PCO ; génération à la création d'une sous-plaque (nombre de PCO libre, 32 et 64 suggérés) ; convention `SPL` pour les splitters ; le technicien du BE ajuste le réseau généré ; les techniciens du BE saisissent les relevés et voient le réseau ; mise sous tension par les techniciens, sur la sous-plaque entière.
+
+8. **(v1.9) SRO** : confirmé le 30/10 : elle part de l'OLT, alimente les splitters d'une sous-plaque, son nom = lettres de la sous-plaque + numéro (`ABB456`) et le raccordement à l'OLT (slot, port, brin) se saisit à la SRO. Le numéro est celui donné par l'opérateur : saisi, indépendant de celui de la sous-plaque. Son GPS est enregistré (facultatif, en Côte d'Ivoire).
+9. **(v1.9) Fichier « Suivi raccordement »** : à quel niveau correspondent « ZONE PCO (SRO, OLT…) » (`DBA01`) et « JDV/HUB » (`HUB001` à `HUB004`, plusieurs par zone) ?
+10. **(v1.9) Création d'un projet** : qui peut le créer (chef du BE, DT, administrateur) ; nom de la plaque (saisi ou pris dans le fichier) ; un seul projet par fichier ; réimport sous un même projet (à quelles phases) ; droits du BE sur la création de la plaque, de l'OLT et des sous-plaques.
+11. **(v1.9) Modification du réseau par le BE** : jusqu'à quelle phase le technicien du BE peut-il ajuster le réseau (avant-projet, survey d'implantation) ; après, corrections par le DT ou l'administrateur ?
+12. **(v1.9) Données existantes** : y a-t-il des plaques, splitters ou PCO réels à conserver au moment du changement de structure (SRO), ou seulement des essais ?
+13. **(v1.9) Désaturation (lot 3)** : où se rattache le PCO créé au 9ᵉ client (splitter qui a de la place, sinon autre splitter de la même SRO) ? L'enregistrement des puissances relevées à la mise sous tension (niveau et valeurs).
 
 ## 10. Architecture technique proposée
 
@@ -276,7 +313,7 @@ Confirmé le 28/10 : le fichier d'études est bien la liste envoyée par l'opér
 
 ## 11. Feuille de route
 
-1. **MVP** : utilisateurs/rôles, référentiels (OLT, plaques, zones/sous-plaques, JDV, PCO), **projet de déploiement et bureau d'études (v1.8, avant l'import des clients)**, **import de la liste clients**, études, planning, installation terrain hors-ligne, reporting coordinateur, **export de la fiche de suivi**, tableaux de bord de base.
+1. **MVP** : utilisateurs/rôles, référentiels (OLT, plaques, zones/sous-plaques, SRO, JDV, PCO), **projet de déploiement et bureau d'études (v1.8, v1.9 : création du projet avec son réseau, avant l'import des clients)**, **import de la liste clients**, études, planning, installation terrain hors-ligne, reporting coordinateur, **export de la fiche de suivi**, tableaux de bord de base.
 2. **V1.1** : matériel et stock, incidents, suivi du déploiement (tirage, soudure) pour superviseurs, avec import et export du fichier de suivi par OLT et plaque.
 3. **V1.2** : cartographie avancée, notifications, indicateurs avancés.
 4. **V2** : API de la plateforme opérateur si elle existe ; étape de recette et facturation si besoin.
