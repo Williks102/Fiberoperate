@@ -17,6 +17,7 @@ class ZoneResource extends JsonResource
             'vendor' => $this->vendor?->value,
             'access_point_label' => $this->accessPointLabel(),
             'status' => $this->status?->value,
+            'plaque' => $this->whenLoaded('plaque', fn () => $this->plaque?->only(['id', 'name'])),
         ];
     }
 }

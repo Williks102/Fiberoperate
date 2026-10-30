@@ -39,6 +39,7 @@ export interface Zone {
   /** « Hub » (Huawei) ou « SRO » (Nokia) ; null si le fabricant est inconnu. */
   access_point_label: string | null;
   status: ZoneStatus;
+  plaque?: { id: string; name: string } | null;
 }
 
 export interface Jdv {

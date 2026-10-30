@@ -7,6 +7,7 @@ use App\Http\Resources\ZoneResource;
 use App\Models\Zone;
 use App\Support\CodeNormalizer;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -27,9 +28,14 @@ class ZoneController extends ApiResourceController
         $query->orderBy('code_normalized');
     }
 
+    protected function load(Model $model): Model
+    {
+        return $model->load('plaque:id,name');
+    }
+
     protected function filters(Request $request, Builder $query): void
     {
-        $query->when($request->query('plaque_id'), fn ($q, $id) => $q->where('plaque_id', $id))
+        $query->with('plaque:id,name')->when($request->query('plaque_id'), fn ($q, $id) => $q->where('plaque_id', $id))
             ->when($request->query('status'), fn ($q, $status) => $q->where('status', $status))
             ->when($request->string('q')->trim()->value(), function ($q, $term) {
                 $q->where(fn ($w) => $w->where('code_normalized', 'like', '%'.CodeNormalizer::zone($term).'%')
@@ -47,6 +53,6 @@ class ZoneController extends ApiResourceController
         $model = Zone::query()->findOrFail($zone);
         $model->update($request->validated());
 
-        return new ZoneResource($model);
+        return new ZoneResource($this->load($model));
     }
 }
