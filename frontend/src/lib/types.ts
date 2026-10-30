@@ -144,6 +144,8 @@ export interface Project {
   phase_changed_at: string | null;
   /** Présents sur la fiche d'un projet seulement. */
   history?: ProjectHistoryLine[];
+  /** Actions du circuit de validation permises à l'utilisateur dans la phase courante. */
+  actions?: { submit: boolean; decide: boolean; advance: boolean; advance_to: string | null };
   network?: ProjectNetwork | null;
 }
 
