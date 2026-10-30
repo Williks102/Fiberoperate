@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\OltController;
 use App\Http\Controllers\Api\V1\PcoController;
 use App\Http\Controllers\Api\V1\PlaqueController;
+use App\Http\Controllers\Api\V1\PriceItemController;
 use App\Http\Controllers\Api\V1\ProjectController;
 use App\Http\Controllers\Api\V1\SroController;
 use App\Http\Controllers\Api\V1\TeamController;
@@ -39,6 +40,10 @@ Route::prefix('v1')->group(function () {
         Route::post('projects/{project}/advance', [ProjectController::class, 'advance']);
         Route::post('projects/{project}/imports/network/preview', [NetworkImportController::class, 'preview']);
         Route::post('projects/{project}/imports/network', [NetworkImportController::class, 'store']);
+        Route::get('price-items/sections', [PriceItemController::class, 'sections']);
+        Route::post('price-items/import/preview', [PriceItemController::class, 'previewImport']);
+        Route::post('price-items/import', [PriceItemController::class, 'import']);
+        Route::get('price-items', [PriceItemController::class, 'index']);
         Route::get('notifications', [NotificationController::class, 'index']);
         Route::post('notifications/read-all', [NotificationController::class, 'readAll']);
         Route::post('notifications/{notification}/read', [NotificationController::class, 'read']);
