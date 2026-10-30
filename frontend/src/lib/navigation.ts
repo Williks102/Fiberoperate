@@ -16,6 +16,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/reseau", label: "Réseau" },
   { href: "/plaques", label: "Plaques", roles: ["admin"] },
   { href: "/sous-plaques", label: "Sous-plaques", roles: ["admin"] },
+  { href: "/splitters", label: "Splitters", roles: ["admin"] },
   { href: "/olt", label: "OLT", roles: ["admin", "dg", "dt", "supervisor", "coordinator"] },
   { href: "/equipes", label: "Équipes", roles: ["admin", "dg", "dt", "coordinator"] },
   { href: "/importer", label: "Importer", roles: ["admin"] },

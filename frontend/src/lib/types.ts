@@ -46,6 +46,7 @@ export interface Jdv {
   id: string;
   zone_id: string;
   code: string;
+  zone?: { id: string; code: string; plaque: { id: string; name: string } | null };
 }
 
 export interface Pco {
