@@ -114,6 +114,12 @@ export interface ProjectHistoryLine {
   created_at: string | null;
 }
 
+export interface ProjectNetwork {
+  olt: { id: string; name: string } | null;
+  supervisor: { id: string; name: string } | null;
+  zones: { id: string; code: string; status: ZoneStatus; sro: string | null; splitters: number; pcos: number }[];
+}
+
 export interface Project {
   id: string;
   plaque_id: string;
@@ -121,8 +127,9 @@ export interface Project {
   phase: ProjectPhase;
   phase_label: string;
   phase_changed_at: string | null;
-  /** Présent sur la fiche d'un projet seulement. */
+  /** Présents sur la fiche d'un projet seulement. */
   history?: ProjectHistoryLine[];
+  network?: ProjectNetwork | null;
 }
 
 export interface Olt {

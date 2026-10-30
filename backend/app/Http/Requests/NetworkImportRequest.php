@@ -2,15 +2,15 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Plaque;
+use App\Models\Project;
 use Illuminate\Foundation\Http\FormRequest;
 
-/** Import du réseau : réservé à ceux qui peuvent créer des plaques (l'administrateur). */
+/** Import du réseau d'un projet : réservé à ceux qui peuvent créer des projets (administrateur et chef du BE). */
 class NetworkImportRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('create', Plaque::class);
+        return $this->user()->can('create', Project::class);
     }
 
     public function rules(): array

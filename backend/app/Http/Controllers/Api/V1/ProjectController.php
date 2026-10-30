@@ -27,7 +27,10 @@ class ProjectController extends ApiResourceController
 
     protected function load(Model $model): Model
     {
-        return $model->load(['plaque:id,name', 'history.author:id,name']);
+        $model->load(['plaque.olt:id,name', 'plaque.supervisor:id,name', 'history.author:id,name']);
+        $model->plaque?->load(['zones' => fn ($q) => $q->with('sro:id,zone_id,code')->withCount(['jdvs', 'pcos'])->orderBy('code_normalized')]);
+
+        return $model;
     }
 
     protected function orderBy(Builder $query): void

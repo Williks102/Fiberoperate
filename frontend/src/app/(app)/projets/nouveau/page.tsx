@@ -64,8 +64,9 @@ export default function NouveauProjetPage() {
         };
 
     try {
-      await apiFetch("/projects", { method: "POST", body: JSON.stringify(body) }, getToken());
-      router.push("/projets");
+      const res = await apiFetch<{ data: Project }>("/projects", { method: "POST", body: JSON.stringify(body) }, getToken());
+      // Sur la fiche du projet, on peut importer tout de suite un fichier CSV du réseau.
+      router.push(`/projets/${res.data.id}`);
     } catch (e) {
       if (e instanceof ApiError) {
         setErrors(e.errors);

@@ -140,6 +140,5 @@ class UsersApiTest extends TestCase
         $this->getJson('/api/v1/olts')->assertOk();
         $this->getJson('/api/v1/users')->assertForbidden();
         $this->getJson('/api/v1/teams')->assertForbidden();
-        $this->postJson('/api/v1/imports/network', [])->assertForbidden();
     }
 }
