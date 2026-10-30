@@ -67,3 +67,9 @@ export interface Team {
   members: { id: string; name: string }[];
   member_ids: string[];
 }
+
+export interface Olt {
+  id: string;
+  name: string;
+  notes: string | null;
+}

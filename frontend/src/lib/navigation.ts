@@ -14,6 +14,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Accueil" },
   { href: "/reseau", label: "Réseau" },
+  { href: "/olt", label: "OLT", roles: ["admin", "dg", "dt", "supervisor", "coordinator"] },
   { href: "/equipes", label: "Équipes", roles: ["admin", "dg", "dt", "coordinator"] },
   { href: "/importer", label: "Importer", roles: ["admin"] },
   { href: "/utilisateurs", label: "Utilisateurs", roles: ["admin", "dg", "dt"] },
