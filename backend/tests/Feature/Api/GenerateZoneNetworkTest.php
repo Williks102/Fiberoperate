@@ -119,7 +119,7 @@ class GenerateZoneNetworkTest extends TestCase
         $zone = $this->zone();
         $this->postJson("/api/v1/zones/{$zone->id}/generate", ['pco_count' => 0, 'sro_code' => 'ABB456'])->assertStatus(422)->assertJsonValidationErrors('pco_count');
 
-        foreach ([Role::Supervisor, Role::Coordinator, Role::Technician, Role::BeManager, Role::Dt, Role::Dg] as $role) {
+        foreach ([Role::Supervisor, Role::Coordinator, Role::Technician, Role::Dt, Role::Dg] as $role) {
             $this->login($role);
             $this->postJson("/api/v1/zones/{$zone->id}/generate", ['pco_count' => 8, 'sro_code' => 'ABB456'])->assertForbidden();
         }

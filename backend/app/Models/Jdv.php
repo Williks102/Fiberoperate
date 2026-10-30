@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\ResolvesPlaque;
 use App\Support\CodeNormalizer;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -14,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /** JDV = splitter (SPL001…). Regroupe plusieurs PCO, sans nombre imposé. */
 class Jdv extends Model
 {
-    use HasUuids, ResolvesPlaque, SoftDeletes;
+    use HasUuids, SoftDeletes;
 
     protected $table = 'jdvs';
 

@@ -17,18 +17,13 @@ class JdvRequest extends ManagesResource
         return 'jdv';
     }
 
-    protected function targetPlaqueId(): ?string
-    {
-        return $this->plaqueOfZone($this->input('zone_id'));
-    }
-
     public function rules(): array
     {
         return [
             // Un splitter ne change pas de sous-plaque : ses PCO y sont rattachés.
             'zone_id' => $this->ignoreId() === null
                 ? ['required', 'uuid', Rule::exists('zones', 'id')->whereNull('deleted_at')]
-                : ['prohibited'],
+                : ['missing'],
             'code' => [$this->req(), 'string', 'max:40'],
         ];
     }

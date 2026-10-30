@@ -27,13 +27,6 @@ class PcoRequest extends ManagesResource
         return 'pco';
     }
 
-    protected function targetPlaqueId(): ?string
-    {
-        $zoneId = Jdv::query()->whereKey($this->validUuid($this->input('jdv_id')))->value('zone_id');
-
-        return $this->plaqueOfZone($zoneId);
-    }
-
     public function rules(): array
     {
         return [
@@ -46,11 +39,11 @@ class PcoRequest extends ManagesResource
             'fiber_strand' => ['nullable', 'string', 'max:255'],
             'comment' => ['nullable', 'string', 'max:2000'],
             // Hors de ce formulaire : la zone se déduit du splitter, le statut passe par son historique.
-            'zone_id' => ['prohibited'],
-            'status' => ['prohibited'],
-            'status_raw' => ['prohibited'],
-            'is_blocked' => ['prohibited'],
-            'block_reason_id' => ['prohibited'],
+            'zone_id' => ['missing'],
+            'status' => ['missing'],
+            'status_raw' => ['missing'],
+            'is_blocked' => ['missing'],
+            'block_reason_id' => ['missing'],
         ];
     }
 

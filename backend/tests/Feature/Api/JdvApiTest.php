@@ -85,7 +85,7 @@ class JdvApiTest extends TestCase
     {
         $zone = $this->zone();
 
-        foreach ([Role::Dg, Role::Dt, Role::Supervisor, Role::Coordinator, Role::Technician, Role::BeManager] as $role) {
+        foreach ([Role::Dg, Role::Dt, Role::Supervisor, Role::Coordinator, Role::Technician] as $role) {
             $this->login($role);
             $this->postJson('/api/v1/jdvs', ['zone_id' => $zone->id, 'code' => 'SPL001'])->assertForbidden();
         }

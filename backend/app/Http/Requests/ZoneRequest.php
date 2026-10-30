@@ -19,18 +19,13 @@ class ZoneRequest extends ManagesResource
         return 'zone';
     }
 
-    protected function targetPlaqueId(): ?string
-    {
-        return $this->validUuid($this->input('plaque_id'));
-    }
-
     public function rules(): array
     {
         return [
             // Une sous-plaque ne change pas de plaque.
             'plaque_id' => $this->ignoreId() === null
                 ? ['required', 'uuid', Rule::exists('plaques', 'id')->whereNull('deleted_at')]
-                : ['prohibited'],
+                : ['missing'],
             'code' => [$this->req(), 'string', 'max:40'],
             'name' => ['nullable', 'string', 'max:120'],
             'vendor' => ['nullable', Rule::enum(Vendor::class)],

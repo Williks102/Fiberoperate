@@ -111,7 +111,7 @@ class AccessMatrixTest extends TestCase
     {
         $payload = ['name' => 'NOUVELLE'];
 
-        foreach ([Role::Dg, Role::Dt, Role::Supervisor, Role::Coordinator, Role::Technician, Role::BeManager] as $i => $role) {
+        foreach ([Role::Dg, Role::Supervisor, Role::Coordinator, Role::Technician] as $i => $role) {
             Sanctum::actingAs($this->user($role, "w{$i}@x.test"));
             $this->patchJson('/api/v1/plaques/'.$this->plaqueA->id, $payload)->assertForbidden();
             $this->deleteJson('/api/v1/plaques/'.$this->plaqueA->id)->assertForbidden();

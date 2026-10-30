@@ -55,12 +55,7 @@ class BeNetworkRightsTest extends TestCase
         return $this->user(Role::Technician, 'tech-be@x.test', MissionType::Drawing);
     }
 
-    private function lockPlan(): void
-    {
-        Project::firstOrFail()->forceFill(['phase' => ProjectPhase::BeManagerReview])->save();
-    }
-
-    public function test_the_be_manager_and_the_be_technician_adjust_the_network_during_the_pre_project(): void
+    public function test_the_be_manager_and_the_be_technician_adjust_the_network(): void
     {
         foreach ([$this->beManager(), $this->beTechnician()] as $user) {
             Sanctum::actingAs($user);
@@ -82,37 +77,44 @@ class BeNetworkRightsTest extends TestCase
         $this->assertSame(16, Pco::count());
     }
 
-    public function test_the_plan_is_locked_for_the_be_once_it_goes_to_validation(): void
+    public function test_the_be_adjusts_the_network_whatever_the_phase_of_the_project(): void
     {
-        $this->lockPlan();
+        foreach (ProjectPhase::cases() as $phase) {
+            Project::firstOrFail()->forceFill(['phase' => $phase])->save();
 
-        foreach ([$this->beManager(), $this->beTechnician()] as $user) {
-            Sanctum::actingAs($user);
-            $this->postJson('/api/v1/zones', ['plaque_id' => $this->plaque->id, 'code' => 'ZZ01'])->assertForbidden();
-            $this->postJson("/api/v1/zones/{$this->zone->id}/generate", ['pco_count' => 8, 'sro_code' => 'ABB456'])->assertForbidden();
+            foreach ([$this->beManager(), $this->beTechnician()] as $user) {
+                Sanctum::actingAs($user);
+                $this->postJson('/api/v1/zones', ['plaque_id' => $this->plaque->id, 'code' => 'P'.random_int(1000, 9999)])->assertCreated();
+            }
         }
-        $this->assertSame(0, Pco::count());
-
-        Sanctum::actingAs($this->admin);
-        $this->postJson('/api/v1/zones', ['plaque_id' => $this->plaque->id, 'code' => 'ZZ01'])->assertCreated();
     }
 
-    public function test_the_be_cannot_write_on_a_plaque_without_project_nor_other_roles_anywhere(): void
+    public function test_the_be_also_adjusts_a_plaque_without_project_but_the_other_roles_never_write(): void
     {
         $alone = Plaque::create(['name' => 'SOLO']);
         Sanctum::actingAs($this->beManager());
-        $this->postJson('/api/v1/zones', ['plaque_id' => $alone->id, 'code' => 'SOL01'])->assertForbidden();
+        $this->postJson('/api/v1/zones', ['plaque_id' => $alone->id, 'code' => 'SOL01'])->assertCreated();
+        $this->patchJson("/api/v1/plaques/{$alone->id}", ['name' => 'SOLO 2'])->assertOk();
 
         foreach ([
-            $this->user(Role::Dg, 'dg@x.test'), $this->user(Role::Dt, 'dt@x.test'), $this->user(Role::Supervisor, 's@x.test'),
+            $this->user(Role::Dg, 'dg@x.test'), $this->user(Role::Supervisor, 's@x.test'),
             $this->user(Role::Coordinator, 'c@x.test'), $this->user(Role::Technician, 't@x.test'),
             $this->user(Role::Technician, 'survey@x.test', MissionType::Survey),
         ] as $user) {
             Sanctum::actingAs($user);
             $this->postJson('/api/v1/zones', ['plaque_id' => $this->plaque->id, 'code' => 'ZZ01'])->assertForbidden();
             $this->patchJson("/api/v1/zones/{$this->zone->id}", ['name' => 'X'])->assertForbidden();
+            $this->patchJson("/api/v1/plaques/{$this->plaque->id}", ['name' => 'X'])->assertForbidden();
         }
-        $this->assertSame(1, Zone::count());
+        $this->assertSame(2, Zone::count());
+    }
+
+    public function test_the_dt_designates_the_supervisor_but_does_not_touch_the_network(): void
+    {
+        Sanctum::actingAs($this->user(Role::Dt, 'dt@x.test'));
+
+        $this->postJson('/api/v1/zones', ['plaque_id' => $this->plaque->id, 'code' => 'ZZ01'])->assertForbidden();
+        $this->patchJson("/api/v1/zones/{$this->zone->id}", ['name' => 'X'])->assertForbidden();
     }
 
     public function test_a_zone_never_moves_to_another_plaque(): void

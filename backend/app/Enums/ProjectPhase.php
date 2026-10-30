@@ -14,12 +14,6 @@ enum ProjectPhase: string
     case AsBuiltSurvey = 'as_built_survey';
     case InOperation = 'in_operation';
 
-    /** Le chef du BE et ses techniciens ajustent le réseau tant que le plan n'est pas soumis aux validations. */
-    public function beMayEditNetwork(): bool
-    {
-        return $this === self::PreProject;
-    }
-
     public function label(): string
     {
         return match ($this) {

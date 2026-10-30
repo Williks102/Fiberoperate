@@ -16,7 +16,7 @@ class PlaquesApiTest extends TestCase
 
     private function user(Role $role, string $email): User
     {
-        return User::create(['name' => ucfirst($email), 'email' => $email, 'password' => 'secret123', 'role' => $role]);
+        return User::firstOrCreate(['email' => $email], ['name' => ucfirst($email), 'password' => 'secret123', 'role' => $role]);
     }
 
     public function test_a_plaque_cannot_be_created_alone_it_is_born_with_its_project(): void
@@ -26,17 +26,23 @@ class PlaquesApiTest extends TestCase
         $this->postJson('/api/v1/plaques', ['name' => 'FAYA'])->assertMethodNotAllowed();
     }
 
-    public function test_plaque_gets_olt_and_supervisor_and_returns_their_names(): void
+    public function test_the_olt_sent_by_the_client_is_set_by_the_admin_or_the_be_and_the_supervisor_only_by_the_dt(): void
     {
-        Sanctum::actingAs($this->user(Role::Admin, 'admin@x.test'));
         $olt = Olt::create(['name' => 'OLT1']);
         $supervisor = $this->user(Role::Supervisor, 'sup@x.test');
         $plaque = Plaque::create(['name' => 'FAYA']);
+        $url = "/api/v1/plaques/{$plaque->id}";
 
-        $this->patchJson("/api/v1/plaques/{$plaque->id}", ['olt_id' => $olt->id, 'supervisor_id' => $supervisor->id])
-            ->assertOk()
-            ->assertJsonPath('data.olt.name', 'OLT1')
-            ->assertJsonPath('data.supervisor.name', 'Sup@x.test');
+        foreach ([Role::Admin, Role::BeManager] as $role) {
+            Sanctum::actingAs($this->user($role, "{$role->value}@x.test"));
+            $this->patchJson($url, ['olt_id' => $olt->id])->assertOk()->assertJsonPath('data.olt.name', 'OLT1');
+            $this->patchJson($url, ['supervisor_id' => $supervisor->id])->assertStatus(422)->assertJsonValidationErrors('supervisor_id');
+        }
+
+        Sanctum::actingAs($this->user(Role::Dt, 'dt@x.test'));
+        $this->patchJson($url, ['supervisor_id' => $supervisor->id])->assertOk()->assertJsonPath('data.supervisor.name', 'Sup@x.test');
+        $this->patchJson($url, ['name' => 'AUTRE'])->assertStatus(422)->assertJsonValidationErrors('name');
+        $this->patchJson($url, ['olt_id' => null])->assertStatus(422)->assertJsonValidationErrors('olt_id');
 
         $this->assertSame('OLT1', $this->getJson('/api/v1/plaques')->json('data.0.olt.name'));
     }
@@ -58,22 +64,23 @@ class PlaquesApiTest extends TestCase
         Plaque::create(['name' => 'FAYA']);
         $other = Plaque::create(['name' => 'ARCADE']);
 
+        Sanctum::actingAs($this->user(Role::Dt, 'dt@x.test'));
         $this->patchJson("/api/v1/plaques/{$other->id}", ['supervisor_id' => $coordinator->id])
             ->assertStatus(422)->assertJsonValidationErrors('supervisor_id');
+        Sanctum::actingAs($this->user(Role::Admin, 'admin@x.test'));
         $this->patchJson("/api/v1/plaques/{$other->id}", ['name' => ''])->assertStatus(422)->assertJsonValidationErrors('name');
         $this->patchJson("/api/v1/plaques/{$other->id}", ['name' => 'FAYA'])->assertStatus(422)->assertJsonPath('code', 'DUPLICATE');
     }
 
     public function test_assigning_a_supervisor_gives_them_the_plaque_in_their_perimeter(): void
     {
-        $admin = $this->user(Role::Admin, 'admin@x.test');
         $supervisor = $this->user(Role::Supervisor, 'sup@x.test');
         $plaque = Plaque::create(['name' => 'FAYA']);
 
         Sanctum::actingAs($supervisor);
         $this->assertSame([], $this->getJson('/api/v1/plaques')->json('data'));
 
-        Sanctum::actingAs($admin);
+        Sanctum::actingAs($this->user(Role::Dt, 'dt@x.test'));
         $this->patchJson("/api/v1/plaques/{$plaque->id}", ['supervisor_id' => $supervisor->id])->assertOk();
 
         Sanctum::actingAs($supervisor);
