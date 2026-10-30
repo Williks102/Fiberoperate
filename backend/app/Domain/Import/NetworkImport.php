@@ -7,6 +7,7 @@ use App\Models\Jdv;
 use App\Models\Olt;
 use App\Models\Pco;
 use App\Models\Plaque;
+use App\Models\Sro;
 use App\Models\Zone;
 use App\Support\CodeNormalizer;
 use App\Support\IvoryCoastBounds;
@@ -14,9 +15,11 @@ use Illuminate\Support\Facades\DB;
 use Throwable;
 
 /**
- * Import du réseau depuis un fichier plat, une ligne par PCO :
- * OLT → plaque → sous-plaque (zone) → splitter (JDV) → PCO.
+ * Import du réseau d'un projet depuis un fichier plat, une ligne par PCO :
+ * OLT → plaque → sous-plaque (zone) → SRO → splitter (JDV) → PCO.
  *
+ * - Un fichier = une plaque, celle du projet : la colonne « plaque » peut rester vide ; si elle est remplie, elle doit être celle du projet (sinon la ligne est refusée).
+ * - La colonne « sro » (numéro donné par l'opérateur) crée la SRO de la sous-plaque si elle n'en a pas.
  * - Création seulement : un élément déjà connu est réutilisé, jamais modifié ; un PCO déjà présent est compté et laissé tel quel.
  * - Une ligne invalide est refusée et listée (jamais corrigée en silence) ; un GPS suspect donne un PCO sans coordonnées et un avertissement.
  * - Le statut du fichier est gardé tel quel (status_raw) : la correspondance avec les statuts normalisés reste à valider.
@@ -26,15 +29,12 @@ final class NetworkImport
 {
     public const MAX_ROWS = 5000;
 
-    public const COLUMNS = ['olt', 'plaque', 'sous_plaque', 'fabricant', 'splitter', 'pco', 'latitude', 'longitude', 'slot', 'port', 'brin', 'statut', 'commentaire'];
+    public const COLUMNS = ['olt', 'plaque', 'sous_plaque', 'fabricant', 'sro', 'splitter', 'pco', 'latitude', 'longitude', 'slot', 'port', 'brin', 'statut', 'commentaire'];
 
-    public const REQUIRED = ['plaque', 'sous_plaque', 'splitter', 'pco'];
+    public const REQUIRED = ['sous_plaque', 'splitter', 'pco'];
 
     /** @var array<string, Olt> */
     private array $olts = [];
-
-    /** @var array<string, Plaque> */
-    private array $plaques = [];
 
     /** @var array<string, Zone> */
     private array $zones = [];
@@ -48,8 +48,11 @@ final class NetworkImport
     /** @var array<string, int> clé de PCO déjà vue dans le fichier → ligne */
     private array $seen = [];
 
-    /** @var array{olts: int, plaques: int, zones: int, jdvs: int, pcos: int} */
-    private array $created = ['olts' => 0, 'plaques' => 0, 'zones' => 0, 'jdvs' => 0, 'pcos' => 0];
+    /** @var array<string, true> zones qui ont déjà une SRO */
+    private array $sros = [];
+
+    /** @var array{olts: int, zones: int, sros: int, jdvs: int, pcos: int} */
+    private array $created = ['olts' => 0, 'zones' => 0, 'sros' => 0, 'jdvs' => 0, 'pcos' => 0];
 
     private int $alreadyPresent = 0;
 
@@ -58,6 +61,8 @@ final class NetworkImport
 
     /** @var list<array{line: int, message: string}> */
     private array $warnings = [];
+
+    public function __construct(private readonly Plaque $plaque) {}
 
     public static function parse(string $content): CsvTable
     {
@@ -97,14 +102,14 @@ final class NetworkImport
         foreach (Olt::query()->get() as $olt) {
             $this->olts[mb_strtolower($olt->name)] = $olt;
         }
-        foreach (Plaque::query()->get() as $plaque) {
-            $this->plaques[mb_strtolower($plaque->name)] = $plaque;
-        }
-        foreach (Zone::query()->get() as $zone) {
+        foreach (Zone::query()->where('plaque_id', $this->plaque->id)->get() as $zone) {
             $this->zones[$zone->plaque_id.'|'.$zone->code_normalized] = $zone;
         }
-        foreach (Jdv::query()->get() as $jdv) {
+        foreach (Jdv::query()->whereIn('zone_id', Zone::query()->where('plaque_id', $this->plaque->id)->select('id'))->get() as $jdv) {
             $this->jdvs[$jdv->zone_id.'|'.$jdv->code_normalized] = $jdv;
+        }
+        foreach (Sro::query()->whereIn('zone_id', Zone::query()->where('plaque_id', $this->plaque->id)->select('id'))->pluck('zone_id') as $zoneId) {
+            $this->sros[$zoneId] = true;
         }
     }
 
@@ -121,7 +126,7 @@ final class NetworkImport
             }
         }
 
-        foreach (['olt' => 120, 'plaque' => 120, 'sous_plaque' => 40, 'splitter' => 40, 'pco' => 60, 'slot' => 255, 'port' => 255, 'brin' => 255, 'statut' => 255, 'commentaire' => 2000] as $column => $max) {
+        foreach (['olt' => 120, 'plaque' => 120, 'sous_plaque' => 40, 'sro' => 40, 'splitter' => 40, 'pco' => 60, 'slot' => 255, 'port' => 255, 'brin' => 255, 'statut' => 255, 'commentaire' => 2000] as $column => $max) {
             if (mb_strlen($get($column)) > $max) {
                 $this->reject($line, "La colonne « {$column} » dépasse {$max} caractères.");
 
@@ -131,8 +136,13 @@ final class NetworkImport
 
         $zoneNorm = CodeNormalizer::zone($get('sous_plaque'));
         $pcoNorm = CodeNormalizer::pco($get('pco'));
-        $plaqueKey = mb_strtolower($get('plaque'));
-        $fileKey = $plaqueKey.'|'.$zoneNorm.'|'.$pcoNorm;
+        $fileKey = $zoneNorm.'|'.$pcoNorm;
+
+        if ($get('plaque') !== '' && mb_strtolower($get('plaque')) !== mb_strtolower($this->plaque->name)) {
+            $this->reject($line, 'La plaque « '.$get('plaque').' » n\'est pas celle du projet (« '.$this->plaque->name.' ») : un fichier ne contient qu\'une plaque.');
+
+            return;
+        }
 
         if (isset($this->seen[$fileKey])) {
             $this->reject($line, 'PCO en double : « '.$get('pco').' » figure déjà à la ligne '.$this->seen[$fileKey].' (non fusionné).');
@@ -154,8 +164,8 @@ final class NetworkImport
             $this->warn($line, 'Le code du PCO « '.$get('pco').' » ne correspond pas à la sous-plaque « '.$get('sous_plaque').' ».');
         }
 
-        $plaque = $this->plaques[$plaqueKey] ?? null;
-        $zone = $plaque ? ($this->zones[$plaque->id.'|'.$zoneNorm] ?? null) : null;
+        $plaque = $this->plaque;
+        $zone = $this->zones[$plaque->id.'|'.$zoneNorm] ?? null;
 
         if ($zone && $this->pcoExists($zone, $pcoNorm)) {
             $this->alreadyPresent++;
@@ -165,10 +175,10 @@ final class NetworkImport
         }
 
         $olt = $get('olt') !== '' ? $this->olt($get('olt')) : null;
-        $plaque ??= $this->createPlaque($get('plaque'));
         $this->attachOlt($line, $plaque, $olt);
 
         $zone ??= $this->createZone($plaque, $get('sous_plaque'), $zoneNorm, $vendor);
+        $this->attachSro($line, $zone, $get('sro'));
         if ($vendor && $zone->vendor !== null && $zone->vendor !== $vendor) {
             $this->warn($line, 'Le fabricant du fichier diffère de celui de la sous-plaque « '.$zone->code.' » : non modifié.');
         }
@@ -208,13 +218,22 @@ final class NetworkImport
         return $this->olts[mb_strtolower($name)] ??= tap(Olt::create(['name' => $name]), fn () => $this->created['olts']++);
     }
 
-    private function createPlaque(string $name): Plaque
+    /** La SRO du fichier crée celle de la sous-plaque ; une SRO déjà là n'est jamais modifiée. */
+    private function attachSro(int $line, Zone $zone, string $code): void
     {
-        $plaque = Plaque::create(['name' => $name]);
-        $this->plaques[mb_strtolower($name)] = $plaque;
-        $this->created['plaques']++;
+        if ($code === '' || isset($this->sros[$zone->id])) {
+            return;
+        }
 
-        return $plaque;
+        if (Sro::query()->where('code_normalized', CodeNormalizer::generic($code))->exists()) {
+            $this->warn($line, "Le numéro de SRO « {$code} » existe déjà ailleurs : SRO non créée pour la sous-plaque « {$zone->code} ».");
+
+            return;
+        }
+
+        Sro::create(['zone_id' => $zone->id, 'code' => $code]);
+        $this->sros[$zone->id] = true;
+        $this->created['sros']++;
     }
 
     private function attachOlt(int $line, Plaque $plaque, ?Olt $olt): void

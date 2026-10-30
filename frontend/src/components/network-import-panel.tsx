@@ -13,7 +13,7 @@ interface Issue {
 interface Report {
   committed: boolean;
   rows: number;
-  created: { olts: number; plaques: number; zones: number; jdvs: number; pcos: number };
+  created: { olts: number; zones: number; sros: number; jdvs: number; pcos: number };
   already_present: number;
   rejected: Issue[];
   warnings: Issue[];
@@ -42,7 +42,8 @@ function IssueList({ title, tone, issues }: { title: string; tone: "red" | "ambe
   );
 }
 
-export default function ImporterPage() {
+/** Import CSV du réseau d'un projet : un fichier, une seule plaque (celle du projet). */
+export function NetworkImportPanel({ projectId, onImported }: { projectId: string; onImported: () => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [report, setReport] = useState<Report | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -56,8 +57,9 @@ export default function ImporterPage() {
     try {
       const form = new FormData();
       form.append("file", file);
-      const res = await apiFetch<{ data: Report }>(mode === "preview" ? "/imports/network/preview" : "/imports/network", { method: "POST", body: form }, getToken());
+      const res = await apiFetch<{ data: Report }>(mode === "preview" ? `/projects/${projectId}/imports/network/preview` : `/projects/${projectId}/imports/network`, { method: "POST", body: form }, getToken());
       setReport(res.data);
+      if (res.data.committed) onImported();
       setConfirming(false);
     } catch (e) {
       setReport(null);
@@ -71,11 +73,13 @@ export default function ImporterPage() {
   const imported = report?.committed === true;
 
   return (
-    <div className="max-w-2xl space-y-4">
+    <section aria-labelledby="import" className="space-y-4 rounded-xl border border-zinc-200 bg-white p-4">
       <div className="space-y-1">
-        <h1 className="text-xl font-semibold">Importer le réseau</h1>
+        <h2 id="import" className="text-lg font-semibold">
+          Importer le réseau (CSV)
+        </h2>
         <p className="text-sm text-zinc-700">
-          Un fichier CSV, une ligne par PCO : OLT, plaque, sous-plaque, splitter, PCO… Les éléments déjà connus ne sont jamais modifiés.{" "}
+          Un fichier CSV, une ligne par PCO : sous-plaque, SRO, splitter, PCO… Une seule plaque par fichier : celle du projet (la colonne « plaque » peut rester vide). Les éléments déjà connus ne sont jamais modifiés.{" "}
           <a href="/modeles-import/reseau.csv" download className="underline">
             Télécharger le modèle
           </a>
@@ -120,7 +124,7 @@ export default function ImporterPage() {
             <h2 className="font-semibold">{imported ? "Import terminé" : "Résultat de la vérification (rien n'est encore enregistré)"}</h2>
             <p>{report.rows} lignes lues.</p>
             <p>
-              {imported ? "Créés" : "À créer"} : {report.created.plaques} plaque(s), {report.created.zones} sous-plaque(s), {report.created.jdvs} splitter(s), {report.created.pcos} PCO
+              {imported ? "Créés" : "À créer"} : {report.created.zones} sous-plaque(s), {report.created.sros} SRO, {report.created.jdvs} splitter(s), {report.created.pcos} PCO
               {report.created.olts > 0 && `, ${report.created.olts} OLT`}.
             </p>
             {report.already_present > 0 && <p>{report.already_present} PCO déjà présent(s) : laissés tels quels.</p>}
@@ -155,12 +159,12 @@ export default function ImporterPage() {
           {!imported && toCreate === 0 && <p className="text-sm text-zinc-700">Rien à créer avec ce fichier.</p>}
 
           {imported && (
-            <Link href="/reseau" className="inline-flex h-11 items-center rounded-lg bg-slate-900 px-6 font-medium text-white">
+            <Link href="/reseau" className="inline-flex h-11 items-center rounded-lg border border-zinc-300 px-6 font-medium">
               Voir le réseau
             </Link>
           )}
         </div>
       )}
-    </div>
+    </section>
   );
 }
