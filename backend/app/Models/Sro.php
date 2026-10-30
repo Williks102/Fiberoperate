@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ResolvesPlaque;
 use App\Support\CodeNormalizer;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /** SRO : une par sous-plaque, part de l'OLT et alimente les splitters de sa sous-plaque. */
 class Sro extends Model
 {
-    use HasUuids, SoftDeletes;
+    use HasUuids, ResolvesPlaque, SoftDeletes;
 
     protected $fillable = ['zone_id', 'code', 'latitude', 'longitude', 'olt_slot', 'olt_port', 'fiber_strand'];
 

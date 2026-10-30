@@ -21,6 +21,11 @@ class SroRequest extends ManagesResource
         return 'sro';
     }
 
+    protected function targetPlaqueId(): ?string
+    {
+        return $this->plaqueOfZone($this->input('zone_id'));
+    }
+
     public function rules(): array
     {
         $id = $this->ignoreId();

@@ -39,6 +39,11 @@ class Zone extends Model
         ];
     }
 
+    public function plaqueId(): ?string
+    {
+        return $this->plaque_id;
+    }
+
     public function plaque(): BelongsTo
     {
         return $this->belongsTo(Plaque::class);

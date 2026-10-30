@@ -17,6 +17,11 @@ class JdvRequest extends ManagesResource
         return 'jdv';
     }
 
+    protected function targetPlaqueId(): ?string
+    {
+        return $this->plaqueOfZone($this->input('zone_id'));
+    }
+
     public function rules(): array
     {
         return [

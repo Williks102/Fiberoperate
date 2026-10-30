@@ -27,6 +27,13 @@ class PcoRequest extends ManagesResource
         return 'pco';
     }
 
+    protected function targetPlaqueId(): ?string
+    {
+        $zoneId = Jdv::query()->whereKey($this->validUuid($this->input('jdv_id')))->value('zone_id');
+
+        return $this->plaqueOfZone($zoneId);
+    }
+
     public function rules(): array
     {
         return [

@@ -33,7 +33,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const groups = groupsFor(user.role);
+  const groups = groupsFor(user.role, user.skills);
   const linkClass = (active: boolean) => `flex h-11 items-center rounded-lg px-3 text-sm font-medium ${active ? "bg-slate-900 text-white" : "text-zinc-700 hover:bg-zinc-100"}`;
 
   return (
@@ -92,7 +92,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <main className="mx-auto w-full max-w-6xl flex-1 p-4 pb-24 sm:p-6 md:pb-6">{children}</main>
       </div>
 
-      <BottomBar role={user.role} pathname={pathname} />
+      <BottomBar role={user.role} skills={user.skills} pathname={pathname} />
       <MobileDrawer
         open={menuOpen}
         onClose={closeMenu}

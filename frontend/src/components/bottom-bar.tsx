@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { NavIcon } from "@/components/nav-icons";
 import { bottomBarFor, isActive, isGroupActive } from "@/lib/navigation";
-import type { Role } from "@/lib/types";
+import type { MissionType, Role } from "@/lib/types";
 
 /**
  * Barre de navigation du téléphone : des icônes (accueil et activités), 5 au plus.
  * Le libellé reste accessible (lecteurs d'écran, infobulle) ; le menu complet est dans le tiroir hamburger.
  */
-export function BottomBar({ role, pathname }: { role: Role; pathname: string }) {
-  const { main, groups } = bottomBarFor(role);
+export function BottomBar({ role, skills, pathname }: { role: Role; skills?: MissionType[]; pathname: string }) {
+  const { main, groups } = bottomBarFor(role, skills);
 
   const active = (href: string) => {
     const group = groups.find((g) => g.href === href);

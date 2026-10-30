@@ -1,4 +1,4 @@
-import type { Role } from "@/lib/types";
+import type { MissionType, Role } from "@/lib/types";
 
 /** Icône d'une activité (voir `nav-icons.tsx`). */
 export type NavIconName = "home" | "project" | "network" | "admin";
@@ -10,6 +10,8 @@ export interface NavItem {
   description?: string;
   /** Rôles qui voient l'entrée ; absent = tous. */
   roles?: Role[];
+  /** Pour un technicien, l'entrée n'apparaît qu'avec cette habilitation (ex. « dessin » pour le BE). */
+  skill?: MissionType;
 }
 
 /** Une activité du métier : ses écrans sont regroupés sous une page d'accueil (« hub »). */
@@ -45,10 +47,10 @@ export const NAV_GROUPS: NavGroup[] = [
     description: "Les plaques et leur réseau : sous-plaques, SRO, splitters, PCO et OLT.",
     items: [
       { href: "/plaques", label: "Plaques", description: "Une plaque et tout ce qu'on y déploie : sous-plaques, SRO, splitters et PCO." },
-      { href: "/sous-plaques", label: "Sous-plaques", description: "Ajouter ou corriger une sous-plaque.", roles: ["admin"] },
-      { href: "/sro", label: "SRO", description: "Ajouter ou corriger une SRO : son numéro, son GPS et son départ de l'OLT.", roles: ["admin"] },
-      { href: "/splitters", label: "Splitters", description: "Ajouter ou corriger un splitter (JDV).", roles: ["admin"] },
-      { href: "/pco", label: "PCO", description: "Les boîtiers : chercher un PCO, voir son statut et ses coordonnées.", roles: ["admin"] },
+      { href: "/sous-plaques", label: "Sous-plaques", description: "Ajouter ou corriger une sous-plaque.", roles: ["admin", "be_manager", "technician"], skill: "drawing" },
+      { href: "/sro", label: "SRO", description: "Ajouter ou corriger une SRO : son numéro, son GPS et son départ de l'OLT.", roles: ["admin", "be_manager", "technician"], skill: "drawing" },
+      { href: "/splitters", label: "Splitters", description: "Ajouter ou corriger un splitter (JDV).", roles: ["admin", "be_manager", "technician"], skill: "drawing" },
+      { href: "/pco", label: "PCO", description: "Les boîtiers : chercher un PCO, voir son statut et ses coordonnées.", roles: ["admin", "be_manager", "technician"], skill: "drawing" },
       { href: "/olt", label: "OLT", description: "Les équipements de tête.", roles: ["admin", "dg", "dt", "supervisor", "coordinator", "be_manager"] },
     ],
   },
@@ -64,18 +66,19 @@ export const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
-function visible(item: NavItem, role: Role): boolean {
-  return !item.roles || item.roles.includes(role);
+function visible(item: NavItem, role: Role, skills: MissionType[]): boolean {
+  if (item.roles && !item.roles.includes(role)) return false;
+  return role !== "technician" || !item.skill || skills.includes(item.skill);
 }
 
 /** Les activités du rôle, avec seulement les écrans auxquels il a droit ; une activité vide disparaît. */
-export function groupsFor(role: Role): NavGroup[] {
-  return NAV_GROUPS.map((group) => ({ ...group, items: group.items.filter((item) => visible(item, role)) })).filter((group) => group.items.length > 0);
+export function groupsFor(role: Role, skills: MissionType[] = []): NavGroup[] {
+  return NAV_GROUPS.map((group) => ({ ...group, items: group.items.filter((item) => visible(item, role, skills)) })).filter((group) => group.items.length > 0);
 }
 
 /** Tous les écrans du rôle, à plat. */
-export function navFor(role: Role): NavItem[] {
-  return [HOME, ...groupsFor(role).flatMap((group) => group.items)];
+export function navFor(role: Role, skills: MissionType[] = []): NavItem[] {
+  return [HOME, ...groupsFor(role, skills).flatMap((group) => group.items)];
 }
 
 export function isActive(pathname: string, href: string): boolean {
@@ -101,8 +104,8 @@ export const BOTTOM_BAR_MAX = 5;
  * Barre du bas sur téléphone : l'accueil et les activités, en icônes (5 au plus).
  * Chaque activité ouvre sa page d'accueil, qui liste ses écrans ; le tiroir hamburger montre tout le menu.
  */
-export function bottomBarFor(role: Role): { main: BarEntry[]; groups: NavGroup[] } {
-  const groups = groupsFor(role);
+export function bottomBarFor(role: Role, skills: MissionType[] = []): { main: BarEntry[]; groups: NavGroup[] } {
+  const groups = groupsFor(role, skills);
   const entries: BarEntry[] = [
     { href: HOME.href, label: HOME.label, icon: "home" },
     ...groups.map((group) => ({ href: group.href, label: group.label, icon: group.icon })),

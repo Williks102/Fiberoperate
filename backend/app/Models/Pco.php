@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\PcoStatus;
+use App\Models\Concerns\ResolvesPlaque;
 use App\Support\CodeNormalizer;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -16,7 +17,7 @@ use InvalidArgumentException;
 /** PCO = PBO = « boîtier ». */
 class Pco extends Model
 {
-    use HasUuids, SoftDeletes;
+    use HasUuids, ResolvesPlaque, SoftDeletes;
 
     protected $fillable = [
         'zone_id',

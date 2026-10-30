@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Zone;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 
 /**
  * Base des requêtes d'écriture : le contrôle d'accès passe par la Policy dans authorize(),
@@ -16,17 +18,35 @@ abstract class ManagesResource extends FormRequest
     /** Nom du paramètre de route (ex. « plaque »). */
     abstract protected function routeKey(): string;
 
+    /** Plaque visée par une création (null : seul l'administrateur peut écrire). */
+    protected function targetPlaqueId(): ?string
+    {
+        return null;
+    }
+
     public function authorize(): bool
     {
         $id = $this->route($this->routeKey());
 
         if ($id === null) {
-            return $this->user()->can('create', $this->modelClass());
+            return $this->user()->can('create', [$this->modelClass(), $this->targetPlaqueId()]);
         }
 
         $model = $this->modelClass()::query()->findOrFail($id);
 
         return $this->user()->can('update', $model);
+    }
+
+    protected function validUuid(mixed $value): ?string
+    {
+        return is_string($value) && Str::isUuid($value) ? $value : null;
+    }
+
+    protected function plaqueOfZone(mixed $zoneId): ?string
+    {
+        $zoneId = $this->validUuid($zoneId);
+
+        return $zoneId === null ? null : Zone::query()->whereKey($zoneId)->value('plaque_id');
     }
 
     /** « required » à la création, « sometimes » en modification partielle. */

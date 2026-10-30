@@ -76,6 +76,12 @@ class User extends Authenticatable
         return in_array($this->role, $roles, true);
     }
 
+    /** Chef du BE ou technicien du BE (habilitation « dessin ») : ils dessinent et ajustent le réseau d'un projet. */
+    public function isBeMember(): bool
+    {
+        return $this->hasRole(Role::BeManager) || ($this->hasRole(Role::Technician) && $this->hasSkill(MissionType::Drawing));
+    }
+
     /** Un technicien n'est planifiable que sur une mission pour laquelle il est habilité. */
     public function hasSkill(MissionType $mission): bool
     {
