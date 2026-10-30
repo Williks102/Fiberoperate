@@ -76,8 +76,8 @@ Nouveau **lot 1B — Projet de déploiement et bureau d'études**, en petites tr
 
 ## 4. Questions encore ouvertes
 Confirmé le 30/10/2026 (donc retiré de cette liste) : hiérarchie des techniciens du BE, retour en avant-projet en cas de refus, « prévu » porté par la phase du projet.
-1. **Stockage des fichiers** : taille d'un KMZ ou d'un plan, et service à utiliser (Cloudinary est prévu pour les photos, mais limité en taille pour les fichiers).
-2. **Structure du devis** : des lignes détaillées (désignation, quantité, prix) ou un total par rubrique ?
+1. **Stockage des fichiers** : un KMZ est petit (12 Ko dans l'exemple) ; reste la **taille d'un DWG** et le service à utiliser (Cloudinary est prévu pour les photos, mais limité en taille pour les fichiers). Exemples analysés : `docs/fichiers-exemples/livrables-projet.md`.
+2. **Structure du devis** : *répondu par l'exemple du 31/10* — des lignes d'un **catalogue de prix de l'opérateur** (référence, désignation, unité, prix unitaire) avec une quantité d'étude, puis une quantité réalisée et l'écart. À confirmer : le catalogue est-il commun à tous les projets ?
 3. **Visibilité** : le BE voit-il tous les projets ? Le superviseur ne voit-il que celui de sa plaque ?
 4. **Qui lance chaque phase** — décidé le 31/10 : le BE (ou l'administrateur) envoie l'avant-projet en validation ; le chef du BE valide, puis le DT ; **le DT enregistre l'accord du client** (le client n'a pas de compte) et **le BE est notifié** ; un refus renvoie en avant-projet avec un motif. **Le BE fait ensuite avancer le projet** : survey d'implantation → déploiement → relevé final → exploitation. Les personnes concernées sont prévenues par la cloche de l'application (chef du BE, DT, auteur de l'envoi, superviseur au lancement du déploiement). *Reste à décider* : un dossier (plans, devis) exigé avant l'envoi en validation, quand les documents seront dans l'application ; notification par e-mail.
 5. **Correspondance exacte** entre « implanté / posé / mis en réseau » et les statuts de PCO du cahier.
