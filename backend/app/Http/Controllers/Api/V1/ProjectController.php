@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Project\CreateProject;
+use App\Domain\Project\MoveProject;
 use App\Enums\PcoStatus;
 use App\Enums\ProjectPhase;
+use App\Http\Requests\DecideProjectRequest;
 use App\Http\Requests\ProjectRequest;
+use App\Http\Requests\SubmitProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Models\Plaque;
 use App\Models\Project;
@@ -61,5 +64,19 @@ class ProjectController extends ApiResourceController
         }
 
         return $this->created($create->run($request->validated(), $request->user()));
+    }
+
+    /** Envoie l'avant-projet en validation (chef du BE, puis DT, puis client). */
+    public function submit(SubmitProjectRequest $request, string $project, MoveProject $move): ProjectResource
+    {
+        return new ProjectResource($this->load($move->submit(Project::query()->findOrFail($project), $request->user())));
+    }
+
+    /** Valide ou refuse la phase de validation en cours ; un refus renvoie en avant-projet, avec son motif. */
+    public function decision(DecideProjectRequest $request, string $project, MoveProject $move): ProjectResource
+    {
+        $moved = $move->decide(Project::query()->findOrFail($project), $request->user(), $request->input('decision') === 'approved', $request->input('reason'));
+
+        return new ProjectResource($this->load($moved));
     }
 }

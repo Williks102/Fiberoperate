@@ -2,13 +2,14 @@
 
 namespace App\Policies;
 
+use App\Enums\ProjectPhase;
 use App\Enums\Role;
 use App\Models\Project;
 use App\Models\User;
 
 /**
  * Lecture : administrateur, DG, DT, chef du BE (tous les projets) et superviseur (celui de sa plaque).
- * Ouverture d'un projet : administrateur et chef du BE (décision du 30/10/2026). Les changements de phase viennent avec le circuit de validation.
+ * Ouverture d'un projet : administrateur et chef du BE (décision du 30/10/2026). Circuit de validation : voir submit() et decide().
  */
 class ProjectPolicy
 {
@@ -20,6 +21,18 @@ class ProjectPolicy
     public function view(User $user, Project $project): bool
     {
         return $this->viewAny($user) && Project::query()->visibleTo($user)->whereKey($project->id)->exists();
+    }
+
+    /** Envoi en validation : le BE (ou l'administrateur) depuis l'avant-projet. */
+    public function submit(User $user, Project $project): bool
+    {
+        return $project->phase === ProjectPhase::PreProject && ($user->hasRole(Role::Admin) || $user->isBeMember());
+    }
+
+    /** Décision d'une phase de validation : le rôle prévu pour cette phase (chef du BE, DT, ou celui qui enregistre l'accord du client). */
+    public function decide(User $user, Project $project): bool
+    {
+        return in_array($user->role, $project->phase->deciders(), true);
     }
 
     public function create(User $user): bool

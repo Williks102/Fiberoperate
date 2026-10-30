@@ -79,6 +79,6 @@ Confirmé le 30/10/2026 (donc retiré de cette liste) : hiérarchie des technici
 1. **Stockage des fichiers** : taille d'un KMZ ou d'un plan, et service à utiliser (Cloudinary est prévu pour les photos, mais limité en taille pour les fichiers).
 2. **Structure du devis** : des lignes détaillées (désignation, quantité, prix) ou un total par rubrique ?
 3. **Visibilité** : le BE voit-il tous les projets ? Le superviseur ne voit-il que celui de sa plaque ?
-4. **Qui peut lancer chaque phase** (par exemple passer en déploiement après l'accord du client) ?
+4. **Qui peut lancer chaque phase** : *circuit de validation appliqué (tranche du 31/10, à confirmer)* — le BE (ou l'administrateur) envoie l'avant-projet en validation ; le chef du BE valide, puis le DT ; l'accord du client est enregistré par le DT, le chef du BE ou l'administrateur (le client n'a pas de compte) ; un refus renvoie en avant-projet avec un motif. **Reste à décider** : qui passe de « survey d'implantation » à « déploiement », puis « relevé final » et « exploitation » ; et si un dossier (plans, devis) est exigé avant l'envoi en validation (les documents ne sont pas encore dans l'application).
 6. **(v1.9)** Informations de la SRO ; colonnes « ZONE PCO » et « JDV/HUB » du suivi raccordement ; qui crée un projet ; jusqu'à quelle phase le BE ajuste le réseau ; données existantes à conserver ; rattachement du PCO de désaturation. Liste complète : cahier §9 points 8 à 13.
 5. **Correspondance exacte** entre « implanté / posé / mis en réseau » et les statuts de PCO du cahier.

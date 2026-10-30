@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { ProjectActions } from "@/components/project-actions";
 import { NetworkImportPanel } from "@/components/network-import-panel";
 import { useAuth } from "@/lib/auth/auth-context";
 import { formatDateTime } from "@/lib/format";
@@ -49,6 +50,8 @@ function ProjectDetail({ project, reload }: { project: Project; reload: () => vo
           Phase actuelle : <span className="font-medium text-zinc-900">{project.phase_label}</span> depuis le {formatDateTime(project.phase_changed_at)}
         </p>
       </header>
+
+      <ProjectActions project={project} onDone={reload} />
 
       <Characteristics project={project} />
       {canImport && <NetworkImportPanel projectId={project.id} onImported={reload} />}

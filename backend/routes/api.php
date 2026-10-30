@@ -33,6 +33,8 @@ Route::prefix('v1')->group(function () {
         Route::put('pcos/{pco}/measured-position', [PcoController::class, 'measure']);
         Route::apiResource('pcos', PcoController::class);
         Route::apiResource('projects', ProjectController::class)->only(['index', 'show', 'store']);
+        Route::post('projects/{project}/submit', [ProjectController::class, 'submit']);
+        Route::post('projects/{project}/decision', [ProjectController::class, 'decision']);
         Route::post('projects/{project}/imports/network/preview', [NetworkImportController::class, 'preview']);
         Route::post('projects/{project}/imports/network', [NetworkImportController::class, 'store']);
         Route::get('block-reasons', [BlockReasonController::class, 'index']);
