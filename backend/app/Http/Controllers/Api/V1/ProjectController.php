@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Domain\Project\CreateProject;
 use App\Enums\ProjectPhase;
 use App\Http\Requests\ProjectRequest;
 use App\Http\Resources\ProjectResource;
@@ -42,10 +43,12 @@ class ProjectController extends ApiResourceController
             ->when($request->string('q')->trim()->value(), fn ($q, $term) => $q->whereIn('plaque_id', Plaque::query()->where('name', 'ilike', "%{$term}%")->select('id')));
     }
 
-    public function store(ProjectRequest $request): JsonResponse
+    public function store(ProjectRequest $request, CreateProject $create): JsonResponse
     {
-        $plaque = Plaque::query()->findOrFail($request->validated('plaque_id'));
+        if ($request->filled('plaque_id')) {
+            return $this->created(Project::startFor(Plaque::query()->findOrFail($request->validated('plaque_id')), $request->user()));
+        }
 
-        return $this->created(Project::startFor($plaque, $request->user()));
+        return $this->created($create->run($request->validated(), $request->user()));
     }
 }

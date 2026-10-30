@@ -8,7 +8,7 @@ use App\Models\User;
 
 /**
  * Lecture : administrateur, DG, DT, chef du BE (tous les projets) et superviseur (celui de sa plaque).
- * Ouverture d'un projet : administrateur, DT et chef du BE. Les changements de phase viennent avec le circuit de validation.
+ * Ouverture d'un projet : administrateur et chef du BE (décision du 30/10/2026). Les changements de phase viennent avec le circuit de validation.
  */
 class ProjectPolicy
 {
@@ -24,6 +24,6 @@ class ProjectPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasRole(Role::Admin, Role::Dt, Role::BeManager);
+        return $user->hasRole(Role::Admin, Role::BeManager);
     }
 }
