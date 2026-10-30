@@ -9,7 +9,7 @@ import { MISSION_LABELS, ROLE_LABELS } from "@/lib/labels";
 import type { MissionType, Paged, Role, User } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
 
-const MANAGER_ROLES: Role[] = ["supervisor", "coordinator", "dt"];
+const MANAGER_ROLES: Role[] = ["supervisor", "coordinator", "dt", "be_manager"];
 
 /** Création (user absent) ou modification d'un utilisateur par l'administrateur. */
 export function UserForm({ user }: { user?: User }) {

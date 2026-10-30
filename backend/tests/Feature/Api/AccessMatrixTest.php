@@ -77,7 +77,7 @@ class AccessMatrixTest extends TestCase
 
     public function test_global_roles_see_every_plaque(): void
     {
-        foreach ([Role::Admin, Role::Dg, Role::Dt, Role::Coordinator] as $i => $role) {
+        foreach ([Role::Admin, Role::Dg, Role::Dt, Role::Coordinator, Role::BeManager] as $i => $role) {
             Sanctum::actingAs($this->user($role, "g{$i}@x.test"));
             $this->assertCount(2, $this->ids('/api/v1/plaques'), $role->value);
             $this->assertCount(2, $this->ids('/api/v1/pcos'), $role->value);
@@ -111,7 +111,7 @@ class AccessMatrixTest extends TestCase
     {
         $payload = ['name' => 'NOUVELLE'];
 
-        foreach ([Role::Dg, Role::Dt, Role::Supervisor, Role::Coordinator, Role::Technician] as $i => $role) {
+        foreach ([Role::Dg, Role::Dt, Role::Supervisor, Role::Coordinator, Role::Technician, Role::BeManager] as $i => $role) {
             Sanctum::actingAs($this->user($role, "w{$i}@x.test"));
             $this->postJson('/api/v1/plaques', $payload)->assertForbidden();
             $this->patchJson('/api/v1/plaques/'.$this->plaqueA->id, $payload)->assertForbidden();

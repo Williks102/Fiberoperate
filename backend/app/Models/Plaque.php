@@ -35,12 +35,13 @@ class Plaque extends Model
 
     /**
      * Plaques visibles par l'utilisateur : le superviseur voit les siennes, le technicien
-     * celles de son supérieur (technicien déploiement), les autres rôles du back-office tout.
+     * celles de son supérieur (technicien déploiement), les autres rôles du back-office tout
+     * (dont le chef du BE, qui dimensionne le réseau).
      */
     public function scopeVisibleTo(Builder $query, User $user): Builder
     {
         return match ($user->role) {
-            Role::Admin, Role::Dg, Role::Dt, Role::Coordinator => $query,
+            Role::Admin, Role::Dg, Role::Dt, Role::Coordinator, Role::BeManager => $query,
             Role::Supervisor => $query->where('supervisor_id', $user->id),
             Role::Technician => $user->manager_id
                 ? $query->where('supervisor_id', $user->manager_id)

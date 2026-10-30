@@ -35,6 +35,7 @@ export const ROLE_LABELS: Record<Role, string> = {
   supervisor: "Superviseur",
   coordinator: "Coordinateur",
   technician: "Technicien",
+  be_manager: "Chef du bureau d'études",
 };
 
 export const MISSION_LABELS: Record<MissionType, string> = {
@@ -42,4 +43,6 @@ export const MISSION_LABELS: Record<MissionType, string> = {
   customer_connection: "Raccordement client",
   maintenance: "Maintenance",
   study: "Étude",
+  drawing: "Dessin et avant-projet",
+  survey: "Relevés (survey)",
 };

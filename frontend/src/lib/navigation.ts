@@ -34,7 +34,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/plaques", label: "Plaques", description: "Ajouter ou corriger une plaque.", roles: ["admin"] },
       { href: "/sous-plaques", label: "Sous-plaques", description: "Ajouter ou corriger une sous-plaque.", roles: ["admin"] },
       { href: "/splitters", label: "Splitters", description: "Ajouter ou corriger un splitter (JDV).", roles: ["admin"] },
-      { href: "/olt", label: "OLT", description: "Les équipements de tête.", roles: ["admin", "dg", "dt", "supervisor", "coordinator"] },
+      { href: "/olt", label: "OLT", description: "Les équipements de tête.", roles: ["admin", "dg", "dt", "supervisor", "coordinator", "be_manager"] },
       { href: "/importer", label: "Importer le réseau", description: "Créer le réseau depuis un fichier CSV.", roles: ["admin"] },
     ],
   },

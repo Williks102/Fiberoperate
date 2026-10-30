@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { BOTTOM_BAR_MAX, bottomBarFor, groupsFor, isActive, isGroupActive, NAV_GROUPS, navFor } from "./navigation";
 import type { Role } from "./types";
 
-const ROLES: Role[] = ["admin", "dg", "dt", "supervisor", "coordinator", "technician"];
+const ROLES: Role[] = ["admin", "dg", "dt", "supervisor", "coordinator", "technician", "be_manager"];
 const labels = (role: Role) => groupsFor(role).map((g) => g.label);
 
 describe("menu par activité", () => {
@@ -22,6 +22,8 @@ describe("menu par activité", () => {
     expect(labels("technician")).toEqual(["Déploiement"]);
     expect(groupsFor("supervisor")[0].items.map((i) => i.href)).toEqual(["/reseau", "/olt"]);
     expect(groupsFor("technician")[0].items.map((i) => i.href)).toEqual(["/reseau"]);
+    expect(labels("be_manager")).toEqual(["Déploiement"]);
+    expect(groupsFor("be_manager")[0].items.map((i) => i.href)).toEqual(["/reseau", "/olt"]);
     expect(groupsFor("coordinator").find((g) => g.label === "Administration")!.items.map((i) => i.href)).toEqual(["/equipes"]);
   });
 

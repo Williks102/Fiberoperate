@@ -28,7 +28,7 @@ class UsersApiTest extends TestCase
 
     public function test_only_admin_manages_users(): void
     {
-        foreach ([Role::Dg, Role::Dt, Role::Supervisor, Role::Coordinator, Role::Technician] as $role) {
+        foreach ([Role::Dg, Role::Dt, Role::Supervisor, Role::Coordinator, Role::Technician, Role::BeManager] as $role) {
             $this->login($role);
             $this->postJson('/api/v1/users', $this->payload(['email' => "{$role->value}-new@x.test"]))->assertForbidden();
         }
@@ -107,5 +107,39 @@ class UsersApiTest extends TestCase
         $this->assertStringNotContainsString('validation.', $message);
         $this->assertStringContainsString('mot de passe', $message);
         $this->assertStringContainsString('au moins', $message);
+    }
+
+    public function test_be_manager_and_the_new_skills_can_be_created_by_the_admin(): void
+    {
+        $this->login(Role::Admin);
+
+        $this->postJson('/api/v1/users', $this->payload(['email' => 'chef@x.test', 'role' => 'be_manager']))
+            ->assertCreated()->assertJsonPath('data.role', 'be_manager')->assertJsonPath('data.role_label', "Chef du bureau d'études");
+
+        $id = $this->postJson('/api/v1/users', $this->payload(['email' => 'dessin@x.test', 'skills' => ['drawing', 'survey']]))
+            ->assertCreated()->json('data.id');
+        $user = User::findOrFail($id);
+        $this->assertTrue($user->hasSkill(MissionType::Drawing));
+        $this->assertTrue($user->hasSkill(MissionType::Survey));
+        $this->assertFalse($user->hasSkill(MissionType::Study));
+    }
+
+    public function test_skills_are_still_reserved_to_technicians_for_the_be_manager(): void
+    {
+        $this->login(Role::Admin);
+
+        $this->postJson('/api/v1/users', $this->payload(['email' => 'chef@x.test', 'role' => 'be_manager', 'skills' => ['drawing']]))
+            ->assertStatus(422)->assertJsonValidationErrors('skills');
+    }
+
+    public function test_be_manager_reads_the_network_but_cannot_manage_users_or_teams(): void
+    {
+        $this->login(Role::BeManager);
+
+        $this->getJson('/api/v1/plaques')->assertOk();
+        $this->getJson('/api/v1/olts')->assertOk();
+        $this->getJson('/api/v1/users')->assertForbidden();
+        $this->getJson('/api/v1/teams')->assertForbidden();
+        $this->postJson('/api/v1/imports/network', [])->assertForbidden();
     }
 }
