@@ -1,9 +1,9 @@
 # CLAUDE.md — Application de gestion FTTH (sous-traitant opérateur)
 
-Référence fonctionnelle complète : `CAHIER_DES_CHARGES.md` (v1.7). En cas de doute métier, ce document fait foi.
+Référence fonctionnelle complète : `CAHIER_DES_CHARGES.md` (v1.8). Parcours d'un projet : `docs/workflow-projet-deploiement.md`. En cas de doute métier, ce document fait foi.
 
 ## Objectif
-Application de gestion pour une entreprise sous-traitante qui installe la fibre optique : import de la liste des clients, études, plannings (raccordements, déploiements, tirages, maintenance), suivi des zones et des PCO, reporting du coordinateur, matériel, incidents, tableaux de bord. **Opérationnel uniquement** : pas de facturation ni de paie. **Pas d'intégration technique** avec la plateforme de l'opérateur en v1.
+Application de gestion pour une entreprise sous-traitante qui installe la fibre optique : import de la liste des clients, études, plannings (raccordements, déploiements, tirages, maintenance), suivi des zones et des PCO, reporting du coordinateur, matériel, incidents, tableaux de bord. **Opérationnel uniquement** : pas de facturation ni de paie (le **devis de l'AVP** est saisi, sans facturation). **Pas d'intégration technique** avec la plateforme de l'opérateur en v1.
 
 ## Stack
 - Backend : Laravel (API REST, Sanctum, policies), PostgreSQL, Redis + queues, Cloudinary pour les photos.
@@ -19,15 +19,17 @@ Application de gestion pour une entreprise sous-traitante qui installe la fibre 
 - Le « D » des codes (D01…) = **division** : pas exploité pour l'instant, conserver le texte brut. Le « F » (F22, F77…) est peut-être un numéro de fibre : à confirmer, ne pas le coder en dur.
 - **Étude technique initiale** (vocabulaire de l'opérateur, à ne pas inverser) : « **Sans PCO** » = étude **réalisée**, client raccordable ; « **Avec PCO** » = étude **à réaliser**. Stocker le libellé d'origine (`initial_study_status_raw`) et un état normalisé ; afficher des libellés clairs dans l'interface ; reprendre les libellés de l'opérateur dans l'export de la fiche de suivi.
 - **Box (ONT)** : après l'étude, une box est attribuée au client pour son installation ; elle est rattachée à un **SN ONT** (numéro de série) et à un **numéro fixe** (colonne « LIGNE FIXE » du fichier de suivi raccordement). Structure du fichier et pièges d'import : `docs/fichiers-exemples/suivi-raccordement.md`.
+- **BE** = bureau d'études (chef du BE, dessinateurs, techniciens réseau). **AVP** = avant-projet (plans et devis). **KMZ** = plan lisible dans Google Earth. **Survey** = relevé de terrain (d'implantation avant le déploiement, final après).
 - **RAB** = référence de commande opérateur (clé d'import). **FT** = numéro de ligne FTTH. Ne pas supposer une longueur fixe : les données réelles varient.
 
 ## Rôles (un seul rôle `technician` avec habilitations)
-`admin`, `dg`, `dt`, `supervisor`, `coordinator`, `technician`.
-Habilitations technicien : `deployment`, `customer_connection`, `maintenance`, `study`.
-Hiérarchie : technicien déploiement → superviseur → DT ; autres techniciens → coordinateur → DT.
+`admin`, `dg`, `dt`, `supervisor`, `coordinator`, `technician`, et (v1.8, à créer) `be_manager` (chef du BE).
+Habilitations technicien : `deployment`, `customer_connection`, `maintenance`, `study`, et (v1.8, à créer) `drawing` (dessin, AVP) et `survey` (relevés).
+Hiérarchie : technicien déploiement → superviseur → DT ; technicien raccordement ou maintenance → coordinateur → DT ; technicien du BE → chef du BE → DT (le coordinateur reçoit les résultats d'étude, sans être leur supérieur).
 Toute requête est filtrée par rôle **et** périmètre (plaque pour le superviseur, équipes pour le coordinateur). Policies Laravel obligatoires, jamais de contrôle uniquement côté front.
 
 ## Flux métier
+0. **Projet de déploiement** (une plaque) : avant-projet par le BE (plans, KMZ, AVP et devis), validation du chef du BE, puis du DT, puis du client ; survey d'implantation ; déploiement par le superviseur ; relevé final. Détail et phases : `docs/workflow-projet-deploiement.md`. Documents toujours versionnés, jamais écrasés ; un refus renvoie en avant-projet avec un motif obligatoire.
 1. Le coordinateur importe la liste des clients (Excel/CSV) → une `customer_order` par ligne.
 2. Mise en étude → intervention `study` → résultat saisi (formulaire terrain ou par le coordinateur).
 3. Programmation de l'installation (équipe, date) → intervention `customer_connection`.
@@ -77,6 +79,7 @@ Toute requête est filtrée par rôle **et** périmètre (plaque pour le supervi
 
 ## Ordre de développement
 1. Auth, rôles, habilitations, équipes, référentiels (OLT, plaques, zones/sous-plaques, JDV, PCO).
+1B. **Avant-projet et bureau d'études** (décision du 30/10/2026 : avant l'import des clients, qui se fait quand la structure de l'activité est maîtrisée). Le formulaire PCO s'y rattache.
 2. Import de la liste des clients et commandes.
 3. Études et planning.
 4. PWA technicien hors-ligne (études, installation, photos, signature).
@@ -93,6 +96,7 @@ Toute requête est filtrée par rôle **et** périmètre (plaque pour le supervi
 
 ## Navigation par activité (décision du 30/10/2026)
 Le menu est regroupé par activité du métier, pas par table (`frontend/src/lib/navigation.ts`, `NAV_GROUPS`). Ce regroupement est une décision de présentation : il ne change le contenu d'aucun lot.
+- **Avant-projet** (lot 1B) : projets par plaque, documents versionnés, AVP et devis, circuit de validation (BE, chef du BE, DT).
 - **Déploiement** : Réseau, Plaques, Sous-plaques, Splitters, PCO, OLT, import du réseau (superviseur, DT, DG, administrateur).
 - **Études** (lot 3) : clients à étudier, formulaire d'étude, résultats (coordinateur, techniciens habilités « étude »).
 - **Raccordement** (lots 2 et 3) : clients et commandes, programmation et résultat de l'installation, attribution de la box (SN ONT et numéro fixe) (coordinateur, techniciens habilités « raccordement client »).

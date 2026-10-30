@@ -3,7 +3,7 @@
 Référence : `CAHIER_DES_CHARGES.md` v1.7 et `CLAUDE.md`. Tailles relatives : S < M < L < XL (pas d'estimation en jours tant que l'équipe n'est pas connue).
 
 ## Chemin critique
-Lot 0 → 1 → 2 → 3 → 4 → 5. Le lot 4 (hors-ligne) conditionne la mise sur le terrain ; démarrer les spikes (IndexedDB, file d'actions, `client_uuid`) dès le lot 3.
+Lot 0 → 1 → **1B (avant-projet, v1.8)** → 2 → 3 → 4 → 5. Le lot 4 (hors-ligne) conditionne la mise sur le terrain ; démarrer les spikes (IndexedDB, file d'actions, `client_uuid`) dès le lot 3.
 
 ## MVP = lots 0 à 5
 Utilisateurs/rôles, référentiels, import clients, études, planning, installation hors-ligne, reporting coordinateur, export fiche de suivi, tableaux de bord de base.
@@ -22,6 +22,14 @@ Utilisateurs/rôles, référentiels, import clients, études, planning, installa
 - **Acceptation** : un superviseur ne voit que sa plaque ; un coordinateur que ses équipes ; un technicien non habilité n'est pas planifiable sur la mission.
 - **Tests** : matrice rôle × périmètre, normalisation des codes, unicité, cycle de statut PCO.
 - **Questions** : sens du « F » des codes ; coordinateur avec plusieurs équipes.
+
+## Lot 1B — Avant-projet et bureau d'études (L) — *ajouté le 30/10/2026*
+- **Objectif** : gérer la phase amont d'un projet de déploiement (une plaque) : dimensionnement par le BE, validations, surveys. Parcours et décisions : `docs/workflow-projet-deploiement.md`.
+- **Périmètre** : rôle chef du BE et habilitations `drawing` et `survey` ; projet par plaque avec phases et historique ; documents versionnés (plan des plaques, plan synoptique, KMZ, AVP) ; devis de l'AVP ; circuit de validation chef du BE, puis DT, puis client (refus motivé) ; coordonnées prévues et mesurées sur les PCO, avec le **formulaire PCO** (dernière PR du lot 1) ; comparaison prévu et réel par sous-plaque.
+- **Dépendances** : lot 1. Choix du stockage des fichiers avant la tranche « documents ».
+- **Acceptation** : un projet passe de l'avant-projet à l'exploitation avec chaque décision tracée ; aucune version de document n'est perdue ; le superviseur ne voit que le projet de sa plaque.
+- **Tests** : permissions par rôle et périmètre, transitions de phase, versions de documents immuables, refus avec motif.
+- **Questions** : voir `docs/workflow-projet-deploiement.md` §4.
 
 ## Lot 2 — Import clients et commandes (L)
 - **Périmètre** : import Excel/CSV asynchrone en 2 temps (analyse → revue → validation), lignes `ok / to_fix / rejected`, découpage d'adresse (`address_raw` conservée), GPS (inversion, séparateurs, aberrations, jamais corrigé en silence), téléphones (+225, `*` retiré), doublons RAB/FT/nom+adresse, réimport = mise à jour, dates (numéros de série Excel), étude initiale « Sans PCO / Avec PCO ».

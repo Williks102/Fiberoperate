@@ -1,6 +1,8 @@
 # Cahier des charges — Application de gestion d'une entreprise d'installation de fibre optique (FTTH)
 
-Version 1.7 — 28/10/2026
+Version 1.8 — 30/10/2026
+
+**Changements v1.8** : le parcours réel d'un projet de déploiement est intégré : phase d'avant-projet menée par le bureau d'études (plans, KMZ, AVP avec devis), validations en chaîne (chef du BE, DT, client), surveys d'implantation et final, documents versionnés (§1.2, §3.7, `docs/workflow-projet-deploiement.md`) ; nouveaux rôle (chef du BE) et habilitations ; l'avant-projet passe avant l'import des clients.
 
 **Changements v1.7** : un superviseur couvre une plaque entière ; les cas spécifiques de Divo sont mis de côté, la structure du fichier de déploiement est la seule référence de l'architecture.
 
@@ -22,7 +24,7 @@ L'entreprise est **sous-traitante d'un opérateur**. Elle déploie le réseau FT
 
 **Dans le périmètre** : planification, études, suivi terrain, reporting, matériel, incidents, tableaux de bord, import de la liste des clients, export de la fiche de suivi.
 
-**Hors périmètre (v1)** : facturation, paie et rémunération des techniciens ; intégration technique avec la plateforme de l'opérateur.
+**Hors périmètre (v1)** : facturation et paie (le **devis de l'AVP** est saisi, §3.7, mais rien n'est facturé) et rémunération des techniciens ; intégration technique avec la plateforme de l'opérateur.
 
 **Contraintes** : réseau mobile instable → **mode hors-ligne obligatoire** pour les techniciens. Volumes variables selon les chantiers → listes paginées, traitements lourds en file d'attente.
 
@@ -37,6 +39,10 @@ L'entreprise est **sous-traitante d'un opérateur**. Elle déploie le réseau FT
 
 En v1, l'application n'est pas connectée à la plateforme de l'opérateur. Elle produit un **export au format de la fiche de suivi** pour faciliter le report, et conserve pour chaque commande l'indicateur « reporté sur la plateforme opérateur » (oui/non + date) afin d'éviter les oublis.
 
+### 1.2 Parcours d'un projet de déploiement (v1.8)
+
+Un projet porte sur **une plaque**. Le **bureau d'études (BE)** dimensionne la plaque (sous-plaques, splitters, PCO) et produit le plan des plaques, le plan synoptique, le plan KMZ et l'AVP (devis). Le chef du BE, puis le DT, valident ; le client (l'opérateur) valide à son tour. Le technicien du BE en charge fait ensuite le **survey d'implantation** avec un superviseur. Le superviseur et son équipe déploient (poteaux, tirage dans les chambres, pose et mise en réseau des PCO). Le BE fait un **relevé final** pour les coordonnées exactes. Quand le client envoie la liste des personnes à raccorder, les techniciens du BE font l'étude avant raccordement et la transmettent au coordinateur, qui planifie l'installation et la pose de poteaux métalliques. Détail : `docs/workflow-projet-deploiement.md`.
+
 ## 2. Rôles et hiérarchie
 
 | Rôle | Description |
@@ -46,11 +52,13 @@ En v1, l'application n'est pas connectée à la plateforme de l'opérateur. Elle
 | DT (Directeur technique) | Supervise toutes les activités ; encadre les superviseurs ; valide plannings et clôtures de zone |
 | Superviseur | Supervise les travaux de déploiement d'une plaque entière (toutes ses sous-plaques) ; encadre les techniciens déploiement |
 | Coordinateur | Reçoit et importe la liste des clients, pilote études et installations, supervise les techniciens raccordement/maintenance/études, fait le reporting |
-| Technicien | Un seul rôle, avec des **types de mission** (voir 2.1) |
+| Chef du BE | Supervise les activités du bureau d'études ; valide le dossier d'avant-projet avant le DT (§3.7) |
+| Technicien | Un seul rôle, avec des **types de mission** (voir 2.1). Au BE : dessinateurs ou techniciens réseau |
 
 Chaîne hiérarchique :
 - Technicien déploiement → Superviseur → DT
-- Technicien raccordement / maintenance / étude → Coordinateur → DT
+- Technicien raccordement / maintenance → Coordinateur → DT
+- Technicien du BE (dessin, survey, étude avant raccordement) → Chef du BE → DT ; le coordinateur reçoit les résultats d'étude (relation fonctionnelle, confirmé le 30/10/2026)
 
 ### 2.1 Technicien et missions
 
@@ -111,6 +119,17 @@ Hiérarchie confirmée le 28/10, reprise de la structure du fichier de suivi de 
 ### 3.5 Types d'intervention
 `tirage`, `soudure_pco`, `raccordement_client`, `etude`, `maintenance`.
 
+### 3.7 Projet de déploiement (v1.8)
+
+Un **projet** = une plaque. Phases, dans l'ordre : avant-projet, validation du chef du BE, validation du DT, validation du client, survey d'implantation, déploiement, relevé final, exploitation.
+
+- Chaque changement de phase est historisé (qui, quand, décision, motif). Un refus renvoie le projet en avant-projet avec un motif obligatoire (confirmé le 30/10/2026).
+- **Documents versionnés** (plan des plaques, plan synoptique, KMZ, AVP) : chaque version est conservée, jamais écrasée.
+- Le **devis de l'AVP** est saisi dans l'application (sans facturation) ; le nombre de poteaux y figure, les poteaux ne sont pas suivis un par un.
+- Le client n'a pas de compte : sa décision, sa date et son justificatif sont enregistrés.
+- Le dimensionnement est le réseau lui-même (sous-plaques, splitters, PCO créés à l'avant-projet) ; la phase du projet indique s'il est « prévu » ou posé. Chaque PCO a des coordonnées prévues et des coordonnées mesurées au relevé final.
+- Nouveaux types de travail : survey d'implantation, relevé final, pose de poteaux métalliques.
+
 ### 3.6 Suivi de déploiement (fichier « Nouveaux OLT Nokia »)
 
 Le fichier de suivi reçu (5 feuilles de données et 1 feuille vide, 2 681 lignes de PCO, 7 OLT, 56 sous-plaques, 347 splitters) montre la structure réelle et ses variations. Il concerne surtout des sites d'immeubles (autorisations de syndic) ; l'application ne doit pas supposer ce contexte pour tous les sites.
@@ -151,6 +170,7 @@ Le **blocage** est un indicateur indépendant du statut, avec un motif du réfé
 10. **Incidents** : chantier, réseau, HSE ; gravité, statut, résolution.
 11. **Tableaux de bord** (DG, DT, superviseur, coordinateur) : voir §7.
 12. **Notifications** : planning modifié, rapport à valider, incident grave.
+13. **Avant-projet et bureau d'études** (v1.8) : projet par plaque et ses phases, documents versionnés, AVP et devis, circuit de validation (chef du BE, DT, client), surveys d'implantation et final, comparaison prévu et réel.
 
 ## 5. Formulaires terrain
 
@@ -229,6 +249,7 @@ Second type d'import, pour le fichier de suivi des PCO par OLT et plaque :
 - `materials`, `warehouses`, `stock_movements`, `intervention_materials`, `tool_assignments`
 - `incidents`
 - `import_batches`, `import_rows` (statut OK/à corriger/rejetée, anomalies détectées)
+- (v1.8) `projects` (plaque_id unique, phase) · `project_phase_history` (de, vers, décision, motif, utilisateur) · `project_documents` et `project_document_versions` (type, version, fichier, taille, auteur, commentaire) · `project_quotes` (devis de l'AVP, montants entiers en FCFA, structure à préciser) · sur `pcos` : coordonnées mesurées, date et auteur du relevé
 - `audit_logs`, `notifications`
 
 Toutes les tables métier : UUID, horodatage, `deleted_at`, `client_uuid` pour les créations hors-ligne. Les dates sont stockées en vraies dates (la fiche actuelle contient des numéros de série Excel).
@@ -243,6 +264,7 @@ Confirmé le 28/10 : le fichier d'études est bien la liste envoyée par l'opér
 4. Un coordinateur peut-il avoir plusieurs équipes ? Photos et signature obligatoires ?
 5. **Statuts du PCO** : valider la correspondance proposée en §3.6 (libellés du fichier → statuts normalisés) et la liste des motifs de blocage.
 6. Le fichier de suivi de déploiement doit-il être **remplacé par l'application** (saisie par les superviseurs, export identique) ou seulement importé ?
+7. **(v1.8)** Stockage des fichiers du projet (taille d'un KMZ ou d'un plan, service) ; structure du devis de l'AVP (lignes ou totaux) ; visibilité des projets par rôle ; qui lance chaque phase ; correspondance entre implanté / posé / mis en réseau et les statuts de PCO. Détail : `docs/workflow-projet-deploiement.md`.
 
 ## 10. Architecture technique proposée
 
@@ -254,7 +276,7 @@ Confirmé le 28/10 : le fichier d'études est bien la liste envoyée par l'opér
 
 ## 11. Feuille de route
 
-1. **MVP** : utilisateurs/rôles, référentiels (OLT, plaques, zones/sous-plaques, JDV, PCO), **import de la liste clients**, études, planning, installation terrain hors-ligne, reporting coordinateur, **export de la fiche de suivi**, tableaux de bord de base.
+1. **MVP** : utilisateurs/rôles, référentiels (OLT, plaques, zones/sous-plaques, JDV, PCO), **avant-projet et bureau d'études (v1.8, avant l'import des clients)**, **import de la liste clients**, études, planning, installation terrain hors-ligne, reporting coordinateur, **export de la fiche de suivi**, tableaux de bord de base.
 2. **V1.1** : matériel et stock, incidents, suivi du déploiement (tirage, soudure) pour superviseurs, avec import et export du fichier de suivi par OLT et plaque.
 3. **V1.2** : cartographie avancée, notifications, indicateurs avancés.
 4. **V2** : API de la plateforme opérateur si elle existe ; étape de recette et facturation si besoin.
