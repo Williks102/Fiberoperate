@@ -48,6 +48,18 @@ enum ProjectPhase: string
         };
     }
 
+    /** Quantités d'étude du devis : modifiables par le BE tant que le dossier n'est pas envoyé en validation. */
+    public function quoteStudyEditable(): bool
+    {
+        return $this === self::PreProject;
+    }
+
+    /** Quantités réalisées du devis : saisies pendant et après le déploiement. */
+    public function quoteDoneEditable(): bool
+    {
+        return in_array($this, [self::Deployment, self::AsBuiltSurvey, self::InOperation], true);
+    }
+
     public function label(): string
     {
         return match ($this) {
