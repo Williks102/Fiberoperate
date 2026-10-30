@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ProjectActions } from "@/components/project-actions";
+import { ProjectQuotePanel } from "@/components/project-quote-panel";
 import { NetworkImportPanel } from "@/components/network-import-panel";
 import { useAuth } from "@/lib/auth/auth-context";
 import { formatDateTime } from "@/lib/format";
@@ -39,6 +40,8 @@ export default function ProjetPage() {
 function ProjectDetail({ project, reload }: { project: Project; reload: () => void }) {
   const { user } = useAuth();
   const canImport = user?.role === "admin" || user?.role === "be_manager";
+  // Le devis est vu par l'administration, la direction et le BE (l'API refuse les autres).
+  const canViewQuote = canImport || user?.role === "dg" || user?.role === "dt" || (user?.role === "technician" && user.skills?.includes("drawing") === true);
   const steps = phaseProgress(project.phase);
   const history = [...(project.history ?? [])].reverse();
 
@@ -54,6 +57,7 @@ function ProjectDetail({ project, reload }: { project: Project; reload: () => vo
       <ProjectActions project={project} onDone={reload} />
 
       <Characteristics project={project} />
+      {canViewQuote && <ProjectQuotePanel projectId={project.id} />}
       {canImport && <NetworkImportPanel projectId={project.id} onImported={reload} />}
 
       <section aria-labelledby="phases" className="space-y-2">
