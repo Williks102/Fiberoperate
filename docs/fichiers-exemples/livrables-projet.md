@@ -50,10 +50,19 @@ Conséquence : c'est le sujet du **lot 7 (matériel et stock)**, à ne pas antic
 ## 4. Plan de la sous-plaque (DWG)
 Format AutoCAD : l'application ne le lit pas (ni la lecture ni l'aperçu). Il est **stocké comme document versionné** du projet, sans traitement. Taille à connaître avant de choisir le stockage (un DWG dépasse vite les limites d'un service d'images).
 
+## Réponses du client (31/10/2026)
+- **`SPL/TR05` est la SRO** de la sous-plaque : le code d'une SRO n'est donc pas toujours de la forme `ABB456` (ici avec une barre oblique). Le champ reste libre.
+- **`PEP01` et `PEP02`** : à ignorer pour l'instant.
+- **Une sous-plaque peut avoir une ancienne SRO et en recevoir une nouvelle** (cas du projet de désaturation) : le lien « une SRO par sous-plaque » devra s'assouplir (plusieurs SRO par sous-plaque, et chaque splitter rattaché à la sienne). Pas encore construit : voir la question 1 ci-dessous.
+- **Le catalogue de prix est commun à tous les projets.**
+
+## Constats sur le bordereau (à la lecture du fichier)
+- La **référence n'est pas unique** : `RC01`, `RC02` et `RFO10` apparaissent deux fois sous des rubriques différentes (avec une autre désignation et un autre prix). Une ligne est donc identifiée par rubrique + référence + désignation.
+- Certaines lignes n'ont **pas de référence** mais portent une quantité (par exemple « Câble Aérien G652D 16FO », 7 960 ml) ; trois lignes de **coupleurs 1/8** (pour splitter, pour PCO) figurent après une rubrique « NB », hors catalogue.
+- Cinq lignes n'ont pas de prix unitaire.
+
 ## Questions ouvertes
-1. **`SPL/TR05`** est-il bien la SRO de la sous-plaque (et `7TR05` ou `TR05` son code) ? Le point s'appelle `SPL/…` alors que `SPL001` est la convention des splitters.
-2. **`PEP01` et `PEP02`** : que représentent-ils ?
-3. **Projet de désaturation** : le BOQ parle d'un « projet de désaturation de la SRO FAYA22 ». Un projet peut-il porter sur une **SRO existante** (désaturer) et pas sur une nouvelle plaque ? Quel lien avec la désaturation d'un PCO au 9ᵉ client ?
-4. **Lettres `D` et `T`** du fichier de matériel : distribution et transport ?
-5. **Catalogue de prix** : est-il le même pour tous les projets du client, et qui le met à jour ? Les prix changent-ils ?
-6. **Taille d'un DWG** et durée de conservation des versions.
+1. **Désaturation** : le projet de désaturation d'une SRO sur une plaque déjà déployée est-il un **nouveau projet sur la même plaque** (aujourd'hui, une plaque n'a qu'un projet) ? La nouvelle SRO reprend-elle une partie des PCO de l'ancienne ?
+2. **Lettres `D` et `T`** du fichier de matériel : distribution et transport ?
+3. **Mise à jour du catalogue** : qui le fait, à quelle fréquence ? (réservé à l'administrateur dans l'application).
+4. **Taille d'un DWG** et durée de conservation des versions.
