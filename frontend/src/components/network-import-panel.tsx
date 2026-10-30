@@ -159,8 +159,8 @@ export function NetworkImportPanel({ projectId, onImported }: { projectId: strin
           {!imported && toCreate === 0 && <p className="text-sm text-zinc-700">Rien à créer avec ce fichier.</p>}
 
           {imported && (
-            <Link href="/reseau" className="inline-flex h-11 items-center rounded-lg border border-zinc-300 px-6 font-medium">
-              Voir le réseau
+            <Link href="/plaques" className="inline-flex h-11 items-center rounded-lg border border-zinc-300 px-6 font-medium">
+              Voir les plaques
             </Link>
           )}
         </div>

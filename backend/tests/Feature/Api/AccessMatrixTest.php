@@ -113,13 +113,11 @@ class AccessMatrixTest extends TestCase
 
         foreach ([Role::Dg, Role::Dt, Role::Supervisor, Role::Coordinator, Role::Technician, Role::BeManager] as $i => $role) {
             Sanctum::actingAs($this->user($role, "w{$i}@x.test"));
-            $this->postJson('/api/v1/plaques', $payload)->assertForbidden();
             $this->patchJson('/api/v1/plaques/'.$this->plaqueA->id, $payload)->assertForbidden();
             $this->deleteJson('/api/v1/plaques/'.$this->plaqueA->id)->assertForbidden();
         }
 
         Sanctum::actingAs($this->user(Role::Admin, 'adm@x.test'));
-        $this->postJson('/api/v1/plaques', $payload)->assertCreated();
         $this->patchJson('/api/v1/plaques/'.$this->plaqueA->id, ['name' => 'FAYA 2'])->assertOk();
         $this->deleteJson('/api/v1/plaques/'.$this->plaqueA->id)->assertNoContent();
         $this->assertSoftDeleted($this->plaqueA);

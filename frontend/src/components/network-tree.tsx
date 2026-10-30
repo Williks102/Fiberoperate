@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { AsyncList } from "@/components/async-list";
+import { useAuth } from "@/lib/auth/auth-context";
 import { pcoStatusLabel, ZONE_STATUS_LABELS } from "@/lib/labels";
 import type { Jdv, Paged, Pco, Plaque, Zone } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
@@ -114,6 +116,7 @@ function Zones({ plaqueId }: { plaqueId: string }) {
 
 /** Plaque → sous-plaques (zones) → splitters (JDV) → PCO, en lecture, dans le périmètre du rôle. */
 export function NetworkTree() {
+  const { user } = useAuth();
   const { reload, ...state } = useApi<Paged<Plaque>>(`/plaques?per_page=${PER_PAGE}`);
 
   return (
@@ -122,6 +125,16 @@ export function NetworkTree() {
         <ul className="space-y-2">
           {plaques.map((plaque) => (
             <Node key={plaque.id} title={`Plaque ${plaque.name}`}>
+              <p className="mb-3 flex flex-wrap items-center justify-between gap-2 text-sm text-zinc-700">
+                <span>
+                  OLT : {plaque.olt?.name ?? "non renseigné"} · Superviseur : {plaque.supervisor?.name ?? "non désigné"}
+                </span>
+                {user?.role === "admin" && (
+                  <Link href={`/plaques/${plaque.id}`} className="inline-flex h-11 items-center rounded-lg border border-zinc-300 px-4 font-medium text-zinc-900">
+                    Modifier la plaque
+                  </Link>
+                )}
+              </p>
               <Zones plaqueId={plaque.id} />
             </Node>
           ))}

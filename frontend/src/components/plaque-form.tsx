@@ -8,14 +8,13 @@ import { getToken } from "@/lib/auth/token";
 import type { Olt, Paged, Plaque, User } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
 
-/** Création (plaque absente) ou modification d'une plaque par l'administrateur. */
-export function PlaqueForm({ plaque }: { plaque?: Plaque }) {
+/** Modification d'une plaque par l'administrateur (une plaque se crée avec son projet). */
+export function PlaqueForm({ plaque }: { plaque: Plaque }) {
   const router = useRouter();
-  const editing = Boolean(plaque);
 
-  const [name, setName] = useState(plaque?.name ?? "");
-  const [oltId, setOltId] = useState(plaque?.olt_id ?? "");
-  const [supervisorId, setSupervisorId] = useState(plaque?.supervisor_id ?? "");
+  const [name, setName] = useState(plaque.name);
+  const [oltId, setOltId] = useState(plaque.olt_id ?? "");
+  const [supervisorId, setSupervisorId] = useState(plaque.supervisor_id ?? "");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -34,12 +33,8 @@ export function PlaqueForm({ plaque }: { plaque?: Plaque }) {
     const body = { name, olt_id: oltId || null, supervisor_id: supervisorId || null };
 
     try {
-      await apiFetch(editing ? `/plaques/${plaque!.id}` : "/plaques", { method: editing ? "PATCH" : "POST", body: JSON.stringify(body) }, getToken());
-      if (editing) {
-        setMessage({ type: "success", text: "Modifications enregistrées." });
-      } else {
-        router.push("/plaques");
-      }
+      await apiFetch(`/plaques/${plaque.id}`, { method: "PATCH", body: JSON.stringify(body) }, getToken());
+      setMessage({ type: "success", text: "Modifications enregistrées." });
     } catch (e) {
       if (e instanceof ApiError) {
         setErrors(e.errors);
@@ -91,7 +86,7 @@ export function PlaqueForm({ plaque }: { plaque?: Plaque }) {
 
       <div className="fixed inset-x-0 bottom-14 z-10 flex gap-3 border-t border-zinc-200 bg-white p-3 md:static md:border-0 md:p-0">
         <button type="submit" disabled={submitting} className="h-11 flex-1 rounded-lg bg-slate-900 font-medium text-white disabled:opacity-60 md:flex-none md:px-6">
-          {submitting ? "Enregistrement…" : editing ? "Enregistrer" : "Créer la plaque"}
+          {submitting ? "Enregistrement…" : "Enregistrer"}
         </button>
         <button type="button" onClick={() => router.push("/plaques")} className="h-11 rounded-lg border border-zinc-300 px-4 font-medium">
           Retour
