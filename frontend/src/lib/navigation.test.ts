@@ -29,7 +29,7 @@ describe("menu par activité", () => {
   });
 
   it("masque une activité dont aucun écran n'est accessible", () => {
-    NAV_GROUPS.push({ href: "/secret", label: "Secret", description: "", items: [{ href: "/secret/a", label: "A", roles: ["admin"] }] });
+    NAV_GROUPS.push({ href: "/secret", label: "Secret", description: "", icon: "admin", items: [{ href: "/secret/a", label: "A", roles: ["admin"] }] });
     try {
       expect(labels("admin")).toContain("Secret");
       expect(labels("technician")).not.toContain("Secret");
@@ -51,21 +51,20 @@ describe("menu par activité", () => {
 });
 
 describe("barre du bas (téléphone)", () => {
-  it("montre l'accueil et les activités, sans « Plus » tant que tout tient", () => {
-    const { main, hasMore } = bottomBarFor("admin");
+  it("montre l'accueil et les activités, avec une icône chacune", () => {
+    const { main } = bottomBarFor("admin");
     expect(main.map((m) => m.label)).toEqual(["Accueil", "Projet", "Déploiement", "Administration"]);
-    expect(hasMore).toBe(false);
+    expect(main.map((m) => m.icon)).toEqual(["home", "project", "network", "admin"]);
     expect(bottomBarFor("technician").main.map((m) => m.label)).toEqual(["Accueil", "Déploiement"]);
   });
 
-  it("ne dépasse jamais 4 entrées et range le reste dans « Plus »", () => {
-    const extra = ["Études", "Raccordement", "Suivi Rac"].map((label, i) => ({ href: `/x${i}`, label, description: "", items: [{ href: `/x${i}/a`, label: "A" }] }));
+  it("ne dépasse jamais 5 icônes, le menu complet restant dans le tiroir", () => {
+    const extra = ["Études", "Raccordement", "Suivi Rac"].map((label, i) => ({ href: `/x${i}`, label, description: "", icon: "admin" as const, items: [{ href: `/x${i}/a`, label: "A" }] }));
     NAV_GROUPS.push(...extra);
     try {
       for (const role of ROLES) expect(bottomBarFor(role).main.length).toBeLessThanOrEqual(BOTTOM_BAR_MAX);
-      const admin = bottomBarFor("admin");
-      expect(admin.hasMore).toBe(true);
-      expect(admin.main.map((m) => m.label)).toEqual(["Accueil", "Projet", "Déploiement", "Administration"]);
+      expect(bottomBarFor("admin").main.map((m) => m.label)).toEqual(["Accueil", "Projet", "Déploiement", "Administration", "Études"]);
+      expect(bottomBarFor("admin").groups.length).toBe(6);
     } finally {
       NAV_GROUPS.splice(-3, 3);
     }
