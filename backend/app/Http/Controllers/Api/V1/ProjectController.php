@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Project\CreateProject;
+use App\Enums\PcoStatus;
 use App\Enums\ProjectPhase;
 use App\Http\Requests\ProjectRequest;
 use App\Http\Resources\ProjectResource;
@@ -28,7 +29,14 @@ class ProjectController extends ApiResourceController
     protected function load(Model $model): Model
     {
         $model->load(['plaque.olt:id,name', 'plaque.supervisor:id,name', 'history.author:id,name']);
-        $model->plaque?->load(['zones' => fn ($q) => $q->with('sro:id,zone_id,code')->withCount(['jdvs', 'pcos'])->orderBy('code_normalized')]);
+        $model->plaque?->load(['zones' => fn ($q) => $q->with('sro:id,zone_id,code')->withCount([
+            'jdvs', 'pcos',
+            'pcos as pcos_to_pull_count' => fn ($q) => $q->where('status', PcoStatus::ToPull->value),
+            'pcos as pcos_pulled_count' => fn ($q) => $q->where('status', PcoStatus::Pulled->value),
+            'pcos as pcos_spliced_count' => fn ($q) => $q->where('status', PcoStatus::Spliced->value),
+            'pcos as pcos_activated_count' => fn ($q) => $q->where('status', PcoStatus::Activated->value),
+            'pcos as pcos_measured_count' => fn ($q) => $q->whereNotNull('measured_at'),
+        ])->orderBy('code_normalized')]);
 
         return $model;
     }

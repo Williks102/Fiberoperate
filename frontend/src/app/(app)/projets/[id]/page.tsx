@@ -119,7 +119,7 @@ function Characteristics({ project }: { project: Project }) {
     ["Superviseur", network.supervisor?.name ?? "Non désigné"],
     ["Sous-plaques", String(network.zones.length)],
     ["Splitters", String(total("splitters"))],
-    ["PCO", String(total("pcos"))],
+    ["PCO prévus", String(total("pcos"))],
   ];
 
   return (
@@ -146,12 +146,41 @@ function Characteristics({ project }: { project: Project }) {
                 <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700">{ZONE_STATUS_LABELS[zone.status]}</span>
               </p>
               <p className="text-zinc-700">
-                SRO {zone.sro ?? "à créer"} · {zone.splitters} splitters · {zone.pcos} PCO
+                SRO {zone.sro ?? "à créer"} · {zone.splitters} splitters · {zone.pcos} PCO prévus
               </p>
+              {zone.pcos > 0 && (
+                <>
+                  <ZoneProgress zone={zone} />
+                  <p className="text-zinc-700">
+                    Soudés ou activés : {zone.progress.spliced + zone.progress.activated} sur {zone.pcos} · Positions relevées : {zone.progress.measured} sur {zone.pcos}
+                  </p>
+                </>
+              )}
             </li>
           ))}
         </ul>
       )}
     </section>
+  );
+}
+
+const PROGRESS_STEPS: { key: "to_pull" | "pulled" | "spliced" | "activated"; label: string; color: string }[] = [
+  { key: "to_pull", label: "À tirer", color: "bg-zinc-300" },
+  { key: "pulled", label: "Tirés", color: "bg-sky-400" },
+  { key: "spliced", label: "Soudés", color: "bg-amber-400" },
+  { key: "activated", label: "Activés", color: "bg-green-600" },
+];
+
+/** Barre d'avancement des PCO d'une sous-plaque, avec les chiffres écrits (la couleur ne porte jamais seule l'information). */
+function ZoneProgress({ zone }: { zone: NonNullable<Project["network"]>["zones"][number] }) {
+  return (
+    <div className="space-y-1">
+      <div className="flex h-2 overflow-hidden rounded-full bg-zinc-100" aria-hidden="true">
+        {PROGRESS_STEPS.map((step) => (
+          <span key={step.key} className={step.color} style={{ width: `${(zone.progress[step.key] / zone.pcos) * 100}%` }} />
+        ))}
+      </div>
+      <p className="text-xs text-zinc-700">{PROGRESS_STEPS.map((step) => `${step.label} ${zone.progress[step.key]}`).join(" · ")}</p>
+    </div>
   );
 }
