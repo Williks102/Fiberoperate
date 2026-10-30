@@ -15,3 +15,8 @@ export function formatDateTime(iso: string | null | undefined): string {
     .format(date)
     .replace(",", "");
 }
+
+/** Montant en FCFA entiers, groupé par milliers : « 150 000 FCFA ». */
+export function formatFcfa(amount: number | null | undefined): string {
+  return amount == null ? "—" : `${new Intl.NumberFormat("fr-FR").format(amount).replace(/[\u202f\u00a0]/g, " ")} FCFA`;
+}
