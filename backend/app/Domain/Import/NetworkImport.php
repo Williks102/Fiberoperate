@@ -9,6 +9,7 @@ use App\Models\Pco;
 use App\Models\Plaque;
 use App\Models\Zone;
 use App\Support\CodeNormalizer;
+use App\Support\IvoryCoastBounds;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -28,11 +29,6 @@ final class NetworkImport
     public const COLUMNS = ['olt', 'plaque', 'sous_plaque', 'fabricant', 'splitter', 'pco', 'latitude', 'longitude', 'slot', 'port', 'brin', 'statut', 'commentaire'];
 
     public const REQUIRED = ['plaque', 'sous_plaque', 'splitter', 'pco'];
-
-    // Côte d'Ivoire : zone attendue des coordonnées.
-    private const LAT_RANGE = [4.3, 10.8];
-
-    private const LON_RANGE = [-8.7, -2.4];
 
     /** @var array<string, Olt> */
     private array $olts = [];
@@ -258,9 +254,8 @@ final class NetworkImport
             return [null, null];
         }
 
-        if (! $this->inRange($latitude, self::LAT_RANGE) || ! $this->inRange($longitude, self::LON_RANGE)) {
-            $inverted = $this->inRange($longitude, self::LAT_RANGE) && $this->inRange($latitude, self::LON_RANGE);
-            $this->warn($line, $inverted
+        if (! IvoryCoastBounds::contains($latitude, $longitude)) {
+            $this->warn($line, IvoryCoastBounds::looksInverted($latitude, $longitude)
                 ? 'Latitude et longitude semblent inversées : PCO importé sans coordonnées (à corriger dans le fichier).'
                 : 'Coordonnées hors de la Côte d\'Ivoire : PCO importé sans coordonnées.');
 
@@ -275,12 +270,6 @@ final class NetworkImport
         $value = str_replace(',', '.', trim($value));
 
         return $value !== '' && is_numeric($value) ? (float) $value : null;
-    }
-
-    /** @param array{0: float, 1: float} $range */
-    private function inRange(float $value, array $range): bool
-    {
-        return $value >= $range[0] && $value <= $range[1];
     }
 
     private function reject(int $line, string $message): void
