@@ -76,8 +76,8 @@ Nouveau **lot 1B — Projet de déploiement et bureau d'études**, en petites tr
 
 ## 4. Questions encore ouvertes
 Confirmé le 30/10/2026 (donc retiré de cette liste) : hiérarchie des techniciens du BE, retour en avant-projet en cas de refus, « prévu » porté par la phase du projet.
-1. **Stockage des fichiers** : taille d'un KMZ ou d'un plan, et service à utiliser (Cloudinary est prévu pour les photos, mais limité en taille pour les fichiers).
-2. **Structure du devis** : des lignes détaillées (désignation, quantité, prix) ou un total par rubrique ?
+1. **Stockage des fichiers** : un KMZ est petit (12 Ko dans l'exemple) ; reste la **taille d'un DWG** et le service à utiliser (Cloudinary est prévu pour les photos, mais limité en taille pour les fichiers). Exemples analysés : `docs/fichiers-exemples/livrables-projet.md`.
+2. **Structure du devis** : *répondu par l'exemple du 31/10* — des lignes d'un **catalogue de prix de l'opérateur** (référence, désignation, unité, prix unitaire) avec une quantité d'étude, puis une quantité réalisée et l'écart. À confirmer : le catalogue est-il commun à tous les projets ?
 3. **Visibilité** : le BE voit-il tous les projets ? Le superviseur ne voit-il que celui de sa plaque ?
 4. **Qui peut lancer chaque phase** (par exemple passer en déploiement après l'accord du client) ?
 6. **(v1.9)** Informations de la SRO ; colonnes « ZONE PCO » et « JDV/HUB » du suivi raccordement ; qui crée un projet ; jusqu'à quelle phase le BE ajuste le réseau ; données existantes à conserver ; rattachement du PCO de désaturation. Liste complète : cahier §9 points 8 à 13.
