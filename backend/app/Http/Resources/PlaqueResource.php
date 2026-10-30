@@ -14,6 +14,8 @@ class PlaqueResource extends JsonResource
             'name' => $this->name,
             'olt_id' => $this->olt_id,
             'supervisor_id' => $this->supervisor_id,
+            'olt' => $this->whenLoaded('olt', fn () => $this->olt?->only(['id', 'name'])),
+            'supervisor' => $this->whenLoaded('supervisor', fn () => $this->supervisor?->only(['id', 'name'])),
         ];
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Requests\PlaqueRequest;
 use App\Http\Resources\PlaqueResource;
 use App\Models\Plaque;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -26,9 +27,14 @@ class PlaqueController extends ApiResourceController
         $query->orderBy('name');
     }
 
+    protected function load(Model $model): Model
+    {
+        return $model->load(['olt:id,name', 'supervisor:id,name']);
+    }
+
     protected function filters(Request $request, Builder $query): void
     {
-        $query->when($request->string('q')->trim()->value(), fn ($q, $term) => $q->where('name', 'ilike', "%{$term}%"));
+        $query->with(['olt:id,name', 'supervisor:id,name'])->when($request->string('q')->trim()->value(), fn ($q, $term) => $q->where('name', 'ilike', "%{$term}%"));
     }
 
     public function store(PlaqueRequest $request): JsonResponse
@@ -41,6 +47,6 @@ class PlaqueController extends ApiResourceController
         $model = Plaque::query()->findOrFail($plaque);
         $model->update($request->validated());
 
-        return new PlaqueResource($model);
+        return new PlaqueResource($this->load($model));
     }
 }
