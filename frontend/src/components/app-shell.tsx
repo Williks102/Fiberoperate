@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Menu } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BottomBar } from "@/components/bottom-bar";
+import { NotificationBell } from "@/components/notification-bell";
 import { MobileDrawer } from "@/components/mobile-drawer";
 import { useAuth } from "@/lib/auth/auth-context";
 import { groupsFor, HOME, isActive, isGroupActive } from "@/lib/navigation";
@@ -78,15 +79,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <span className="hidden text-sm text-zinc-700 md:block">
             {user.name} · {user.role_label}
           </span>
-          <button
-            onClick={async () => {
-              await logout();
-              router.replace("/login");
-            }}
-            className="h-11 rounded-lg border border-zinc-300 px-4 text-sm font-medium"
-          >
-            Se déconnecter
-          </button>
+          <span className="flex items-center gap-2">
+            <NotificationBell />
+            <button
+              onClick={async () => {
+                await logout();
+                router.replace("/login");
+              }}
+              className="h-11 rounded-lg border border-zinc-300 px-4 text-sm font-medium"
+            >
+              Se déconnecter
+            </button>
+          </span>
         </header>
 
         <main className="mx-auto w-full max-w-6xl flex-1 p-4 pb-24 sm:p-6 md:pb-6">{children}</main>

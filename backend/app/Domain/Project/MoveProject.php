@@ -9,51 +9,57 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Circuit de validation d'un projet : envoi en validation, puis décision du chef du BE, du DT et du client.
+ * Parcours d'un projet : envoi en validation, décisions du chef du BE, du DT et du client, puis avancement par le BE.
  * Un refus renvoie toujours en avant-projet, avec un motif obligatoire. Chaque passage écrit une ligne d'historique,
- * dans la même transaction, sur le projet verrouillé (deux décisions simultanées ne peuvent pas se doubler).
+ * dans la même transaction, sur le projet verrouillé (deux décisions simultanées ne peuvent pas se doubler) ;
+ * les notifications partent une fois la transaction validée.
  */
 class MoveProject
 {
+    public function __construct(private readonly ProjectNotifier $notifier) {}
+
     public function submit(Project $project, User $by): Project
     {
-        return $this->move($project, ProjectPhase::PreProject, ProjectPhase::BeManagerReview, $by, null, null);
+        return $this->run($project, $by, fn (ProjectPhase $current) => $current === ProjectPhase::PreProject ? ProjectPhase::BeManagerReview : null, null, null);
     }
 
     public function decide(Project $project, User $by, bool $approved, ?string $reason): Project
     {
-        return DB::transaction(function () use ($project, $by, $approved, $reason) {
-            $current = $this->lock($project)->phase;
-            $next = $approved ? $current->nextOnApproval() : ProjectPhase::PreProject;
-
-            if ($current->deciders() === [] || $next === null) {
-                throw ValidationException::withMessages(['phase' => "Le projet n'est pas en phase de validation."]);
-            }
-
-            return $this->move($project, $current, $next, $by, $approved ? 'approved' : 'rejected', $reason);
-        });
+        return $this->run(
+            $project,
+            $by,
+            fn (ProjectPhase $current) => $current->deciders() === [] ? null : ($approved ? $current->nextOnApproval() : ProjectPhase::PreProject),
+            $approved ? 'approved' : 'rejected',
+            $reason,
+        );
     }
 
-    private function move(Project $project, ProjectPhase $expected, ProjectPhase $to, User $by, ?string $decision, ?string $reason): Project
+    /** Fait avancer le projet après l'accord du client : survey, déploiement, relevé final, exploitation. */
+    public function advance(Project $project, User $by): Project
     {
-        return DB::transaction(function () use ($project, $expected, $to, $by, $decision, $reason) {
-            $from = $this->lock($project)->phase;
+        return $this->run($project, $by, fn (ProjectPhase $current) => $current->nextOnAdvance(), null, null);
+    }
 
-            if ($from !== $expected) {
-                throw ValidationException::withMessages(['phase' => 'La phase du projet a changé : « '.$from->label().' ». Rechargez la page.']);
+    /** @param  callable(ProjectPhase): ?ProjectPhase  $target  phase à atteindre depuis la phase courante, null si impossible */
+    private function run(Project $project, User $by, callable $target, ?string $decision, ?string $reason): Project
+    {
+        $to = DB::transaction(function () use ($project, $by, $target, $decision, $reason) {
+            $fresh = Project::query()->whereKey($project->id)->lockForUpdate()->firstOrFail();
+            $project->setRawAttributes($fresh->getAttributes(), true);
+
+            $from = $project->phase;
+            $to = $target($from);
+            if ($to === null) {
+                throw ValidationException::withMessages(['phase' => "Cette action n'est pas possible en phase « {$from->label()} ». Rechargez la page."]);
             }
 
             $project->forceFill(['phase' => $to, 'phase_changed_at' => now()])->save();
             $project->history()->create(['from_phase' => $from, 'to_phase' => $to, 'decision' => $decision, 'reason' => $reason, 'changed_by' => $by->id]);
 
-            return $project;
+            return $to;
         });
-    }
 
-    private function lock(Project $project): Project
-    {
-        $fresh = Project::query()->whereKey($project->id)->lockForUpdate()->firstOrFail();
-        $project->setRawAttributes($fresh->getAttributes(), true);
+        $this->notifier->phaseMoved($project, $to, $by, $decision, $reason);
 
         return $project;
     }

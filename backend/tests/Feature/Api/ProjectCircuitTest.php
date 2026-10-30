@@ -57,11 +57,13 @@ class ProjectCircuitTest extends TestCase
         $this->login(Role::Dt, 'dt@x.test');
         $this->decide('approved')->assertOk()->assertJsonPath('data.phase', 'client_review');
 
-        $this->login(Role::Dg, 'dg@x.test');
-        $this->decide('approved')->assertForbidden();
+        // Le client n'a pas de compte : seul le DT enregistre son accord (le BE en est notifié).
+        foreach ([Role::Dg, Role::BeManager] as $role) {
+            $this->login($role, "{$role->value}@x.test");
+            $this->decide('approved')->assertForbidden();
+        }
 
-        // Le client n'a pas de compte : le chef du BE (ou le DT) enregistre son accord.
-        $this->login(Role::BeManager, 'be@x.test');
+        $this->login(Role::Dt, 'dt@x.test');
         $this->decide('approved')->assertOk()->assertJsonPath('data.phase', 'implantation_survey');
 
         $history = $this->project->history()->get();
@@ -136,12 +138,12 @@ class ProjectCircuitTest extends TestCase
     public function test_the_sheet_tells_which_actions_the_user_may_take(): void
     {
         $this->login(Role::BeManager, 'be@x.test');
-        $this->getJson("/api/v1/projects/{$this->project->id}")->assertJsonPath('data.actions', ['submit' => true, 'decide' => false]);
+        $this->getJson("/api/v1/projects/{$this->project->id}")->assertJsonPath('data.actions', ['submit' => true, 'decide' => false, 'advance' => false, 'advance_to' => null]);
 
         $this->submit()->assertOk();
-        $this->getJson("/api/v1/projects/{$this->project->id}")->assertJsonPath('data.actions', ['submit' => false, 'decide' => true]);
+        $this->getJson("/api/v1/projects/{$this->project->id}")->assertJsonPath('data.actions', ['submit' => false, 'decide' => true, 'advance' => false, 'advance_to' => null]);
 
         $this->login(Role::Dt, 'dt@x.test');
-        $this->getJson("/api/v1/projects/{$this->project->id}")->assertJsonPath('data.actions', ['submit' => false, 'decide' => false]);
+        $this->getJson("/api/v1/projects/{$this->project->id}")->assertJsonPath('data.actions', ['submit' => false, 'decide' => false, 'advance' => false, 'advance_to' => null]);
     }
 }
