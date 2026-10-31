@@ -54,3 +54,26 @@ Taille de l'exemple : 1 feuille, 17 clients, 27 colonnes renseignées (44 colonn
 5. **`Date previsionnelle de raccordement`** est-elle la date planifiée de l'installation, ou une date de campagne ?
 6. Faut-il stocker **`Superviseur Moov`** et **`Entreprise FTTH`** ? (valeurs constantes dans l'exemple)
 7. À quel moment la box est-elle attribuée : lors de la clôture de l'étude, ou à la programmation de l'installation ? (impacte le formulaire d'étude, lot 3)
+
+## Structure retenue pour la commande client (31/10/2026)
+Une **commande** par abonnement, clé **référence RAB** (une seule commande vivante par RAB : un réimport met à jour, il ne crée pas de doublon). Tables `customer_orders` et `order_status_history`. Les valeurs d'origine sont **toujours conservées** à côté des valeurs normalisées.
+
+| Colonne du fichier (modèle `clients.csv`) | Champ de la commande | Remarque |
+|---|---|---|
+| `rab` | `rab` | clé, aucune longueur supposée |
+| `ft`, `compte` | `ft_line`, `account_number` | facultatifs |
+| `nom` | `name` | |
+| `adresse` | `address_raw` | conservée telle quelle ; ville, commune, quartier, rue et précision sont découpés ensuite (`city`, `commune`, `district`, `street`, `address_detail`) |
+| `contact1`, `contact2` | `phone_1`, `phone_2` (+ `_raw`) | normalisés en `+225` + 10 chiffres ; le texte d'origine est gardé ; toute correction est signalée (`PhoneNumber`) |
+| `latitude`, `longitude` | `declared_latitude`, `declared_longitude` | GPS déclaré ; le GPS relevé sur le terrain est un autre champ |
+| `sous_plaque`, `pco` | `zone_id`, `pco_id` | rapprochés du réseau par leur code normalisé ; un code inconnu est signalé, jamais créé |
+| `sn_ont`, `ligne_fixe` | `ont_serial`, `fixed_line` | la box attribuée après l'étude ; texte, jamais un nombre |
+| `date_enregistrement`, `date_envoi` | `registered_at`, `sent_to_contractor_at` | vraies dates (les numéros de série Excel sont convertis) |
+| `etude_technique` | `initial_study_raw`, `initial_study` | « SANS PCO » = étude réalisée, « AVEC PCO » = étude à réaliser ; libellé inconnu proposé à la correspondance |
+| `distance` | `distance_m` | |
+| `etat_ligne` | `operator_line_status` (+ date) | état côté opérateur, distinct du statut interne |
+| `commentaire` | `observation` | brin, longueur et anciens points de branchement restent en texte |
+
+Statut interne (`status`) : reçue → en étude → étudiée (faisable, non faisable, client absent) → installation programmée → installée, reportée ou échec → activée ; chaque changement écrit une ligne d'historique. Une commande dont l'étude initiale est « SANS PCO » démarre « étudiée (faisable) », « AVEC PCO » démarre « reçue ».
+
+**Pas encore construit** : l'import lui-même (analyse, écran de revue, validation), les écrans, les droits d'accès et les interventions.
