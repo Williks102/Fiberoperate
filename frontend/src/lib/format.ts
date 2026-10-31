@@ -32,3 +32,19 @@ export function formatFcfa(amount: number | null | undefined): string {
 export function clientName(name: string | null | undefined): string {
   return name?.trim() ? name : "Client sans nom";
 }
+
+/** Jour d'une visite par rapport à aujourd'hui (jour local) : « En retard », « Aujourd'hui », « Demain » ou la date. */
+export function visitDay(day: string, today: Date = new Date()): { label: string; late: boolean } {
+  const match = day.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return { label: "—", late: false };
+
+  const planned = Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  const now = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  const days = Math.round((planned - now) / 86_400_000);
+
+  if (days < 0) return { label: `En retard (${formatDate(day)})`, late: true };
+  if (days === 0) return { label: "Aujourd'hui", late: false };
+  if (days === 1) return { label: "Demain", late: false };
+
+  return { label: formatDate(day), late: false };
+}

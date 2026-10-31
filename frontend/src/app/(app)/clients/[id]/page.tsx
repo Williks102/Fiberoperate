@@ -25,11 +25,12 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 /** Fiche d'un client : identité, localisation, avancement et historique. */
 export default function ClientPage() {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const result = useApi<{ data: CustomerOrder }>(`/customer-orders/${id}`);
 
   return (
     <div className="space-y-5">
-      <Link href="/instances" className="inline-flex h-11 items-center text-sm font-medium underline">
+      <Link href={user?.role === "technician" ? "/mes-visites" : "/instances"} className="inline-flex h-11 items-center text-sm font-medium underline">
         ← Retour
       </Link>
 

@@ -52,7 +52,8 @@ describe("menu par activité", () => {
     expect(hasClients("be_manager")).toBe(false);
     const hrefs = (role: Role, skills: Parameters<typeof groupsFor>[1] = []) => groupsFor(role, skills).find((g) => g.label === "Raccordement")!.items.map((i) => i.href);
     expect(hrefs("coordinator")).toEqual(["/instances", "/raccordables", "/suivi-raccordement"]);
-    expect(hrefs("technician", ["study"])).toEqual(["/instances", "/raccordables"]);
+    expect(hrefs("technician", ["study"])).toEqual(["/mes-visites", "/instances", "/raccordables"]);
+    expect(hrefs("coordinator")).not.toContain("/mes-visites");
   });
 
   it("masque une activité dont aucun écran n'est accessible", () => {

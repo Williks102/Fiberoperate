@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clientName, formatDate, formatDateTime, formatFcfa } from "./format";
+import { clientName, formatDate, visitDay, formatDateTime, formatFcfa } from "./format";
 
 describe("formatDateTime", () => {
   it("affiche jour/mois/année et l'heure d'Abidjan", () => {
@@ -34,5 +34,17 @@ describe("clientName", () => {
     expect(clientName("Koné Awa")).toBe("Koné Awa");
     expect(clientName("")).toBe("Client sans nom");
     expect(clientName(null)).toBe("Client sans nom");
+  });
+});
+
+describe("visitDay", () => {
+  const today = new Date(2026, 9, 31); // 31/10/2026
+
+  it("dit si la visite est en retard, aujourd'hui, demain ou plus tard", () => {
+    expect(visitDay("2026-10-30", today)).toEqual({ label: "En retard (30/10/2026)", late: true });
+    expect(visitDay("2026-10-31", today)).toEqual({ label: "Aujourd'hui", late: false });
+    expect(visitDay("2026-11-01", today)).toEqual({ label: "Demain", late: false });
+    expect(visitDay("2026-11-05", today)).toEqual({ label: "05/11/2026", late: false });
+    expect(visitDay("n'importe quoi", today).label).toBe("—");
   });
 });

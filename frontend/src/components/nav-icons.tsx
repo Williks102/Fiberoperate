@@ -1,4 +1,4 @@
-import { BookOpenText, Boxes, CircleCheck, ClipboardList, FileUp, Hourglass, FolderKanban, House, LayoutGrid, Map, Network, Package, RadioTower, Server, Split, UserCog, Users, type LucideIcon } from "lucide-react";
+import { BookOpenText, CalendarCheck, Boxes, CircleCheck, ClipboardList, FileUp, Hourglass, FolderKanban, House, LayoutGrid, Map, Network, Package, RadioTower, Server, Split, UserCog, Users, type LucideIcon } from "lucide-react";
 import type { NavIconName } from "@/lib/navigation";
 
 /** Une icône par activité. Les activités à venir (Études, Raccordement, Suivi Rac) ajouteront la leur. */
@@ -21,6 +21,7 @@ const ITEM_ICONS: Record<string, LucideIcon> = {
   "/pco": Package,
   "/olt": Server,
   "/clients/importer": FileUp,
+  "/mes-visites": CalendarCheck,
   "/instances": Hourglass,
   "/raccordables": ClipboardList,
   "/suivi-raccordement": CircleCheck,
