@@ -46,14 +46,14 @@ class Pco extends Model
                 $pco->number = (int) $m[1];
             }
 
-            // La zone se déduit du JDV ; si les deux sont fournis, ils doivent concorder.
+            // La zone se déduit du splitter ; si les deux sont fournis, ils doivent concorder.
             if ($pco->jdv_id && $pco->isDirty(['jdv_id', 'zone_id'])) {
                 $jdvZoneId = Jdv::query()->whereKey($pco->jdv_id)->value('zone_id');
 
                 if ($pco->zone_id === null) {
                     $pco->zone_id = $jdvZoneId;
                 } elseif ($jdvZoneId !== null && $jdvZoneId !== $pco->zone_id) {
-                    throw new InvalidArgumentException('Le JDV du PCO n\'appartient pas à la zone indiquée.');
+                    throw new InvalidArgumentException('Le splitter du PCO n\'appartient pas à la zone indiquée.');
                 }
             }
         });

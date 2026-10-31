@@ -18,6 +18,7 @@ class PhoneNumberTest extends TestCase
             ['2250707123456', '+2250707123456', null],
             ['225707123456', '+2250707123456', 'Zéro initial ajouté (numéro à 9 chiffres).'],
             [707123456, '+2250707123456', 'Zéro initial ajouté (numéro à 9 chiffres).'],
+            ['707123456.0', '+2250707123456', 'Zéro initial ajouté (numéro à 9 chiffres).'],
             [707123456.0, '+2250707123456', 'Zéro initial ajouté (numéro à 9 chiffres).'],
             [212345678901.0, null, 'Longueur anormale (12 chiffres) : numéro à vérifier.'],
         ];
