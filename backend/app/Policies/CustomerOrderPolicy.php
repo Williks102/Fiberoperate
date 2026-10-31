@@ -22,4 +22,10 @@ class CustomerOrderPolicy
     {
         return $this->viewAny($user);
     }
+
+    /** Mettre en étude, programmer : le coordinateur et l'administrateur. */
+    public function plan(User $user): bool
+    {
+        return $user->hasRole(Role::Admin, Role::Coordinator);
+    }
 }

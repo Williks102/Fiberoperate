@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { StudyPlanningPanel } from "@/components/study-planning-panel";
 import { Badge } from "@/components/ui/badge";
-import { formatDateTime } from "@/lib/format";
+import { useAuth } from "@/lib/auth/auth-context";
+import { formatDate, formatDateTime } from "@/lib/format";
 import { ORDER_TONES, STUDY_RESULT_LABELS } from "@/lib/labels";
 import type { CustomerOrder } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
@@ -39,12 +41,15 @@ export default function ClientPage() {
         </div>
       )}
 
-      {result.status === "ok" && <Detail order={result.data.data} />}
+      {result.status === "ok" && <Detail order={result.data.data} reload={result.reload} />}
     </div>
   );
 }
 
-function Detail({ order }: { order: CustomerOrder }) {
+function Detail({ order, reload }: { order: CustomerOrder; reload: () => void }) {
+  const { user } = useAuth();
+  const canPlan = user?.role === "admin" || user?.role === "coordinator";
+
   return (
     <>
       <div className="flex items-start justify-between gap-3">
@@ -55,6 +60,8 @@ function Detail({ order }: { order: CustomerOrder }) {
         <Badge tone={ORDER_TONES[order.status.value]}>{order.status.label}</Badge>
       </div>
 
+      {canPlan && order.status.value === "received" && <StudyPlanningPanel order={order} onDone={reload} />}
+
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="rounded-xl border border-slate-200 bg-white p-4">
           <h2 className="font-semibold">Le client</h2>
@@ -63,8 +70,8 @@ function Detail({ order }: { order: CustomerOrder }) {
             <Row label="Adresse">{order.address_raw}</Row>
             <Row label="Compte client">{order.account_number}</Row>
             <Row label="Ligne FT">{order.ft_line}</Row>
-            <Row label="Enregistré le">{order.registered_at}</Row>
-            <Row label="Envoyé au prestataire le">{order.sent_to_contractor_at}</Row>
+            <Row label="Enregistré le">{order.registered_at ? formatDate(order.registered_at) : null}</Row>
+            <Row label="Envoyé au prestataire le">{order.sent_to_contractor_at ? formatDate(order.sent_to_contractor_at) : null}</Row>
           </dl>
         </section>
 
@@ -80,6 +87,20 @@ function Detail({ order }: { order: CustomerOrder }) {
           </dl>
         </section>
       </div>
+
+      {order.interventions && order.interventions.length > 0 && (
+        <section className="rounded-xl border border-slate-200 bg-white p-4">
+          <h2 className="font-semibold">Interventions</h2>
+          <ul className="mt-2 space-y-2">
+            {order.interventions.map((i) => (
+              <li key={i.id} className="text-sm">
+                <span className="font-medium">{i.type === "study" ? "Étude" : "Installation"}</span> · {formatDate(i.planned_date)} · {i.technician ?? "—"} · {i.status_label}
+                {i.observation ? <span className="block text-slate-700">{i.observation}</span> : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="rounded-xl border border-slate-200 bg-white p-4">
         <h2 className="font-semibold">Historique</h2>

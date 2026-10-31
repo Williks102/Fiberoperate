@@ -32,6 +32,15 @@ class CustomerOrderResource extends JsonResource
             'observation' => $this->observation,
             'zone' => $this->whenLoaded('zone', fn () => $this->zone?->only(['id', 'code'])),
             'pco' => $this->whenLoaded('pco', fn () => $this->pco?->only(['id', 'code'])),
+            'interventions' => $this->whenLoaded('interventions', fn () => $this->interventions->map(fn ($i) => [
+                'id' => $i->id,
+                'type' => $i->type->value,
+                'status' => $i->status->value,
+                'status_label' => $i->status->label(),
+                'planned_date' => $i->planned_date->toDateString(),
+                'technician' => $i->relationLoaded('technician') ? $i->technician?->name : null,
+                'observation' => $i->observation,
+            ])),
             'history' => $this->whenLoaded('history', fn () => $this->history->map(fn ($h) => [
                 'from' => $h->from_status?->value,
                 'to' => $h->to_status->value,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDateTime, formatFcfa } from "./format";
+import { formatDate, formatDateTime, formatFcfa } from "./format";
 
 describe("formatDateTime", () => {
   it("affiche jour/mois/année et l'heure d'Abidjan", () => {
@@ -17,5 +17,14 @@ describe("formatFcfa", () => {
     expect(formatFcfa(150000)).toBe("150 000 FCFA");
     expect(formatFcfa(0)).toBe("0 FCFA");
     expect(formatFcfa(null)).toBe("—");
+  });
+});
+
+describe("formatDate", () => {
+  it("met une date de l'API au format français", () => {
+    expect(formatDate("2026-10-31")).toBe("31/10/2026");
+    expect(formatDate("2026-10-31T00:00:00Z")).toBe("31/10/2026");
+    expect(formatDate(null)).toBe("—");
+    expect(formatDate("n'importe quoi")).toBe("—");
   });
 });
