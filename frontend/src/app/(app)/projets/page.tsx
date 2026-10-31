@@ -92,7 +92,10 @@ export default function ProjetsPage() {
                         Plaque {project.plaque?.name ?? "—"}
                       </Link>
                     </p>
-                    <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-900">{project.phase_label}</span>
+                    <span className="flex flex-wrap items-center gap-2">
+                      {project.kind === "desaturation" && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">{project.kind_label}</span>}
+                      <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-900">{project.phase_label}</span>
+                    </span>
                   </div>
                   <p className="text-sm text-zinc-700">Phase depuis le {formatDateTime(project.phase_changed_at)}</p>
                 </li>

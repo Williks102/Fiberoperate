@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ProjectPhase;
 use App\Models\Project;
 use App\Rules\UniqueSroCode;
 use App\Support\CodeNormalizer;
@@ -26,7 +27,8 @@ class ProjectRequest extends FormRequest
             'plaque_id' => [
                 'required_without:plaque_name', 'prohibits:plaque_name,olt_id,olt_name,zones', 'uuid',
                 Rule::exists('plaques', 'id')->whereNull('deleted_at'),
-                Rule::unique('projects', 'plaque_id')->whereNull('deleted_at'),
+                // Une plaque a un seul projet en cours : un nouveau (désaturation) n'est possible qu'une fois le précédent en exploitation.
+                Rule::unique('projects', 'plaque_id')->whereNull('deleted_at')->where(fn ($query) => $query->where('phase', '<>', ProjectPhase::InOperation->value)),
             ],
             'plaque_name' => ['required_without:plaque_id', 'string', 'max:120', Rule::unique('plaques', 'name')->whereNull('deleted_at')],
             'olt_id' => ['nullable', 'prohibits:olt_name', 'uuid', Rule::exists('olts', 'id')->whereNull('deleted_at')],
@@ -41,7 +43,7 @@ class ProjectRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'plaque_id.unique' => 'Cette plaque a déjà un projet.',
+            'plaque_id.unique' => 'Cette plaque a déjà un projet en cours : le suivant (désaturation) s\'ouvre une fois le précédent en exploitation.',
             'plaque_name.unique' => 'Une plaque porte déjà ce nom.',
             'olt_name.unique' => 'Un OLT porte déjà ce nom : choisissez-le dans la liste.',
             'zones.*.code.distinct' => 'Cette sous-plaque est saisie deux fois.',

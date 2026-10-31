@@ -49,7 +49,9 @@ function ProjectDetail({ project, reload }: { project: Project; reload: () => vo
   return (
     <>
       <header className="space-y-1">
-        <h1 className="text-xl font-semibold">Projet de la plaque {project.plaque?.name ?? "—"}</h1>
+        <h1 className="text-xl font-semibold">
+          {project.kind === "desaturation" ? "Projet de désaturation" : "Projet"} de la plaque {project.plaque?.name ?? "—"}
+        </h1>
         <p className="text-sm text-zinc-700">
           Phase actuelle : <span className="font-medium text-zinc-900">{project.phase_label}</span> depuis le {formatDateTime(project.phase_changed_at)}
         </p>
