@@ -15,17 +15,17 @@ export function Pager({
       <button
         onClick={() => onChange(page - 1)}
         disabled={page <= 1}
-        className="h-11 rounded-lg border border-zinc-300 px-4 text-sm font-medium disabled:opacity-60"
+        className="h-11 rounded-lg border border-slate-300 px-4 text-sm font-medium disabled:opacity-60"
       >
         Précédent
       </button>
-      <span className="text-sm text-zinc-700">
+      <span className="text-sm text-slate-700">
         Page {page} / {lastPage}
       </span>
       <button
         onClick={() => onChange(page + 1)}
         disabled={page >= lastPage}
-        className="h-11 rounded-lg border border-zinc-300 px-4 text-sm font-medium disabled:opacity-60"
+        className="h-11 rounded-lg border border-slate-300 px-4 text-sm font-medium disabled:opacity-60"
       >
         Suivant
       </button>

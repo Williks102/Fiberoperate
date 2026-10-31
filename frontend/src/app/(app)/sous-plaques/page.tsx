@@ -27,7 +27,7 @@ export default function SousPlaquesPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Sous-plaques</h1>
-        <Link href="/sous-plaques/nouveau" className="flex h-11 items-center rounded-lg bg-slate-900 px-4 text-sm font-medium text-white">
+        <Link href="/sous-plaques/nouveau" className="flex h-11 items-center rounded-lg bg-primary hover:bg-primary-hover px-4 text-sm font-medium text-white">
           Nouvelle sous-plaque
         </Link>
       </div>
@@ -78,13 +78,13 @@ export default function SousPlaquesPage() {
           <>
             <ul className="space-y-2">
               {zones.map((zone) => (
-                <li key={zone.id} className="space-y-1 rounded-xl border border-zinc-200 bg-white p-4">
+                <li key={zone.id} className="space-y-1 rounded-xl border border-slate-200 bg-white p-4">
                   <p className="font-medium">
                     <Link href={`/sous-plaques/${zone.id}`} className="underline-offset-2 hover:underline">
                       {zone.name ? `${zone.code} · ${zone.name}` : zone.code}
                     </Link>
                   </p>
-                  <p className="text-sm text-zinc-700">
+                  <p className="text-sm text-slate-700">
                     Plaque {zone.plaque?.name ?? "—"} · {zone.vendor ? VENDOR_LABELS[zone.vendor] : "Fabricant non renseigné"} · {ZONE_STATUS_LABELS[zone.status]}
                   </p>
                 </li>

@@ -14,7 +14,7 @@ export default function ModifierSousPlaquePage() {
     <div className="max-w-xl space-y-4">
       <h1 className="text-xl font-semibold">Modifier la sous-plaque</h1>
 
-      {result.status === "loading" && <div aria-busy="true" className="h-40 animate-pulse rounded-xl bg-zinc-200" />}
+      {result.status === "loading" && <div aria-busy="true" className="h-40 animate-pulse rounded-xl bg-slate-200" />}
 
       {result.status === "error" && (
         <div role="alert" className="space-y-3 rounded-xl bg-red-50 p-4 text-sm text-red-800">

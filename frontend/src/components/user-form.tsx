@@ -122,7 +122,7 @@ export function UserForm({ user }: { user?: User }) {
         <fieldset className="space-y-2">
           <legend className="text-sm font-medium">Missions autorisées</legend>
           {(Object.keys(MISSION_LABELS) as MissionType[]).map((skill) => (
-            <label key={skill} className="flex min-h-11 items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3">
+            <label key={skill} className="flex min-h-11 items-center gap-3 rounded-lg border border-slate-200 bg-white px-3">
               <input type="checkbox" checked={skills.includes(skill)} onChange={() => toggleSkill(skill)} className="h-5 w-5" />
               {MISSION_LABELS[skill]}
             </label>
@@ -148,7 +148,7 @@ export function UserForm({ user }: { user?: User }) {
 
       {editing && (
         <div className="space-y-1">
-          <label className="flex min-h-11 items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3">
+          <label className="flex min-h-11 items-center gap-3 rounded-lg border border-slate-200 bg-white px-3">
             <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} className="h-5 w-5" />
             Compte actif
           </label>
@@ -157,15 +157,15 @@ export function UserForm({ user }: { user?: User }) {
               {error("is_active")}
             </p>
           )}
-          {!isActive && <p className="text-xs text-zinc-700">Un compte désactivé est déconnecté immédiatement et ne peut plus se connecter.</p>}
+          {!isActive && <p className="text-xs text-slate-700">Un compte désactivé est déconnecté immédiatement et ne peut plus se connecter.</p>}
         </div>
       )}
 
-      <div className="fixed inset-x-0 bottom-14 z-10 flex gap-3 border-t border-zinc-200 bg-white p-3 md:static md:border-0 md:p-0">
-        <button type="submit" disabled={submitting} className="h-11 flex-1 rounded-lg bg-slate-900 font-medium text-white disabled:opacity-60 md:flex-none md:px-6">
+      <div className="fixed inset-x-0 bottom-14 z-10 flex gap-3 border-t border-slate-200 bg-white p-3 md:static md:border-0 md:p-0">
+        <button type="submit" disabled={submitting} className="h-11 flex-1 rounded-lg bg-primary hover:bg-primary-hover font-medium text-white disabled:opacity-60 md:flex-none md:px-6">
           {submitting ? "Enregistrement…" : editing ? "Enregistrer" : "Créer l'utilisateur"}
         </button>
-        <button type="button" onClick={() => router.push("/utilisateurs")} className="h-11 rounded-lg border border-zinc-300 px-4 font-medium">
+        <button type="button" onClick={() => router.push("/utilisateurs")} className="h-11 rounded-lg border border-slate-300 px-4 font-medium">
           Retour
         </button>
       </div>

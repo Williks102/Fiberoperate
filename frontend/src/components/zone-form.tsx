@@ -113,11 +113,11 @@ export function ZoneForm({ zone }: { zone?: Zone }) {
         </select>
       </Field>
 
-      <div className="fixed inset-x-0 bottom-14 z-10 flex gap-3 border-t border-zinc-200 bg-white p-3 md:static md:border-0 md:p-0">
-        <button type="submit" disabled={submitting} className="h-11 flex-1 rounded-lg bg-slate-900 font-medium text-white disabled:opacity-60 md:flex-none md:px-6">
+      <div className="fixed inset-x-0 bottom-14 z-10 flex gap-3 border-t border-slate-200 bg-white p-3 md:static md:border-0 md:p-0">
+        <button type="submit" disabled={submitting} className="h-11 flex-1 rounded-lg bg-primary hover:bg-primary-hover font-medium text-white disabled:opacity-60 md:flex-none md:px-6">
           {submitting ? "Enregistrement…" : editing ? "Enregistrer" : "Créer la sous-plaque"}
         </button>
-        <button type="button" onClick={() => router.push("/sous-plaques")} className="h-11 rounded-lg border border-zinc-300 px-4 font-medium">
+        <button type="button" onClick={() => router.push("/sous-plaques")} className="h-11 rounded-lg border border-slate-300 px-4 font-medium">
           Retour
         </button>
       </div>

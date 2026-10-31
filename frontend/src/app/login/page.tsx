@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { BrandMark } from "@/components/brand-mark";
 import { ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth/auth-context";
 
@@ -32,11 +33,14 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex flex-1 items-center justify-center p-4">
-      <form onSubmit={onSubmit} className="w-full max-w-sm space-y-4 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm" noValidate>
-        <div className="space-y-1 text-center">
-          <h1 className="text-xl font-semibold">FTTH Gestion</h1>
-          <p className="text-sm text-zinc-700">Connectez-vous pour continuer.</p>
+    <main className="flex flex-1 items-center justify-center bg-linear-to-b from-primary-soft via-canvas to-canvas p-4">
+      <form onSubmit={onSubmit} className="w-full max-w-sm space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-900/5 sm:p-8" noValidate>
+        <div className="flex flex-col items-center gap-3 text-center">
+          <BrandMark className="h-14 w-14" />
+          <div className="space-y-1">
+            <h1 className="text-2xl font-semibold tracking-tight">FTTH Gestion</h1>
+            <p className="text-sm text-slate-700">Déploiement et raccordement fibre optique. Connectez-vous pour continuer.</p>
+          </div>
         </div>
 
         {error && (
@@ -57,7 +61,7 @@ export default function LoginPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="h-11 w-full rounded-lg border border-zinc-300 px-3 text-base"
+            className="h-11 w-full rounded-xl border border-slate-300 px-3 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
         </div>
 
@@ -72,14 +76,14 @@ export default function LoginPage() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-11 w-full rounded-lg border border-zinc-300 px-3 text-base"
+            className="h-11 w-full rounded-xl border border-slate-300 px-3 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
         </div>
 
         <button
           type="submit"
           disabled={submitting || !email || !password}
-          className="h-11 w-full rounded-lg bg-slate-900 font-medium text-white disabled:opacity-60"
+          className="h-12 w-full rounded-xl bg-primary font-semibold text-white shadow-sm hover:bg-primary-hover disabled:opacity-60"
         >
           {submitting ? "Connexion…" : "Se connecter"}
         </button>

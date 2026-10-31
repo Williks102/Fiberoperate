@@ -37,17 +37,17 @@ export function ProjectActions({ project, onDone }: { project: Project; onDone: 
 
   if (project.actions?.submit) {
     return (
-      <section aria-labelledby="action" className="space-y-3 rounded-xl border border-zinc-300 bg-white p-4">
+      <section aria-labelledby="action" className="space-y-3 rounded-xl border border-slate-300 bg-white p-4">
         <h2 id="action" className="text-lg font-semibold">
           Envoyer en validation
         </h2>
-        <p className="text-sm text-zinc-700">L&apos;avant-projet sera validé par le chef du BE, puis par le DT, puis par le client. Un refus le renvoie ici avec son motif.</p>
+        <p className="text-sm text-slate-700">L&apos;avant-projet sera validé par le chef du BE, puis par le DT, puis par le client. Un refus le renvoie ici avec son motif.</p>
         {error && (
           <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">
             {error}
           </p>
         )}
-        <button onClick={() => send("submit")} disabled={busy} className="h-11 rounded-lg bg-slate-900 px-6 font-medium text-white disabled:opacity-60">
+        <button onClick={() => send("submit")} disabled={busy} className="h-11 rounded-lg bg-primary hover:bg-primary-hover px-6 font-medium text-white disabled:opacity-60">
           {busy ? "Envoi…" : "Envoyer en validation"}
         </button>
       </section>
@@ -56,17 +56,17 @@ export function ProjectActions({ project, onDone }: { project: Project; onDone: 
 
   if (project.actions?.advance) {
     return (
-      <section aria-labelledby="action" className="space-y-3 rounded-xl border border-zinc-300 bg-white p-4">
+      <section aria-labelledby="action" className="space-y-3 rounded-xl border border-slate-300 bg-white p-4">
         <h2 id="action" className="text-lg font-semibold">
           Phase suivante
         </h2>
-        <p className="text-sm text-zinc-700">Le projet passera en « {project.actions.advance_to} ». La décision est enregistrée dans l&apos;historique.</p>
+        <p className="text-sm text-slate-700">Le projet passera en « {project.actions.advance_to} ». La décision est enregistrée dans l&apos;historique.</p>
         {error && (
           <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">
             {error}
           </p>
         )}
-        <button onClick={() => send("advance")} disabled={busy} className="h-11 rounded-lg bg-slate-900 px-6 font-medium text-white disabled:opacity-60">
+        <button onClick={() => send("advance")} disabled={busy} className="h-11 rounded-lg bg-primary hover:bg-primary-hover px-6 font-medium text-white disabled:opacity-60">
           {busy ? "Envoi…" : `Passer en « ${project.actions.advance_to} »`}
         </button>
       </section>
@@ -75,7 +75,7 @@ export function ProjectActions({ project, onDone }: { project: Project; onDone: 
 
   if (project.actions?.decide) {
     return (
-      <section aria-labelledby="action" className="space-y-3 rounded-xl border border-zinc-300 bg-white p-4">
+      <section aria-labelledby="action" className="space-y-3 rounded-xl border border-slate-300 bg-white p-4">
         <h2 id="action" className="text-lg font-semibold">
           Décision : {project.phase_label}
         </h2>
@@ -93,17 +93,17 @@ export function ProjectActions({ project, onDone }: { project: Project; onDone: 
               <button onClick={() => send("decision", { decision: "rejected", reason })} disabled={busy} className="h-11 rounded-lg bg-red-700 px-6 font-medium text-white disabled:opacity-60">
                 {busy ? "Envoi…" : "Confirmer le refus"}
               </button>
-              <button onClick={() => setRefusing(false)} disabled={busy} className="h-11 rounded-lg border border-zinc-300 px-4 font-medium">
+              <button onClick={() => setRefusing(false)} disabled={busy} className="h-11 rounded-lg border border-slate-300 px-4 font-medium">
                 Annuler
               </button>
             </div>
           </div>
         ) : (
           <div className="flex flex-wrap gap-3">
-            <button onClick={() => send("decision", { decision: "approved" })} disabled={busy} className="h-11 rounded-lg bg-slate-900 px-6 font-medium text-white disabled:opacity-60">
+            <button onClick={() => send("decision", { decision: "approved" })} disabled={busy} className="h-11 rounded-lg bg-primary hover:bg-primary-hover px-6 font-medium text-white disabled:opacity-60">
               {busy ? "Envoi…" : "Valider"}
             </button>
-            <button onClick={() => setRefusing(true)} disabled={busy} className="h-11 rounded-lg border border-zinc-300 px-4 font-medium">
+            <button onClick={() => setRefusing(true)} disabled={busy} className="h-11 rounded-lg border border-slate-300 px-4 font-medium">
               Refuser…
             </button>
           </div>

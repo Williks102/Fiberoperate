@@ -46,22 +46,22 @@ export function PcoMeasurePanel({ pco: initial, canMeasure }: { pco: Pco; canMea
   const planned = pco.latitude && pco.longitude ? `${pco.latitude}, ${pco.longitude}` : "non renseignée";
 
   return (
-    <section aria-labelledby="releve" className="space-y-3 rounded-xl border border-zinc-200 bg-white p-4">
+    <section aria-labelledby="releve" className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
       <h2 id="releve" className="text-lg font-semibold">
         Relevé de terrain
       </h2>
       <dl className="grid gap-2 text-sm sm:grid-cols-2">
         <div>
-          <dt className="text-zinc-700">Position prévue</dt>
+          <dt className="text-slate-700">Position prévue</dt>
           <dd className="font-medium">{planned}</dd>
         </div>
         <div>
-          <dt className="text-zinc-700">Position mesurée</dt>
+          <dt className="text-slate-700">Position mesurée</dt>
           <dd className="font-medium">{pco.measured_latitude ? `${pco.measured_latitude}, ${pco.measured_longitude}` : "pas encore relevée"}</dd>
         </div>
         {pco.measured_at && (
           <div className="sm:col-span-2">
-            <dt className="text-zinc-700">Dernier relevé</dt>
+            <dt className="text-slate-700">Dernier relevé</dt>
             <dd>
               {formatDateTime(pco.measured_at)} · {pco.measured_by?.name ?? "auteur inconnu"}
               {pco.deviation_m != null && <span className="font-medium"> · écart avec le prévu : {pco.deviation_m} m</span>}
@@ -85,7 +85,7 @@ export function PcoMeasurePanel({ pco: initial, canMeasure }: { pco: Pco; canMea
               <input id="measured-longitude" inputMode="decimal" placeholder="-4.0083" value={longitude} onChange={(e) => setLongitude(e.target.value)} className={inputClass} />
             </Field>
           </div>
-          <button type="submit" disabled={submitting} className="h-11 rounded-lg bg-slate-900 px-6 font-medium text-white disabled:opacity-60">
+          <button type="submit" disabled={submitting} className="h-11 rounded-lg bg-primary hover:bg-primary-hover px-6 font-medium text-white disabled:opacity-60">
             {submitting ? "Enregistrement…" : "Enregistrer le relevé"}
           </button>
         </form>

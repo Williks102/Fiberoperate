@@ -18,7 +18,7 @@ export function Field({
         {label}
       </label>
       {children}
-      {hint && !error && <p className="text-xs text-zinc-700">{hint}</p>}
+      {hint && !error && <p className="text-xs text-slate-700">{hint}</p>}
       {error && (
         <p id={`${id}-error`} role="alert" className="text-sm text-red-700">
           {error}
@@ -28,4 +28,4 @@ export function Field({
   );
 }
 
-export const inputClass = "h-11 w-full rounded-lg border border-zinc-300 bg-white px-3 text-base";
+export const inputClass = "h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-base";

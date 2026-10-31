@@ -10,21 +10,21 @@ export function ActivityHub({ href }: { href: string }) {
   const group = user ? groupsFor(user.role, user.skills).find((g) => g.href === href) : undefined;
 
   if (!group) {
-    return <p className="rounded-xl border border-dashed border-zinc-300 p-6 text-center text-zinc-700">Aucun écran de cette activité n&apos;est disponible pour votre rôle.</p>;
+    return <p className="rounded-xl border border-dashed border-slate-300 p-6 text-center text-slate-700">Aucun écran de cette activité n&apos;est disponible pour votre rôle.</p>;
   }
 
   return (
     <div className="space-y-4">
       <div className="space-y-1">
         <h1 className="text-xl font-semibold">{group.label}</h1>
-        <p className="text-sm text-zinc-700">{group.description}</p>
+        <p className="text-sm text-slate-700">{group.description}</p>
       </div>
       <ul className="grid gap-2 sm:grid-cols-2">
         {group.items.map((item) => (
           <li key={item.href}>
-            <Link href={item.href} className="block min-h-11 space-y-1 rounded-xl border border-zinc-200 bg-white p-4 hover:bg-zinc-50">
+            <Link href={item.href} className="block min-h-11 space-y-1 rounded-xl border border-slate-200 bg-white p-4 hover:bg-slate-50">
               <span className="block font-medium">{item.label}</span>
-              {item.description && <span className="block text-sm text-zinc-700">{item.description}</span>}
+              {item.description && <span className="block text-sm text-slate-700">{item.description}</span>}
             </Link>
           </li>
         ))}

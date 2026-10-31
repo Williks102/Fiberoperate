@@ -114,8 +114,8 @@ export function PcoForm({ pco }: { pco?: Pco }) {
       )}
 
       {editing ? (
-        <p className="rounded-lg border border-zinc-200 bg-white p-3 text-sm text-zinc-700">
-          Plaque <span className="font-medium text-zinc-900">{pco?.zone?.plaque?.name ?? "—"}</span> · Sous-plaque <span className="font-medium text-zinc-900">{pco?.zone?.code ?? "—"}</span>. Un PCO ne change pas de sous-plaque : seul son splitter peut changer.
+        <p className="rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-700">
+          Plaque <span className="font-medium text-ink">{pco?.zone?.plaque?.name ?? "—"}</span> · Sous-plaque <span className="font-medium text-ink">{pco?.zone?.code ?? "—"}</span>. Un PCO ne change pas de sous-plaque : seul son splitter peut changer.
         </p>
       ) : (
         <>
@@ -168,7 +168,7 @@ export function PcoForm({ pco }: { pco?: Pco }) {
 
       <fieldset className="space-y-3">
         <legend className="text-sm font-medium">Coordonnées prévues (facultatif)</legend>
-        <p className="text-xs text-zinc-700">Dans la Côte d&apos;Ivoire. Les coordonnées mesurées au relevé final seront enregistrées à part.</p>
+        <p className="text-xs text-slate-700">Dans la Côte d&apos;Ivoire. Les coordonnées mesurées au relevé final seront enregistrées à part.</p>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field id="latitude" label="Latitude" error={error("latitude")}>
             <input id="latitude" inputMode="decimal" placeholder="5.3600" value={latitude} onChange={(e) => (setLatitude(e.target.value), clearError("latitude", "longitude"))} className={inputClass} />
@@ -196,18 +196,18 @@ export function PcoForm({ pco }: { pco?: Pco }) {
       </Field>
 
       {editing && pco && (
-        <p className="rounded-lg border border-zinc-200 bg-white p-3 text-sm text-zinc-700">
-          Statut : <span className="font-medium text-zinc-900">{pcoStatusLabel(pco)}</span>
+        <p className="rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-700">
+          Statut : <span className="font-medium text-ink">{pcoStatusLabel(pco)}</span>
           {pco.is_blocked && <span className="ml-2 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-900">Bloqué</span>}
           <span className="mt-1 block text-xs">Le statut ne se modifie pas ici : chaque changement de statut est historisé.</span>
         </p>
       )}
 
-      <div className="fixed inset-x-0 bottom-14 z-10 flex gap-3 border-t border-zinc-200 bg-white p-3 md:static md:border-0 md:p-0">
-        <button type="submit" disabled={submitting || !jdvId} className="h-11 flex-1 rounded-lg bg-slate-900 font-medium text-white disabled:opacity-60 md:flex-none md:px-6">
+      <div className="fixed inset-x-0 bottom-14 z-10 flex gap-3 border-t border-slate-200 bg-white p-3 md:static md:border-0 md:p-0">
+        <button type="submit" disabled={submitting || !jdvId} className="h-11 flex-1 rounded-lg bg-primary hover:bg-primary-hover font-medium text-white disabled:opacity-60 md:flex-none md:px-6">
           {submitting ? "Enregistrement…" : editing ? "Enregistrer" : "Créer le PCO"}
         </button>
-        <button type="button" onClick={() => router.push("/pco")} className="h-11 rounded-lg border border-zinc-300 px-4 font-medium">
+        <button type="button" onClick={() => router.push("/pco")} className="h-11 rounded-lg border border-slate-300 px-4 font-medium">
           Retour
         </button>
       </div>

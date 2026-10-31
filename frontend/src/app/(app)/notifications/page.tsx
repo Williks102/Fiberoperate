@@ -42,7 +42,7 @@ export default function NotificationsPage() {
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Notifications</h1>
         {state.status === "ok" && state.data.meta.unread_count > 0 && (
-          <button onClick={readAll} className="h-11 rounded-lg border border-zinc-300 px-4 text-sm font-medium">
+          <button onClick={readAll} className="h-11 rounded-lg border border-slate-300 px-4 text-sm font-medium">
             Tout marquer comme lu
           </button>
         )}
@@ -56,14 +56,14 @@ export default function NotificationsPage() {
                 <li key={n.id}>
                   <button
                     onClick={() => open(n)}
-                    className={`w-full space-y-1 rounded-xl border p-4 text-left ${n.read ? "border-zinc-200 bg-white" : "border-slate-900 bg-white"}`}
+                    className={`w-full space-y-1 rounded-xl border p-4 text-left ${n.read ? "border-slate-200 bg-white" : "border-primary bg-white"}`}
                   >
                     <span className="flex flex-wrap items-center justify-between gap-2">
                       <span className="font-medium">{n.title}</span>
-                      {!n.read && <span className="rounded-full bg-slate-900 px-2 py-0.5 text-xs font-medium text-white">Nouveau</span>}
+                      {!n.read && <span className="rounded-full bg-primary hover:bg-primary-hover px-2 py-0.5 text-xs font-medium text-white">Nouveau</span>}
                     </span>
-                    <span className="block text-sm text-zinc-700">{n.message}</span>
-                    <span className="block text-xs text-zinc-700">{formatDateTime(n.created_at)}</span>
+                    <span className="block text-sm text-slate-700">{n.message}</span>
+                    <span className="block text-xs text-slate-700">{formatDateTime(n.created_at)}</span>
                   </button>
                 </li>
               ))}

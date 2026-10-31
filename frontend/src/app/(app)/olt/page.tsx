@@ -25,7 +25,7 @@ export default function OltPage() {
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">OLT</h1>
         {canManage && (
-          <Link href="/olt/nouveau" className="flex h-11 items-center rounded-lg bg-slate-900 px-4 text-sm font-medium text-white">
+          <Link href="/olt/nouveau" className="flex h-11 items-center rounded-lg bg-primary hover:bg-primary-hover px-4 text-sm font-medium text-white">
             Nouvel OLT
           </Link>
         )}
@@ -44,7 +44,7 @@ export default function OltPage() {
             setSearch(e.target.value);
             setPage(1);
           }}
-          className="h-11 w-full rounded-lg border border-zinc-300 px-3 text-base"
+          className="h-11 w-full rounded-lg border border-slate-300 px-3 text-base"
         />
       </div>
 
@@ -53,7 +53,7 @@ export default function OltPage() {
           <>
             <ul className="space-y-2">
               {olts.map((olt) => (
-                <li key={olt.id} className="space-y-1 rounded-xl border border-zinc-200 bg-white p-4">
+                <li key={olt.id} className="space-y-1 rounded-xl border border-slate-200 bg-white p-4">
                   <p className="font-medium">
                     {canManage ? (
                       <Link href={`/olt/${olt.id}`} className="underline-offset-2 hover:underline">
@@ -63,7 +63,7 @@ export default function OltPage() {
                       olt.name
                     )}
                   </p>
-                  {olt.notes && <p className="text-sm text-zinc-700">{olt.notes}</p>}
+                  {olt.notes && <p className="text-sm text-slate-700">{olt.notes}</p>}
                 </li>
               ))}
             </ul>

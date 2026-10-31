@@ -19,7 +19,7 @@ export default function EquipesPage() {
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Équipes</h1>
         {canManage && (
-          <Link href="/equipes/nouveau" className="flex h-11 items-center rounded-lg bg-slate-900 px-4 text-sm font-medium text-white">
+          <Link href="/equipes/nouveau" className="flex h-11 items-center rounded-lg bg-primary hover:bg-primary-hover px-4 text-sm font-medium text-white">
             Nouvelle équipe
           </Link>
         )}
@@ -30,7 +30,7 @@ export default function EquipesPage() {
           <>
             <ul className="space-y-2">
               {teams.map((team) => (
-                <li key={team.id} className="space-y-1 rounded-xl border border-zinc-200 bg-white p-4">
+                <li key={team.id} className="space-y-1 rounded-xl border border-slate-200 bg-white p-4">
                   <p className="font-medium">
                     {canManage ? (
                       <Link href={`/equipes/${team.id}`} className="underline-offset-2 hover:underline">
@@ -40,10 +40,10 @@ export default function EquipesPage() {
                       team.name
                     )}
                   </p>
-                  <p className="text-sm text-zinc-700">
+                  <p className="text-sm text-slate-700">
                     Coordinateur : {team.coordinator?.name ?? "non défini"} · Chef d&apos;équipe : {team.leader?.name ?? "non défini"}
                   </p>
-                  <p className="text-sm text-zinc-700">
+                  <p className="text-sm text-slate-700">
                     {team.members.length === 0
                       ? "Aucun membre"
                       : `${team.members.length} membre${team.members.length > 1 ? "s" : ""} : ${team.members.map((m) => m.name).join(", ")}`}

@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { LogOut, X } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { NavIcon } from "@/components/nav-icons";
+import { BrandName } from "@/components/brand-mark";
+import { ItemIcon, NavIcon } from "@/components/nav-icons";
 import { HOME, isActive, type NavGroup } from "@/lib/navigation";
 
 const FOCUSABLE = 'a[href], button:not([disabled])';
@@ -67,7 +68,7 @@ export function MobileDrawer({
   if (!open) return null;
 
   const linkClass = (active: boolean, indent = false) =>
-    `flex min-h-12 items-center gap-3 rounded-lg px-3 text-base ${indent ? "ml-6" : "font-semibold"} ${active ? "bg-slate-900 text-white" : "text-zinc-900"}`;
+    `flex min-h-12 items-center gap-3 rounded-lg px-3 text-base ${indent ? "ml-6" : "font-semibold"} ${active ? "bg-primary-soft text-primary-ink shadow-[inset_3px_0_0_var(--color-primary)]" : "text-ink hover:bg-slate-100"}`;
 
   return (
     <div className="fixed inset-0 z-30 md:hidden">
@@ -80,14 +81,15 @@ export function MobileDrawer({
         aria-label="Menu"
         className="drawer-panel absolute inset-y-0 left-0 flex w-[85%] max-w-xs flex-col gap-3 overflow-y-auto bg-white p-4"
       >
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="font-semibold">{name}</p>
-            <p className="text-sm text-zinc-700">{roleLabel}</p>
-          </div>
-          <button ref={closeRef} onClick={onClose} aria-label="Fermer le menu" className="flex h-11 w-11 items-center justify-center rounded-lg border border-zinc-300">
+        <div className="flex items-center justify-between gap-3">
+          <BrandName />
+          <button ref={closeRef} onClick={onClose} aria-label="Fermer le menu" className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-300">
             <X aria-hidden="true" className="h-5 w-5" />
           </button>
+        </div>
+        <div className="rounded-xl bg-slate-50 px-3 py-2">
+          <p className="font-semibold">{name}</p>
+          <p className="text-sm text-slate-700">{roleLabel}</p>
         </div>
 
         <nav aria-label="Menu complet" className="flex-1 space-y-2">
@@ -103,6 +105,7 @@ export function MobileDrawer({
               </Link>
               {group.items.map((item) => (
                 <Link key={item.href} href={item.href} onClick={onClose} aria-current={isActive(pathname, item.href) ? "page" : undefined} className={linkClass(isActive(pathname, item.href), true)}>
+                  <ItemIcon href={item.href} />
                   {item.label}
                 </Link>
               ))}
@@ -110,7 +113,7 @@ export function MobileDrawer({
           ))}
         </nav>
 
-        <button onClick={onLogout} className="flex h-12 items-center justify-center gap-2 rounded-lg border border-zinc-300 text-base font-medium">
+        <button onClick={onLogout} className="flex h-12 items-center justify-center gap-2 rounded-xl border border-slate-300 text-base font-medium">
           <LogOut aria-hidden="true" className="h-5 w-5" />
           Se déconnecter
         </button>

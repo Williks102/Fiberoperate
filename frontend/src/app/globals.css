@@ -1,11 +1,24 @@
 @import "tailwindcss";
+@import "@fontsource-variable/inter";
+
+/* Charte visuelle : les écrans n'utilisent que ces jetons (couleur principale, repère, fonds). Brancher une charte client = changer ces valeurs. */
+@theme {
+  --font-sans: "Inter Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --color-primary: #0369a1; /* bleu fibre ; 5,9:1 sur blanc */
+  --color-primary-hover: #075985;
+  --color-primary-soft: #e0f2fe;
+  --color-primary-ink: #0c4a6e;
+  --color-signal: #06b6d4; /* repère lumineux : avancement, accents */
+  --color-ink: #0f172a;
+  --color-canvas: #f8fafc;
+}
 
 /* Thème clair uniquement en V1 : les écrans sont dessinés pour un fond clair.
    Sans cela, un téléphone en mode sombre affichait du texte clair sur des cartes blanches. */
 :root {
   color-scheme: light;
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8fafc;
+  --foreground: #0f172a;
 }
 
 @theme inline {
@@ -16,7 +29,8 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01"; /* chiffres plus lisibles dans les tableaux de montants */
 }
 
 /* Texte d'exemple des champs : lisible, mais distinct d'une valeur saisie. */

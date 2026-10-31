@@ -32,7 +32,7 @@ export function NotificationBell() {
     <Link
       href="/notifications"
       aria-label={unread > 0 ? `Notifications : ${unread} non lue${unread > 1 ? "s" : ""}` : "Notifications"}
-      className="relative flex h-11 w-11 items-center justify-center rounded-lg border border-zinc-300"
+      className="relative flex h-11 w-11 items-center justify-center rounded-lg border border-slate-300"
     >
       <Bell aria-hidden="true" className="h-5 w-5" />
       {unread > 0 && (
