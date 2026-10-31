@@ -45,7 +45,7 @@ Toute requête est filtrée par rôle **et** périmètre (plaque pour le supervi
 - Statuts commande (`customer_orders.status`) : `received → in_study → studied (feasible | not_feasible | customer_absent) → appointment_set → installed | postponed | failed → activated`.
 - `operator_line_status` (état de ligne côté opérateur) est un champ distinct du statut interne, avec sa date.
 - Étude : poteaux saisis par type (béton = transport, métalliques = raccordement client), chacun en **existants** et **à installer**. `distance_m` est préremplie avec nombre de poteaux du trajet × 50 m et reste modifiable par le technicien ; les types à compter par défaut sont à confirmer (le rendre configurable).
-- Un report ou un échec exige un `reason_id` du référentiel.
+- Un report ou un échec exige un `reason_id` du référentiel (`outcome_reasons`, lecture seule pour l'instant : client absent, accès impossible, câble ou poteau manquant, PCO saturé). L'issue d'une visite (`interventions.outcome` : installé, reporté, échec) est saisie par le technicien désigné, le coordinateur ou l'administrateur ; un client reporté ou en échec se reprogramme.
 - Un technicien n'est planifiable que sur un type de mission pour lequel il est habilité.
 - Tout changement de statut écrit une ligne d'historique (qui, quand, appareil).
 - Zones (sous-plaques) : `planned → deploying → in_operation → closed` (clôture validée par le DT).

@@ -42,6 +42,8 @@ class CustomerOrderResource extends JsonResource
                 'technician_id' => $i->technician_id,
                 'technician' => $i->relationLoaded('technician') ? $i->technician?->name : null,
                 'observation' => $i->observation,
+                'outcome' => $i->outcome,
+                'reason' => $i->relationLoaded('reason') ? $i->reason?->label : null,
             ])),
             'studies' => $this->whenLoaded('studies', fn () => $this->studies->map(fn ($st) => collect([
                 'id' => $st->id,

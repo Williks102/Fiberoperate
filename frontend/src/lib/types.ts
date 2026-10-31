@@ -183,7 +183,7 @@ export interface CustomerOrder {
   observation: string | null;
   zone?: { id: string; code: string } | null;
   pco?: { id: string; code: string } | null;
-  interventions?: { id: string; technician_id: string; type: string; status: string; status_label: string; planned_date: string; technician: string | null; observation: string | null }[];
+  interventions?: { id: string; technician_id: string; type: string; status: string; status_label: string; planned_date: string; technician: string | null; observation: string | null; outcome: "installed" | "postponed" | "failed" | null; reason: string | null }[];
   studies?: {
     id: string;
     result: "feasible" | "not_feasible" | "customer_absent";

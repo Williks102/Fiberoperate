@@ -38,4 +38,12 @@ class CustomerOrderPolicy
             || ($user->hasRole(Role::Technician) && $order->interventions()
                 ->where('type', MissionType::Study->value)->where('status', InterventionStatus::Planned->value)->where('technician_id', $user->getKey())->exists());
     }
+
+    /** Saisir l'issue d'une installation : le coordinateur et l'administrateur, ou le technicien à qui elle est confiée. */
+    public function recordInstallation(User $user, CustomerOrder $order): bool
+    {
+        return $user->hasRole(Role::Admin, Role::Coordinator)
+            || ($user->hasRole(Role::Technician) && $order->interventions()
+                ->where('type', MissionType::CustomerConnection->value)->where('status', InterventionStatus::Planned->value)->where('technician_id', $user->getKey())->exists());
+    }
 }
