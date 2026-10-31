@@ -12,7 +12,7 @@ Taille de l'exemple : 1 feuille, 17 clients, 27 colonnes renseignées (44 colonn
 ## Colonnes
 | Colonne du fichier | Contenu observé | Correspondance prévue |
 |---|---|---|
-| `NumeroAbonnement` | texte de 16 caractères commençant par `RAB` | RAB, clé d'import (jamais 13 caractères supposés) |
+| `NumeroAbonnement` | texte de 16 caractères commençant par `RAB` | ID client (ancien RAB), clé d'import (jamais 13 caractères supposés) |
 | `NOMS_PRENOMS` | nom et prénoms en un champ | nom du client |
 | `LOCALISATION` | texte libre court (quartier, repère) | adresse brute (`address_raw`), conservée telle quelle |
 | `Contact1`, `Contact2` | **nombre** de 9 chiffres | téléphones (voir ci-dessous) |
@@ -56,11 +56,11 @@ Taille de l'exemple : 1 feuille, 17 clients, 27 colonnes renseignées (44 colonn
 7. À quel moment la box est-elle attribuée : lors de la clôture de l'étude, ou à la programmation de l'installation ? (impacte le formulaire d'étude, lot 3)
 
 ## Structure retenue pour la commande client (31/10/2026)
-Une **commande** par abonnement, clé **référence RAB** (une seule commande vivante par RAB : un réimport met à jour, il ne crée pas de doublon). Tables `customer_orders` et `order_status_history`. Les valeurs d'origine sont **toujours conservées** à côté des valeurs normalisées.
+Une **commande** par abonnement, clé **ID client** (ancien RAB ; une seule commande vivante par ID client : un réimport met à jour, il ne crée pas de doublon). Tables `customer_orders` et `order_status_history`. Les valeurs d'origine sont **toujours conservées** à côté des valeurs normalisées.
 
 | Colonne du fichier (modèle `clients.csv`) | Champ de la commande | Remarque |
 |---|---|---|
-| `rab` | `rab` | clé, aucune longueur supposée |
+| `id_client` | `customer_ref` | clé, aucune longueur supposée (la valeur commence souvent par RAB) |
 | `ft`, `compte` | `ft_line`, `account_number` | facultatifs |
 | `nom` | `name` | |
 | `adresse` | `address_raw` | conservée telle quelle ; ville, commune, quartier, rue et précision sont découpés ensuite (`city`, `commune`, `district`, `street`, `address_detail`) |

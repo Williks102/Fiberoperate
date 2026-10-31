@@ -33,7 +33,7 @@ Utilisateurs/rôles, référentiels, import clients, études, planning, installa
 - **Questions** : voir `docs/workflow-projet-deploiement.md` §4 et cahier §9 (points 8 à 13).
 
 ## Lot 2 — Import clients et commandes (L)
-- **Périmètre** : import Excel/CSV asynchrone en 2 temps (analyse → revue → validation), lignes `ok / to_fix / rejected`, découpage d'adresse (`address_raw` conservée), GPS (inversion, séparateurs, aberrations, jamais corrigé en silence), téléphones (+225, `*` retiré), doublons RAB/FT/nom+adresse, réimport = mise à jour, dates (numéros de série Excel), étude initiale « Sans PCO / Avec PCO ».
+- **Périmètre** : import Excel/CSV asynchrone en 2 temps (analyse → revue → validation), lignes `ok / to_fix / rejected`, découpage d'adresse (`address_raw` conservée), GPS (inversion, séparateurs, aberrations, jamais corrigé en silence), téléphones (+225, `*` retiré), doublons ID client/FT/nom+adresse, réimport = mise à jour, dates (numéros de série Excel), étude initiale « Sans PCO / Avec PCO ».
 - **Dépendances** : lot 1.
 - **Acceptation** : jeu réel anonymisé importé, anomalies listées, aucun doublon sur réimport.
 - **Questions** : sens des deux colonnes « État ligne » et du préfixe `*`.

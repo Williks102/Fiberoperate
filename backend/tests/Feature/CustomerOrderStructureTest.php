@@ -19,7 +19,7 @@ class CustomerOrderStructureTest extends TestCase
 
     private function order(array $attributes = []): CustomerOrder
     {
-        return CustomerOrder::create($attributes + ['rab' => 'RAB0000000000001', 'name' => 'Koné Awa']);
+        return CustomerOrder::create($attributes + ['customer_ref' => 'RAB0000000000001', 'name' => 'Koné Awa']);
     }
 
     public function test_an_order_starts_received_and_keeps_the_original_values_next_to_the_normalized_ones(): void
@@ -41,7 +41,7 @@ class CustomerOrderStructureTest extends TestCase
         $this->assertNull($order->operator_synced_at);
     }
 
-    public function test_the_rab_is_unique_among_live_orders_and_reusable_after_a_soft_delete(): void
+    public function test_the_customer_ref_is_unique_among_live_orders_and_reusable_after_a_soft_delete(): void
     {
         $first = $this->order();
         $first->delete();

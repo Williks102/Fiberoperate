@@ -21,7 +21,7 @@ Application de gestion pour une entreprise sous-traitante qui installe la fibre 
 - **Étude technique initiale** (vocabulaire de l'opérateur, à ne pas inverser) : « **Sans PCO** » = étude **réalisée**, client raccordable ; « **Avec PCO** » = étude **à réaliser**. Stocker le libellé d'origine (`initial_study_status_raw`) et un état normalisé ; afficher des libellés clairs dans l'interface ; reprendre les libellés de l'opérateur dans l'export de la fiche de suivi.
 - **Box (ONT)** : après l'étude, une box est attribuée au client pour son installation ; elle est rattachée à un **SN ONT** (numéro de série) et à un **numéro fixe** (colonne « LIGNE FIXE » du fichier de suivi raccordement). Structure du fichier et pièges d'import : `docs/fichiers-exemples/suivi-raccordement.md`.
 - **BE** = bureau d'études (chef du BE, dessinateurs, techniciens réseau). **AVP** = avant-projet (plans et devis). **KMZ** = plan lisible dans Google Earth. **Survey** = relevé de terrain (d'implantation avant le déploiement, final après).
-- **RAB** = référence de commande opérateur (clé d'import). **FT** = numéro de ligne FTTH. Ne pas supposer une longueur fixe : les données réelles varient.
+- **ID client** (anciennement « RAB », la valeur du fichier commence souvent par RAB) = référence de commande de l'opérateur, clé d'import ; colonne `customer_ref`. **FT** = numéro de ligne FTTH. Ne pas supposer une longueur fixe : les données réelles varient.
 
 ## Rôles (un seul rôle `technician` avec habilitations)
 `admin`, `dg`, `dt`, `supervisor`, `coordinator`, `technician`, et `be_manager` (chef du BE, créé le 30/10/2026 : lecture du réseau et des OLT ; ses écrans viendront avec le lot 1B).
@@ -56,7 +56,7 @@ Toute requête est filtrée par rôle **et** périmètre (plaque pour le supervi
 - Si la colonne d'étude initiale est présente : « Sans PCO » → commande directement `studied` (`feasible`), « Avec PCO » → `received` (étude à planifier).
 - Valider le GPS : zone attendue, latitude/longitude inversées, séparateurs (`;`, espace, virgule), valeurs aberrantes ; ne jamais corriger silencieusement.
 - Téléphones : supprimer le `*` en tête, normaliser en +225 + 10 chiffres, signaler les longueurs anormales.
-- Doublons : RAB, FT, nom + adresse. Réimport d'un même RAB = mise à jour, pas de doublon.
+- Doublons : ID client, FT, nom + adresse. Réimport d'un même ID client = mise à jour, pas de doublon.
 - Dates : stocker des vraies dates ; les fichiers Excel fournissent parfois des numéros de série.
 
 ## Import du suivi de déploiement

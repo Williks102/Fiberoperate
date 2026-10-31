@@ -222,11 +222,11 @@ Ils reprennent les colonnes de la fiche de planning et de suivi actuelle.
 
 ## 6. Import de la liste des clients
 
-Le fichier reçu (107 lignes, colonnes : référence RAB, ligne FT, nom, adresse en un seul champ, deux contacts) présente des anomalies typiques. Constats sur le fichier fourni :
+Le fichier reçu (107 lignes, colonnes : ID client (ancien RAB), ligne FT, nom, adresse en un seul champ, deux contacts) présente des anomalies typiques. Constats sur le fichier fourni :
 
 | Constat | Volume |
 |---|---|
-| Référence RAB de 13 caractères / de 15–16 caractères | 100 / 7 |
+| ID client (ancien RAB) de 13 caractères / de 15–16 caractères | 100 / 7 |
 | Ligne FT de 12 caractères / de 9 caractères | 105 / 2 |
 | Doublons probables (même FT ; même nom et même adresse) | 1 FT en double ; 1 nom en double |
 | Adresse en champ unique : structurée (Ville/Commune/Quartier/Rue…) / texte libre | 82 / 25 |
@@ -240,9 +240,9 @@ Le fichier reçu (107 lignes, colonnes : référence RAB, ligne FT, nom, adresse
 1. Séparer l'adresse en champs (ville, commune, quartier, rue, précision) et en extraire le GPS et le code PCO s'ils s'y trouvent.
 2. Valider le GPS (zone attendue, latitude/longitude inversées, séparateurs, doublons de point) ; proposer une correction sur carte quand il est invalide ou absent.
 3. Normaliser les téléphones (suppression du « * », format +225 et 10 chiffres) ; signaler les numéros à longueur anormale.
-4. Détecter les doublons (RAB, FT, nom + adresse) et les formats anormaux de RAB/FT, sans bloquer l'import : chaque ligne reçoit un statut **OK / à corriger / rejetée**.
+4. Détecter les doublons (ID client, FT, nom + adresse) et les formats anormaux d'ID client / FT, sans bloquer l'import : chaque ligne reçoit un statut **OK / à corriger / rejetée**.
 5. Écran de revue avant validation : le coordinateur corrige, fusionne ou ignore, puis confirme. Rapport d'import téléchargeable.
-6. Un même client réimporté met à jour sa commande (clé : RAB) sans créer de doublon.
+6. Un même client réimporté met à jour sa commande (clé : ID client) sans créer de doublon.
 
 ### 6.1 Import du suivi de déploiement
 
@@ -269,7 +269,7 @@ Le fichier reçu (107 lignes, colonnes : référence RAB, ligne FT, nom, adresse
 
 - `users` (rôle, supérieur_id, actif) · `technician_skills` · `teams`, `team_members`
 - `olts` (nom) · `plaques` (nom, `olt_id` facultatif, renseigné dès qu'il est connu, `supervisor_id`) · `zones` (= sous-plaques : code, `plaque_id`, statut) · (v1.9) `sros` (une par sous-plaque : `zone_id` unique, code unique du type `ABB456`, latitude/longitude facultatives, `olt_slot`, `olt_port`, `fiber_strand`) · `jdvs` (splitter : code, `zone_id` ; son SRO se déduit de la sous-plaque, sans colonne `sro_id`) · `pcos` (code, numéro, `jdv_id`, `zone_id`, statut, `status_raw`, `is_blocked`, `block_reason_id`, coordonnées, `olt_slot`, `olt_port`, `fiber_strand`, commentaire, capacité en ports (16) et nombre maximal de clients (8, v1.9)) · `pco_status_history`
-- `customer_orders` : réf. RAB, n° compte client, n° ligne FT, nom, contacts normalisés, adresse en champs et adresse brute d'origine, `initial_study_status` (libellé d'origine + état normalisé), GPS déclaré et GPS terrain, dates d'enregistrement et d'envoi au prestataire, `pco_id`, distance, SN ONT, `status`, `operator_line_status` et sa date, `operator_synced_at`, observation · `order_status_history`
+- `customer_orders` : ID client (`customer_ref`, ancien RAB), n° compte client, n° ligne FT, nom, contacts normalisés, adresse en champs et adresse brute d'origine, `initial_study_status` (libellé d'origine + état normalisé), GPS déclaré et GPS terrain, dates d'enregistrement et d'envoi au prestataire, `pco_id`, distance, SN ONT, `status`, `operator_line_status` et sa date, `operator_synced_at`, observation · `order_status_history`
 - `interventions` (type, zone, PCO, commande, équipe/technicien, date planifiée, statut, motif, début/fin, observation)
 - `studies` (intervention_id, client présent, PCO, distance (poteaux × 50 m par défaut, modifiable), poteaux béton existants / à installer, poteaux métalliques existants / à installer, faisable, problème, commentaires terrain, commentaires internes)
 - `intervention_measurements` (facultatif) · `intervention_attachments` (photos, signature, PV)

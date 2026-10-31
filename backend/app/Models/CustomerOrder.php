@@ -12,13 +12,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
-/** Commande d'un client (un abonnement, clé : référence RAB) : de la réception à l'activation de la ligne. */
+/** Commande d'un client (un abonnement, clé : ID client) : de la réception à l'activation de la ligne. */
 class CustomerOrder extends Model
 {
     use HasUuids, SoftDeletes;
 
     protected $fillable = [
-        'client_uuid', 'rab', 'account_number', 'ft_line', 'name',
+        'client_uuid', 'customer_ref', 'account_number', 'ft_line', 'name',
         'phone_1', 'phone_1_raw', 'phone_2', 'phone_2_raw',
         'address_raw', 'city', 'commune', 'district', 'street', 'address_detail',
         'declared_latitude', 'declared_longitude', 'field_latitude', 'field_longitude',
