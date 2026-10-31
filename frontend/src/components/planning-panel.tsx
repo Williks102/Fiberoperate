@@ -9,9 +9,37 @@ import { useApi } from "@/lib/use-api";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-/** Mise en étude : le coordinateur choisit un technicien habilité « étude » et la date ; la commande passe « en étude ». */
-export function StudyPlanningPanel({ order, onDone }: { order: CustomerOrder; onDone: () => void }) {
-  const technicians = useApi<{ data: { id: string; name: string }[] }>("/customer-orders/study-technicians");
+export type PlanningMode = "study" | "installation";
+
+const MODES = {
+  study: {
+    title: "Mettre en étude",
+    intro: "Choisissez le technicien qui ira chez le client. La commande passera « En étude ».",
+    skill: "Étude",
+    dateLabel: "Date de l'étude",
+    button: "Mettre en étude",
+    technicians: "/customer-orders/study-technicians",
+    endpoint: "study",
+  },
+  installation: {
+    title: "Programmer l'installation",
+    intro: "Choisissez le technicien habilité qui fera l'installation et la date. La commande passera « Installation programmée ».",
+    skill: "Raccordement client",
+    dateLabel: "Date de l'installation",
+    button: "Programmer l'installation",
+    technicians: "/customer-orders/installation-technicians",
+    endpoint: "installation",
+  },
+} as const;
+
+/**
+ * Planification d'une intervention chez le client : le coordinateur choisit un technicien habilité pour la mission et la date.
+ * Une installation déjà programmée se reprogramme (`reprogram`), avec un motif obligatoire.
+ */
+export function PlanningPanel({ mode, order, reprogram = false, onDone }: { mode: PlanningMode; order: CustomerOrder; reprogram?: boolean; onDone: () => void }) {
+  const text = MODES[mode];
+  const technicians = useApi<{ data: { id: string; name: string }[] }>(text.technicians);
+  const [reason, setReason] = useState("");
   const [technicianId, setTechnicianId] = useState("");
   const [date, setDate] = useState(today());
   const [observation, setObservation] = useState("");
@@ -24,8 +52,8 @@ export function StudyPlanningPanel({ order, onDone }: { order: CustomerOrder; on
     setBusy(true);
     try {
       await apiFetch(
-        `/customer-orders/${order.id}/study`,
-        { method: "POST", body: JSON.stringify({ technician_id: technicianId, planned_date: date, observation: observation.trim() || null }) },
+        `/customer-orders/${order.id}/${text.endpoint}`,
+        { method: "POST", body: JSON.stringify({ technician_id: technicianId, planned_date: date, observation: observation.trim() || null, reason: reason.trim() || null }) },
         getToken(),
       );
       onDone();
@@ -44,15 +72,15 @@ export function StudyPlanningPanel({ order, onDone }: { order: CustomerOrder; on
   const list = technicians.status === "ok" ? technicians.data.data : [];
 
   return (
-    <section aria-labelledby="study" className="space-y-3 rounded-xl border border-slate-300 bg-white p-4">
-      <h2 id="study" className="text-lg font-semibold">
-        Mettre en étude
+    <section aria-labelledby={`planning-${mode}`} className="space-y-3 rounded-xl border border-slate-300 bg-white p-4">
+      <h2 id={`planning-${mode}`} className="text-lg font-semibold">
+        {reprogram ? "Reprogrammer l'installation" : text.title}
       </h2>
-      <p className="text-sm text-slate-700">Choisissez le technicien qui ira chez le client. La commande passera « En étude ».</p>
+      <p className="text-sm text-slate-700">{reprogram ? "L'installation prévue sera annulée et remplacée. Indiquez le motif." : text.intro}</p>
 
       {technicians.status === "ok" && list.length === 0 && (
         <p role="status" className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
-          Aucun technicien n&apos;est habilité « Étude ». Donnez cette habilitation à un technicien dans Utilisateurs.
+          Aucun technicien n&apos;est habilité « {text.skill} ». Donnez cette habilitation à un technicien dans Utilisateurs.
         </p>
       )}
       {errors.form && (
@@ -77,9 +105,16 @@ export function StudyPlanningPanel({ order, onDone }: { order: CustomerOrder; on
             ))}
           </select>
         </Field>
-        <Field id="planned-date" label="Date de l'étude" error={errors.planned_date}>
+        <Field id="planned-date" label={text.dateLabel} error={errors.planned_date}>
           <input id="planned-date" type="date" min={today()} value={date} onChange={(e) => setDate(e.target.value)} className={inputClass} aria-invalid={!!errors.planned_date} />
         </Field>
+        {reprogram && (
+          <div className="sm:col-span-2">
+            <Field id="reason" label="Motif de la reprogrammation" error={errors.reason}>
+              <input id="reason" value={reason} onChange={(e) => setReason(e.target.value)} className={inputClass} aria-invalid={!!errors.reason} />
+            </Field>
+          </div>
+        )}
         <div className="sm:col-span-2">
           <Field id="observation" label="Observation (facultatif)" error={errors.observation}>
             <textarea id="observation" rows={2} value={observation} onChange={(e) => setObservation(e.target.value)} className={inputClass + " h-auto py-2"} />
@@ -87,7 +122,7 @@ export function StudyPlanningPanel({ order, onDone }: { order: CustomerOrder; on
         </div>
         <div className="sm:col-span-2">
           <button type="submit" disabled={busy || technicianId === ""} className="h-11 rounded-lg bg-primary px-6 font-medium text-white hover:bg-primary-hover disabled:opacity-60">
-            {busy ? "Enregistrement…" : "Mettre en étude"}
+            {busy ? "Enregistrement…" : reprogram ? "Reprogrammer" : text.button}
           </button>
         </div>
       </form>

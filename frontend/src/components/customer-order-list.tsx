@@ -6,6 +6,7 @@ import { AsyncList } from "@/components/async-list";
 import { inputClass } from "@/components/field";
 import { Pager } from "@/components/pager";
 import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/lib/format";
 import { useAuth } from "@/lib/auth/auth-context";
 import { ORDER_TONES, STUDY_RESULT_LABELS } from "@/lib/labels";
 import type { CustomerOrder, OrderStatusValue, Paged } from "@/lib/types";
@@ -152,6 +153,11 @@ export function CustomerOrderList({ stage }: { stage: Stage }) {
                       {order.customer_ref}
                       {order.phone_1 ? ` · ${order.phone_1}` : ""}
                     </p>
+                    {order.interventions?.[0] && (
+                      <p className="text-sm font-medium text-primary-ink">
+                        {order.interventions[0].type === "study" ? "Étude" : "Installation"} prévue le {formatDate(order.interventions[0].planned_date)} · {order.interventions[0].technician ?? "—"}
+                      </p>
+                    )}
                     <p className="text-sm text-slate-700">
                       {order.pco ? `PCO ${order.pco.code}` : order.zone ? `Sous-plaque ${order.zone.code}` : "Pas encore rattaché à un PCO"}
                     </p>
