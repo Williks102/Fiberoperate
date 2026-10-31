@@ -60,3 +60,23 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}, token?: 
 
   return body as T;
 }
+
+/** Télécharge un fichier protégé par le jeton (un lien direct n'enverrait pas l'en-tête) et le propose à l'enregistrement. */
+export async function apiDownload(path: string, fileName: string, token?: string | null): Promise<void> {
+  let response: Response;
+  try {
+    response = await fetch(`${API_URL}/api/v1${path}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  } catch {
+    throw new ApiError(0, "Impossible de joindre le serveur. Vérifiez votre connexion.");
+  }
+  if (!response.ok) {
+    throw new ApiError(response.status, errorMessage(response.status, (await response.json().catch(() => null)) as ErrorBody | null));
+  }
+
+  const url = URL.createObjectURL(await response.blob());
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  link.click();
+  URL.revokeObjectURL(url);
+}
