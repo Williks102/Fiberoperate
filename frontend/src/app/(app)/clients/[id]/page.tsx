@@ -6,7 +6,7 @@ import { StudyFormPanel } from "@/components/study-form-panel";
 import { PlanningPanel } from "@/components/planning-panel";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth/auth-context";
-import { formatDate, formatDateTime } from "@/lib/format";
+import { clientName, formatDate, formatDateTime } from "@/lib/format";
 import { ORDER_TONES, STUDY_RESULT_LABELS } from "@/lib/labels";
 import type { CustomerOrder } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
@@ -59,7 +59,7 @@ function Detail({ order, reload }: { order: CustomerOrder; reload: () => void })
     <>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold">{order.name}</h1>
+          <h1 className="text-xl font-semibold">{clientName(order.name)}</h1>
           <p className="text-sm text-slate-700">ID client {order.customer_ref}</p>
         </div>
         <Badge tone={ORDER_TONES[order.status.value]}>{order.status.label}</Badge>

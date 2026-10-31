@@ -76,7 +76,7 @@ class CustomerImportApiTest extends TestCase
 
         Sanctum::actingAs($this->coordinator);
         $id = $this->postJson('/api/v1/customer-imports', ['file' => $file($valid)])->assertCreated()->assertJsonPath('data.counts.ok', 1)->json('data.id');
-        $this->postJson('/api/v1/customer-imports', ['file' => $file("id_client;couleur\nA;B\n")])->assertStatus(422)->assertJsonPath('code', 'IMPORT_FILE_INVALID');
+        $this->postJson('/api/v1/customer-imports', ['file' => $file("nom;couleur\nA;B\n")])->assertStatus(422)->assertJsonPath('code', 'IMPORT_FILE_INVALID');
         $this->postJson('/api/v1/customer-imports', [])->assertStatus(422)->assertJsonValidationErrors('file');
 
         $this->getJson("/api/v1/customer-imports/{$id}")->assertOk()->assertJsonPath('data.rows.0.customer_ref', 'A1')->assertJsonPath('data.rows.0.status', 'ok');

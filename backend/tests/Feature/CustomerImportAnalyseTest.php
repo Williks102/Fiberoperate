@@ -90,9 +90,10 @@ class CustomerImportAnalyseTest extends TestCase
             $this->line(['id_client' => 'A1', 'nom' => 'Doublon']),
         );
 
-        $this->assertSame(['ok', 'rejected', 'rejected', 'rejected'], $batch->rows()->pluck('status')->all());
+        $this->assertSame(['ok', 'rejected', 'to_fix', 'rejected'], $batch->rows()->pluck('status')->all());
         $this->assertStringContainsString("L'ID client est vide", $this->messages($this->row($batch, 1)));
-        $this->assertStringContainsString('Le nom est vide', $this->messages($this->row($batch, 2)));
+        $this->assertStringContainsString('Le nom est vide', $this->messages($this->row($batch, 2)), 'sans nom : à vérifier, jamais refusé');
+        $this->assertSame('create', $this->row($batch, 2)['action']);
         $this->assertStringContainsString('ID client en double : déjà à la ligne 2', $this->messages($this->row($batch, 3)));
         $this->assertSame('none', $this->row($batch, 1)['action']);
     }

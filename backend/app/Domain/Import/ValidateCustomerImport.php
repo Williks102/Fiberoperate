@@ -68,7 +68,7 @@ final class ValidateCustomerImport
             $studied = ! $installed && ($data['initial_study'] ?? null) === 'done';
             $status = $installed ? OrderStatus::Installed : ($studied ? OrderStatus::Studied : OrderStatus::Received);
 
-            $order = new CustomerOrder($values);
+            $order = new CustomerOrder(array_merge($values, ['name' => $values['name'] ?? ''])); // client sans nom : à compléter ensuite
             $order->forceFill(['status' => $status, 'study_result' => $studied ? StudyResult::Feasible : null])->save();
             $order->history()->create(['from_status' => null, 'to_status' => $status, 'observation' => "Import du fichier « {$batch->file_name} »", 'changed_by' => $by->id]);
             $outcome = 'created';

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDate, formatDateTime, formatFcfa } from "./format";
+import { clientName, formatDate, formatDateTime, formatFcfa } from "./format";
 
 describe("formatDateTime", () => {
   it("affiche jour/mois/année et l'heure d'Abidjan", () => {
@@ -26,5 +26,13 @@ describe("formatDate", () => {
     expect(formatDate("2026-10-31T00:00:00Z")).toBe("31/10/2026");
     expect(formatDate(null)).toBe("—");
     expect(formatDate("n'importe quoi")).toBe("—");
+  });
+});
+
+describe("clientName", () => {
+  it("remplace un nom absent", () => {
+    expect(clientName("Koné Awa")).toBe("Koné Awa");
+    expect(clientName("")).toBe("Client sans nom");
+    expect(clientName(null)).toBe("Client sans nom");
   });
 });
