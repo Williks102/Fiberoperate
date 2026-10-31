@@ -260,7 +260,7 @@ function RowCard({ row, onToggle }: { row: Row; onToggle: () => void }) {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="font-medium">
           <span className="mr-2 text-slate-700">Ligne {row.line}</span>
-          {row.customer_ref ?? "—"} · {row.name ?? "—"}
+          {row.customer_ref ?? "—"} · {row.name ?? "sans nom"}
         </p>
         <span className="flex flex-wrap items-center gap-2">
           <Badge tone={tone}>{label}</Badge>

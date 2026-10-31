@@ -6,7 +6,7 @@ import { AsyncList } from "@/components/async-list";
 import { inputClass } from "@/components/field";
 import { Pager } from "@/components/pager";
 import { Badge } from "@/components/ui/badge";
-import { formatDate } from "@/lib/format";
+import { clientName, formatDate } from "@/lib/format";
 import { useAuth } from "@/lib/auth/auth-context";
 import { ORDER_TONES, STUDY_RESULT_LABELS } from "@/lib/labels";
 import type { CustomerOrder, OrderStatusValue, Paged } from "@/lib/types";
@@ -56,7 +56,7 @@ function OtherStageMatches({ q, stage }: { q: string; stage: Stage }) {
           <li key={order.id}>
             <Link href={`/clients/${order.id}`} className="block space-y-1 rounded-lg bg-white p-3 hover:ring-1 hover:ring-primary">
               <div className="flex items-start justify-between gap-3">
-                <p className="font-medium">{order.name}</p>
+                <p className="font-medium">{clientName(order.name)}</p>
                 <Badge tone={ORDER_TONES[order.status.value]}>{order.status.label}</Badge>
               </div>
               <p className="text-sm text-slate-700">
@@ -143,7 +143,7 @@ export function CustomerOrderList({ stage }: { stage: Stage }) {
                 <li key={order.id}>
                   <Link href={`/clients/${order.id}`} className="block space-y-1 rounded-xl border border-slate-200 bg-white p-4 hover:border-primary">
                     <div className="flex items-start justify-between gap-3">
-                      <p className="font-medium">{order.name}</p>
+                      <p className="font-medium">{clientName(order.name)}</p>
                       <div className="flex flex-wrap justify-end gap-1">
                         {order.study_result && order.study_result !== "feasible" && <Badge tone="warning">{STUDY_RESULT_LABELS[order.study_result]}</Badge>}
                         <Badge tone={ORDER_TONES[order.status.value]}>{order.status.label}</Badge>

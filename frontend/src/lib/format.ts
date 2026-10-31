@@ -27,3 +27,8 @@ export function formatDateTime(iso: string | null | undefined): string {
 export function formatFcfa(amount: number | null | undefined): string {
   return amount == null ? "—" : `${new Intl.NumberFormat("fr-FR").format(amount).replace(/[\u202f\u00a0]/g, " ")} FCFA`;
 }
+
+/** Nom d'un client : un client importé avec son seul ID client n'a pas encore de nom. */
+export function clientName(name: string | null | undefined): string {
+  return name?.trim() ? name : "Client sans nom";
+}

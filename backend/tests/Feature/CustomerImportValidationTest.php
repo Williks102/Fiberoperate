@@ -155,4 +155,33 @@ class CustomerImportValidationTest extends TestCase
         $this->assertSame(1, CustomerOrder::count());
         $this->assertSame(1, CustomerOrder::firstOrFail()->history()->count());
     }
+
+    public function test_an_id_alone_is_enough_to_create_a_client_who_can_then_be_put_in_study(): void
+    {
+        $file = UploadedFile::fake()->createWithContent('rab.csv', "id_client\nRAB0000000000001\nRAB0000000000002\n");
+        $id = $this->postJson('/api/v1/customer-imports', ['file' => $file])->assertCreated()
+            ->assertJsonPath('data.counts.rejected', 0)->assertJsonPath('data.counts.to_fix', 2)->json('data.id');
+
+        $this->postJson("/api/v1/customer-imports/{$id}/validate")->assertOk()->assertJsonPath('data.created', 2);
+
+        $order = CustomerOrder::where('customer_ref', 'RAB0000000000001')->firstOrFail();
+        $this->assertSame('', $order->name);
+        $this->assertSame(OrderStatus::Received, $order->status);
+
+        $tech = User::create(['name' => 'Tech', 'email' => 't@x.test', 'password' => 'secret123', 'role' => Role::Technician]);
+        $tech->skills()->create(['mission_type' => 'study']);
+        $this->postJson("/api/v1/customer-orders/{$order->id}/study", ['technician_id' => $tech->id, 'planned_date' => now()->toDateString()])
+            ->assertOk()->assertJsonPath('data.status.value', 'in_study');
+    }
+
+    public function test_a_later_file_without_the_name_does_not_erase_the_known_name(): void
+    {
+        $first = $this->analyse($this->line(['id_client' => 'N1', 'nom' => 'Koné Awa']));
+        $this->postJson("/api/v1/customer-imports/{$first}/validate")->assertOk();
+
+        $second = $this->analyse($this->line(['id_client' => 'N1', 'adresse' => 'Rue 5']));
+        $this->postJson("/api/v1/customer-imports/{$second}/validate")->assertOk()->assertJsonPath('data.updated', 1);
+
+        $this->assertSame('Koné Awa', CustomerOrder::where('customer_ref', 'N1')->value('name'));
+    }
 }

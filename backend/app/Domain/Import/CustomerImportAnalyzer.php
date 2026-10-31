@@ -21,8 +21,8 @@ use Illuminate\Support\Str;
  * Analyse d'un fichier de clients (premier temps de l'import) : aucune commande n'est créée ni modifiée.
  *
  * Chaque ligne reçoit un statut et ses anomalies :
- * - refusée : ID client ou nom absent, ID client en double dans le fichier ;
- * - à corriger : téléphone, GPS, date, sous-plaque, splitter ou PCO inexploitables ou incohérents (la valeur douteuse n'est jamais devinée) ;
+ * - refusée : ID client absent, ID client en double dans le fichier ;
+ * - à corriger : nom vide, téléphone, GPS, date, sous-plaque, splitter ou PCO inexploitables ou incohérents (la valeur douteuse n'est jamais devinée) ;
  * - ok : le reste (une correction sûre, comme le zéro initial d'un téléphone, est signalée en information).
  * Le splitter du fichier (colonne « JDV/HUB » du client) est contrôlé contre le réseau ; réimport d'un ID client connu = mise à jour.
  */
@@ -38,7 +38,8 @@ final class CustomerImportAnalyzer
     /** Colonnes lues en plus du modèle quand le fichier vient de l'opérateur (fichier de suivi des instances). */
     public const OPERATOR_COLUMNS = ['ville', 'commune', 'avancement', 'problemes', 'besoin_poteaux_beton', 'besoin_poteaux_metalliques'];
 
-    public const REQUIRED = ['id_client', 'nom'];
+    /** Seul l'ID client est indispensable : un client est créé dès qu'il a un ID, même si les autres colonnes manquent. */
+    public const REQUIRED = ['id_client'];
 
     /** En-têtes du fichier de l'opérateur (normalisés) → colonnes du modèle. */
     public const ALIASES = [
@@ -152,11 +153,11 @@ final class CustomerImportAnalyzer
             $seenRefs[$ref] = $line;
         }
         if ($name === '') {
-            $add('error', 'Le nom est vide.');
+            $add('warning', 'Le nom est vide : le client sera créé sans nom (à compléter ensuite).');
         }
 
         $data = [
-            'customer_ref' => $ref, 'name' => $name, 'account_number' => $get('compte') ?: null, 'address_raw' => $get('adresse') ?: null,
+            'customer_ref' => $ref, 'name' => $name !== '' ? $name : null, 'account_number' => $get('compte') ?: null, 'address_raw' => $get('adresse') ?: null,
             'city' => $get('ville') ?: null, 'commune' => $get('commune') ?: null,
         ];
 
