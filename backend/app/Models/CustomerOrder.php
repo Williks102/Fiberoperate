@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\InitialStudy;
 use App\Enums\OrderStatus;
 use App\Enums\StudyResult;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -84,20 +85,27 @@ class CustomerOrder extends Model
     }
 
     /** Change le statut et écrit la ligne d'historique dans la même transaction (le statut n'est pas modifiable en masse). */
-    public function changeStatus(OrderStatus $to, ?User $by = null, ?string $observation = null, ?string $device = null, ?StudyResult $result = null): OrderStatusHistory
+    public function changeStatus(OrderStatus $to, ?User $by = null, ?string $observation = null, ?string $device = null, ?StudyResult $result = null, ?CarbonInterface $at = null): OrderStatusHistory
     {
-        return DB::transaction(function () use ($to, $by, $observation, $device, $result) {
+        return DB::transaction(function () use ($to, $by, $observation, $device, $result, $at) {
             $from = $this->status;
 
             $this->forceFill(['status' => $to, 'study_result' => $result ?? $this->study_result])->save();
 
-            return $this->history()->create([
+            $line = $this->history()->make([
                 'from_status' => $from,
                 'to_status' => $to,
                 'observation' => $observation,
                 'changed_by' => $by?->getKey(),
                 'device' => $device,
             ]);
+            // Une saisie faite hors ligne garde l'heure à laquelle elle a eu lieu sur le terrain, pas celle de sa synchronisation.
+            if ($at !== null) {
+                $line->created_at = $at;
+            }
+            $line->save();
+
+            return $line;
         });
     }
 }

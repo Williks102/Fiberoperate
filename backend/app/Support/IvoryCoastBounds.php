@@ -20,6 +20,16 @@ final class IvoryCoastBounds
         return ! self::contains($latitude, $longitude) && self::contains($longitude, $latitude);
     }
 
+    /** Message en français si les coordonnées sont inversées ou hors de la zone, sinon null (jamais corrigées en silence). */
+    public static function problem(float $latitude, float $longitude): ?string
+    {
+        if (self::looksInverted($latitude, $longitude)) {
+            return 'La latitude et la longitude semblent inversées. Vérifiez les coordonnées.';
+        }
+
+        return self::contains($latitude, $longitude) ? null : "Ces coordonnées ne sont pas en Côte d'Ivoire. Vérifiez-les.";
+    }
+
     /** @param array{0: float, 1: float} $range */
     private static function within(float $value, array $range): bool
     {

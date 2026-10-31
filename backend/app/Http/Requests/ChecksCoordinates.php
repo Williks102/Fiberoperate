@@ -14,13 +14,9 @@ trait ChecksCoordinates
             return;
         }
 
-        $latitude = (float) $this->input('latitude');
-        $longitude = (float) $this->input('longitude');
-
-        if (IvoryCoastBounds::looksInverted($latitude, $longitude)) {
-            $validator->errors()->add('latitude', 'La latitude et la longitude semblent inversées. Vérifiez les coordonnées.');
-        } elseif (! IvoryCoastBounds::contains($latitude, $longitude)) {
-            $validator->errors()->add('latitude', "Ces coordonnées ne sont pas en Côte d'Ivoire. Vérifiez-les.");
+        $problem = IvoryCoastBounds::problem((float) $this->input('latitude'), (float) $this->input('longitude'));
+        if ($problem !== null) {
+            $validator->errors()->add('latitude', $problem);
         }
     }
 }
