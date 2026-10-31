@@ -79,7 +79,7 @@ export function JdvForm({ jdv }: { jdv?: Jdv }) {
         <input id="code" value={code} onChange={(e) => setCode(e.target.value)} className={inputClass} required />
       </Field>
 
-      <div className="fixed inset-x-0 bottom-14 z-10 flex gap-3 border-t border-slate-200 bg-white p-3 md:static md:border-0 md:p-0">
+      <div className="fixed inset-x-0 bottom-14 z-10 flex gap-3 border-t border-slate-200 bg-white/95 p-3 shadow-[0_-6px_16px_rgba(15,23,42,0.06)] backdrop-blur md:static md:border-0 md:bg-transparent md:p-0 md:shadow-none md:backdrop-blur-none">
         <button type="submit" disabled={submitting} className="h-11 flex-1 rounded-lg bg-primary hover:bg-primary-hover font-medium text-white disabled:opacity-60 md:flex-none md:px-6">
           {submitting ? "Enregistrement…" : editing ? "Enregistrer" : "Créer le splitter"}
         </button>

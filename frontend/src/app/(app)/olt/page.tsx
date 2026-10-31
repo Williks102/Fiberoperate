@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { AsyncList } from "@/components/async-list";
+import { inputClass } from "@/components/field";
 import { Pager } from "@/components/pager";
 import { useAuth } from "@/lib/auth/auth-context";
 import type { Olt, Paged } from "@/lib/types";
@@ -44,7 +45,7 @@ export default function OltPage() {
             setSearch(e.target.value);
             setPage(1);
           }}
-          className="h-11 w-full rounded-lg border border-slate-300 px-3 text-base"
+          className={inputClass}
         />
       </div>
 
