@@ -76,4 +76,4 @@ Une **commande** par abonnement, clé **ID client** (ancien RAB ; une seule comm
 
 Statut interne (`status`) : reçue → en étude → étudiée (faisable, non faisable, client absent) → installation programmée → installée, reportée ou échec → activée ; chaque changement écrit une ligne d'historique. Une commande dont l'étude initiale est « SANS PCO » démarre « étudiée (faisable) », « AVEC PCO » démarre « reçue ».
 
-**Import (02/11)** : moteur d'analyse construit (`CustomerImportAnalyzer`) : chaque ligne est analysée, classée ok, à corriger ou refusée avec ses anomalies, sans rien créer. **Pas encore construit** : l'API et la revue à l'écran (exclure des lignes), la validation qui crée ou met à jour les commandes, les écrans et les interventions.
+**Import (02/11)** : premier temps construit (`CustomerImportAnalyzer`, `POST /customer-imports` puis `GET /customer-imports/{lot}`) : chaque ligne est analysée, classée ok, à corriger ou refusée avec ses anomalies, sans rien créer. **Pas encore construit** : la revue à l'écran (exclure des lignes), la validation qui crée ou met à jour les commandes, les écrans et les interventions.
