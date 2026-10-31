@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useState } from "react";
 import { StudyFormPanel } from "@/components/study-form-panel";
 import { InstallationResultPanel } from "@/components/installation-result-panel";
 import { PlanningPanel } from "@/components/planning-panel";
@@ -48,6 +49,26 @@ export default function ClientPage() {
   );
 }
 
+/**
+ * Le résultat d'une visite est saisi par le technicien désigné. Le coordinateur (ou l'administrateur) peut le saisir à sa place,
+ * mais le formulaire reste replié derrière un bouton : la mise en étude ou en installation ne demande aucune saisie de sa part.
+ */
+function OnBehalf({ proxy, technician, children }: { proxy: boolean; technician: string | null; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  if (!proxy || open) return <>{children}</>;
+
+  return (
+    <section className="space-y-3 rounded-xl border border-slate-300 bg-white p-4">
+      <p className="text-sm text-slate-700">
+        {technician ? `${technician} saisit le résultat après sa visite.` : "Le technicien saisit le résultat après sa visite."} Vous pouvez le saisir à sa place (résultat transmis par téléphone ou sur papier).
+      </p>
+      <button type="button" onClick={() => setOpen(true)} className="h-11 rounded-lg border border-slate-300 px-4 text-sm font-medium">
+        Saisir le résultat à la place du technicien
+      </button>
+    </section>
+  );
+}
+
 function Detail({ order, reload }: { order: CustomerOrder; reload: () => void }) {
   const { user } = useAuth();
   const canPlan = user?.role === "admin" || user?.role === "coordinator";
@@ -73,9 +94,17 @@ function Detail({ order, reload }: { order: CustomerOrder; reload: () => void })
 
       {canPlan && readyForInstallation && <PlanningPanel mode="installation" order={order} reprogram={order.status.value === "appointment_set"} onDone={reload} />}
 
-      {canRecordInstall && <InstallationResultPanel order={order} onDone={reload} />}
+      {canRecordInstall && (
+        <OnBehalf proxy={canPlan} technician={plannedInstall?.technician ?? null}>
+          <InstallationResultPanel order={order} onDone={reload} />
+        </OnBehalf>
+      )}
 
-      {canRecord && <StudyFormPanel order={order} showInternal={canPlan} onDone={reload} />}
+      {canRecord && (
+        <OnBehalf proxy={canPlan} technician={planned?.technician ?? null}>
+          <StudyFormPanel order={order} showInternal={canPlan} onDone={reload} />
+        </OnBehalf>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="rounded-xl border border-slate-200 bg-white p-4">

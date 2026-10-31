@@ -14,7 +14,7 @@ export type PlanningMode = "study" | "installation";
 const MODES = {
   study: {
     title: "Mettre en étude",
-    intro: "Choisissez le technicien qui ira chez le client. La commande passera « En étude ».",
+    intro: "Choisissez le technicien qui ira chez le client. La commande passera « Étude programmée ».",
     skill: "Étude",
     dateLabel: "Date de l'étude",
     button: "Mettre en étude",
