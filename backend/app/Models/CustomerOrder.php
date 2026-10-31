@@ -62,6 +62,11 @@ class CustomerOrder extends Model
         return $this->hasMany(Intervention::class)->orderByDesc('planned_date');
     }
 
+    public function studies(): HasMany
+    {
+        return $this->hasMany(Study::class)->orderByDesc('created_at');
+    }
+
     public function history(): HasMany
     {
         return $this->hasMany(OrderStatusHistory::class)->orderBy('created_at');
