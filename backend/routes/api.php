@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\PcoController;
 use App\Http\Controllers\Api\V1\PlaqueController;
 use App\Http\Controllers\Api\V1\PriceItemController;
 use App\Http\Controllers\Api\V1\ProjectController;
+use App\Http\Controllers\Api\V1\ProjectDocumentController;
 use App\Http\Controllers\Api\V1\ProjectQuoteController;
 use App\Http\Controllers\Api\V1\SroController;
 use App\Http\Controllers\Api\V1\TeamController;
@@ -36,6 +37,9 @@ Route::prefix('v1')->group(function () {
         Route::put('pcos/{pco}/measured-position', [PcoController::class, 'measure']);
         Route::apiResource('pcos', PcoController::class);
         Route::apiResource('projects', ProjectController::class)->only(['index', 'show', 'store']);
+        Route::get('projects/{project}/documents', [ProjectDocumentController::class, 'index']);
+        Route::post('projects/{project}/documents', [ProjectDocumentController::class, 'store']);
+        Route::get('projects/{project}/documents/{version}/download', [ProjectDocumentController::class, 'download']);
         Route::get('projects/{project}/quote', [ProjectQuoteController::class, 'show']);
         Route::put('projects/{project}/quote/lines', [ProjectQuoteController::class, 'save']);
         Route::delete('projects/{project}/quote/lines/{line}', [ProjectQuoteController::class, 'destroy']);
