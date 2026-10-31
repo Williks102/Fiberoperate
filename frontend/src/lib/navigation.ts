@@ -61,6 +61,7 @@ export const NAV_GROUPS: NavGroup[] = [
     icon: "customer",
     description: "Les clients à raccorder : importer leur liste, puis suivre leurs commandes.",
     items: [
+      { href: "/clients", label: "Clients", description: "Les commandes des clients : où elles en sont, de la réception à l'installation.", roles: ["admin", "dg", "dt", "coordinator", "technician"], skills: ["study", "customer_connection"] },
       { href: "/clients/importer", label: "Importer les clients", description: "Charger la liste des clients (fichier CSV), relire les anomalies ligne par ligne, puis l'importer.", roles: ["admin", "coordinator"] },
     ],
   },
