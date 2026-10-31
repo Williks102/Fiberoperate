@@ -94,7 +94,7 @@ function Detail({ order, reload }: { order: CustomerOrder; reload: () => void })
 
       {canPlan && order.status.value === "received" && <PlanningPanel mode="study" order={order} onDone={reload} />}
 
-      {canPlan && readyForInstallation && <BoxPanel key={`${order.ont_serial}-${order.fixed_line}`} order={order} onDone={reload} />}
+      {canPlan && order.status.value === "appointment_set" && <BoxPanel key={`${order.ont_serial}-${order.fixed_line}`} order={order} onDone={reload} />}
 
       {canPlan && readyForInstallation && <PlanningPanel mode="installation" order={order} reprogram={order.status.value === "appointment_set"} onDone={reload} />}
 

@@ -6,7 +6,7 @@ import { ApiError, apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth/token";
 import type { CustomerOrder } from "@/lib/types";
 
-/** Box du client : le coordinateur lui attribue le numéro de série de l'ONT et le numéro fixe, avant l'installation. */
+/** Box du client, une fois l'installation programmée : le coordinateur corrige le numéro de série de l'ONT et le numéro fixe (la box se donne à la programmation). */
 export function BoxPanel({ order, onDone }: { order: CustomerOrder; onDone: () => void }) {
   const [ontSerial, setOntSerial] = useState(order.ont_serial ?? "");
   const [fixedLine, setFixedLine] = useState(order.fixed_line ?? "");
@@ -38,21 +38,21 @@ export function BoxPanel({ order, onDone }: { order: CustomerOrder; onDone: () =
       <h2 id="box" className="text-lg font-semibold">
         {assigned ? "Box du client" : "Attribuer la box"}
       </h2>
-      <p className="text-sm text-slate-700">Le numéro de série de l&apos;ONT et le numéro fixe sont donnés au technicien avant l&apos;installation. Modifiables jusqu&apos;à l&apos;installation.</p>
+      <p className="text-sm text-slate-700">Donnée en même temps que la programmation de l&apos;installation ; corrigez-la ici si besoin, jusqu&apos;à l&apos;installation.</p>
       {(errors.form || errors.status) && (
         <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">
           {errors.form ?? errors.status}
         </p>
       )}
       <form onSubmit={submit} className="grid gap-3 sm:grid-cols-2" noValidate>
-        <Field id="ont-serial" label="N° de série de l'ONT" error={errors.ont_serial}>
+        <Field id="ont-serial" label="N° de série de l'ONT, obligatoire" error={errors.ont_serial}>
           <input id="ont-serial" value={ontSerial} onChange={(e) => setOntSerial(e.target.value)} autoCapitalize="characters" className={inputClass} aria-invalid={!!errors.ont_serial} />
         </Field>
-        <Field id="fixed-line" label="Numéro fixe" hint="De 8 à 12 chiffres." error={errors.fixed_line}>
+        <Field id="fixed-line" label="Numéro fixe, obligatoire" hint="De 8 à 12 chiffres." error={errors.fixed_line}>
           <input id="fixed-line" type="tel" inputMode="numeric" value={fixedLine} onChange={(e) => setFixedLine(e.target.value)} className={inputClass} aria-invalid={!!errors.fixed_line} />
         </Field>
         <div className="sm:col-span-2">
-          <button type="submit" disabled={busy || (ontSerial.trim() === "" && fixedLine.trim() === "")} className="h-11 rounded-lg bg-primary px-6 font-medium text-white hover:bg-primary-hover disabled:opacity-60">
+          <button type="submit" disabled={busy || ontSerial.trim() === "" || fixedLine.trim() === ""} className="h-11 rounded-lg bg-primary px-6 font-medium text-white hover:bg-primary-hover disabled:opacity-60">
             {busy ? "Enregistrement…" : assigned ? "Enregistrer la box" : "Attribuer la box"}
           </button>
         </div>

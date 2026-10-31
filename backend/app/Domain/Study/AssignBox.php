@@ -16,7 +16,7 @@ use Illuminate\Validation\ValidationException;
  */
 class AssignBox
 {
-    public function __invoke(CustomerOrder $order, User $by, ?string $ontSerial, ?string $fixedLine): CustomerOrder
+    public function __invoke(CustomerOrder $order, User $by, string $ontSerial, string $fixedLine): CustomerOrder
     {
         return DB::transaction(function () use ($order, $by, $ontSerial, $fixedLine) {
             $order = CustomerOrder::query()->lockForUpdate()->findOrFail($order->getKey());
@@ -30,8 +30,7 @@ class AssignBox
 
             $order->forceFill(['ont_serial' => $ontSerial, 'fixed_line' => $fixedLine])->save();
 
-            $note = implode(', ', array_filter([$ontSerial ? "SN ONT {$ontSerial}" : null, $fixedLine ? "ligne fixe {$fixedLine}" : null]));
-            $order->changeStatus($order->status, $by, "Box attribuée : {$note}");
+            $order->changeStatus($order->status, $by, "Box attribuée : SN ONT {$ontSerial}, ligne fixe {$fixedLine}");
 
             return $order;
         });

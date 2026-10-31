@@ -22,13 +22,13 @@ use Illuminate\Validation\ValidationException;
  */
 class PlanInstallation
 {
-    public function __invoke(CustomerOrder $order, User $technician, CarbonInterface $date, User $by, ?string $observation = null, ?string $reason = null): Intervention
+    public function __invoke(CustomerOrder $order, User $technician, CarbonInterface $date, User $by, string $ontSerial, string $fixedLine, ?string $observation = null, ?string $reason = null): Intervention
     {
         if (! $technician->hasRole(Role::Technician) || ! $technician->is_active || ! $technician->hasSkill(MissionType::CustomerConnection)) {
             throw ValidationException::withMessages(['technician_id' => "Ce technicien n'est pas habilité au raccordement client."]);
         }
 
-        return DB::transaction(function () use ($order, $technician, $date, $by, $observation, $reason) {
+        return DB::transaction(function () use ($order, $technician, $date, $by, $ontSerial, $fixedLine, $observation, $reason) {
             $order = CustomerOrder::query()->lockForUpdate()->findOrFail($order->getKey());
             $reprogramming = $order->status === OrderStatus::AppointmentSet;
 
@@ -56,11 +56,14 @@ class PlanInstallation
                 'created_by' => $by->getKey(),
             ]);
 
+            // La box (n° de série et numéro fixe, obligatoires) se donne en même temps que la programmation.
+            $order->forceFill(['ont_serial' => $ontSerial, 'fixed_line' => $fixedLine])->save();
+
             $label = $reprogramming ? 'Installation reprogrammée' : 'Installation programmée';
             $order->changeStatus(
                 OrderStatus::AppointmentSet,
                 $by,
-                "{$label} : {$technician->name} le {$date->format('d/m/Y')}".($reprogramming ? " (motif : {$reason})" : ''),
+                "{$label} : {$technician->name} le {$date->format('d/m/Y')}".($reprogramming ? " (motif : {$reason})" : '')." · Box : SN ONT {$ontSerial}, ligne fixe {$fixedLine}",
             );
 
             return $intervention;
