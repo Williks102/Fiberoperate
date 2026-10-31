@@ -27,9 +27,9 @@ describe("menu par activité", () => {
   });
 
   it("limite chaque rôle aux activités et écrans auxquels il a droit", () => {
-    expect(labels("admin")).toEqual(["Projet", "Déploiement", "Administration"]);
+    expect(labels("admin")).toEqual(["Projet", "Déploiement", "Raccordement", "Administration"]);
     expect(labels("supervisor")).toEqual(["Projet", "Déploiement"]);
-    expect(labels("coordinator")).toEqual(["Déploiement", "Administration"]);
+    expect(labels("coordinator")).toEqual(["Déploiement", "Raccordement", "Administration"]);
     expect(labels("technician")).toEqual(["Déploiement"]);
     expect(groupsFor("technician", ["drawing"]).map((g) => g.label)).toEqual(["Projet", "Déploiement"]);
     expect(groupsFor("technician", ["survey"]).map((g) => g.label)).toEqual(["Projet", "Déploiement"]);
@@ -66,20 +66,20 @@ describe("menu par activité", () => {
 describe("barre du bas (téléphone)", () => {
   it("montre l'accueil et les activités, avec une icône chacune", () => {
     const { main } = bottomBarFor("admin");
-    expect(main.map((m) => m.label)).toEqual(["Accueil", "Projet", "Déploiement", "Administration"]);
-    expect(main.map((m) => m.icon)).toEqual(["home", "project", "network", "admin"]);
+    expect(main.map((m) => m.label)).toEqual(["Accueil", "Projet", "Déploiement", "Raccordement", "Administration"]);
+    expect(main.map((m) => m.icon)).toEqual(["home", "project", "network", "customer", "admin"]);
     expect(bottomBarFor("technician").main.map((m) => m.label)).toEqual(["Accueil", "Déploiement"]);
   });
 
   it("ne dépasse jamais 5 icônes, le menu complet restant dans le tiroir", () => {
-    const extra = ["Études", "Raccordement", "Suivi Rac"].map((label, i) => ({ href: `/x${i}`, label, description: "", icon: "admin" as const, items: [{ href: `/x${i}/a`, label: "A" }] }));
+    const extra = ["Études", "Suivi Rac"].map((label, i) => ({ href: `/x${i}`, label, description: "", icon: "admin" as const, items: [{ href: `/x${i}/a`, label: "A" }] }));
     NAV_GROUPS.push(...extra);
     try {
       for (const role of ROLES) expect(bottomBarFor(role).main.length).toBeLessThanOrEqual(BOTTOM_BAR_MAX);
-      expect(bottomBarFor("admin").main.map((m) => m.label)).toEqual(["Accueil", "Projet", "Déploiement", "Administration", "Études"]);
+      expect(bottomBarFor("admin").main.map((m) => m.label)).toEqual(["Accueil", "Projet", "Déploiement", "Raccordement", "Administration"]);
       expect(bottomBarFor("admin").groups.length).toBe(6);
     } finally {
-      NAV_GROUPS.splice(-3, 3);
+      NAV_GROUPS.splice(-2, 2);
     }
   });
 });

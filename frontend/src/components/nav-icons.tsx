@@ -1,4 +1,4 @@
-import { BookOpenText, Boxes, FolderKanban, House, LayoutGrid, Map, Network, Package, RadioTower, Server, Split, UserCog, Users, type LucideIcon } from "lucide-react";
+import { BookOpenText, Boxes, ClipboardList, FileUp, FolderKanban, House, LayoutGrid, Map, Network, Package, RadioTower, Server, Split, UserCog, Users, type LucideIcon } from "lucide-react";
 import type { NavIconName } from "@/lib/navigation";
 
 /** Une icône par activité. Les activités à venir (Études, Raccordement, Suivi Rac) ajouteront la leur. */
@@ -6,6 +6,7 @@ export const NAV_ICONS: Record<NavIconName, LucideIcon> = {
   home: House,
   project: FolderKanban,
   network: Network,
+  customer: ClipboardList,
   admin: Users,
 };
 
@@ -19,6 +20,7 @@ const ITEM_ICONS: Record<string, LucideIcon> = {
   "/splitters": Split,
   "/pco": Package,
   "/olt": Server,
+  "/clients/importer": FileUp,
   "/equipes": Users,
   "/utilisateurs": UserCog,
 };
