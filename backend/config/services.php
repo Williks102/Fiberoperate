@@ -28,6 +28,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    // Photos (lot 4e) : CLOUDINARY_URL = cloudinary://clé:secret@nom_du_cloud ; le secret ne quitte jamais l'API.
+    'cloudinary' => [
+        'url' => env('CLOUDINARY_URL'),
+        'folder' => env('CLOUDINARY_UPLOAD_FOLDER', 'ftth'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

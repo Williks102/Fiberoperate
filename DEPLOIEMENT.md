@@ -77,10 +77,10 @@ PWA ──envoi direct (signature fournie par l'API)──► Cloudinary
 
 ## 3 bis. Cloudinary (photos et signatures)
 1. Créer un compte, récupérer `CLOUDINARY_URL` (`cloudinary://clé:secret@nom_du_cloud`) et le renseigner sur Render (API et worker). Le secret ne va **jamais** dans Vercel ni dans le front.
-2. **Envoi direct depuis la PWA** : l'API fournit une signature (`POST /api/uploads/sign`, durée courte, dossier imposé) ; la PWA envoie la photo compressée à Cloudinary en arrière-plan, puis confirme à l'API avec le `public_id` et le `client_uuid` (endpoint idempotent). Cela allège l'API et convient au mode hors-ligne (la photo reste en file locale jusqu'au retour du réseau).
+2. **Envoi direct depuis la PWA** : l'API fournit une signature (`POST /api/v1/uploads/sign`, durée courte, chemin imposé `{dossier}/{commande}/{uuid de la photo}`, mode `authenticated`) ; la PWA envoie la photo compressée à Cloudinary en arrière-plan, puis confirme à l'API avec le `public_id` et le `client_uuid` (`POST /api/v1/photos`, idempotent ; refusé si le `public_id` n'est pas celui que le serveur a imposé). Cela allège l'API et convient au mode hors-ligne (la photo reste en file locale jusqu'au retour du réseau).
 3. **Confidentialité** : les photos de clients/domiciles sont envoyées en mode `authenticated` (pas d'URL publique) ; l'API génère des URL signées à durée limitée.
 4. En base, on ne stocke que `public_id`, format, taille, hash et `client_uuid` ; jamais l'URL complète.
-5. Côté Laravel : SDK `cloudinary/cloudinary_php` (ou le paquet Laravel dédié) pour signer, générer les URL et supprimer. Ce n'est pas un disque S3 : pas de `Storage::disk()` pour les photos.
+5. Côté Laravel : la signature d'envoi est calculée par l'API elle-même (SHA-1, `App\Domain\Photos\Cloudinary`, sans SDK) ; sans `CLOUDINARY_URL`, l'API répond 503 `PHOTOS_NOT_CONFIGURED`. Les URL signées de consultation et la suppression pourront utiliser le SDK `cloudinary/cloudinary_php`. Ce n'est pas un disque S3 : pas de `Storage::disk()` pour les photos.
 6. Quotas du plan gratuit (stockage, transformations, bande passante) à vérifier avant le pilote ; prévoir une politique de rétention.
 7. Même remarque que pour la base : serveurs hors de Côte d'Ivoire, à valider (voir §5).
 
