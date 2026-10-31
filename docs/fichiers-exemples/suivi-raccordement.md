@@ -47,8 +47,8 @@ Taille de l'exemple : 1 feuille, 17 clients, 27 colonnes renseignées (44 colonn
 - 17 colonnes vides sans en-tête : à ignorer.
 
 ## Questions ouvertes (à confirmer avec le client)
-1. **`JDV/HUB`** contient `HUB001`… : ce niveau correspond-il au **splitter (JDV)** de la hiérarchie OLT → plaque → sous-plaque → JDV → PCO ? Le même code `HUB001` existe dans deux zones, ce qui correspond à un JDV propre à chaque sous-plaque.
-2. **`LIGNE FIXE`** est-il le même numéro que le « FT » (numéro de ligne FTTH) du premier fichier clients, ou un autre numéro ?
+1. **`JDV/HUB`** — *répondu le 02/11* : c'est le **splitter** (on dit « splitter », pas « JDV ») ; le même code `HUB001` existe dans deux zones parce qu'un splitter est propre à sa sous-plaque.
+2. **`LIGNE FIXE`** — *répondu le 02/11* : c'est le numéro fixe de la box (`fixed_line`), conservé tel quel, sans le confondre avec le numéro FT.
 3. **`Avancement`** (« En cours de raccordement ») est-il l'état de ligne côté opérateur ?
 4. **`Durée d'attente`** est-elle calculée (date d'envoi − date d'enregistrement) ou saisie ?
 5. **`Date previsionnelle de raccordement`** est-elle la date planifiée de l'installation, ou une date de campagne ?
@@ -66,7 +66,7 @@ Une **commande** par abonnement, clé **ID client** (ancien RAB ; une seule comm
 | `adresse` | `address_raw` | conservée telle quelle ; ville, commune, quartier, rue et précision sont découpés ensuite (`city`, `commune`, `district`, `street`, `address_detail`) |
 | `contact1`, `contact2` | `phone_1`, `phone_2` (+ `_raw`) | normalisés en `+225` + 10 chiffres ; le texte d'origine est gardé ; toute correction est signalée (`PhoneNumber`) |
 | `latitude`, `longitude` | `declared_latitude`, `declared_longitude` | GPS déclaré ; le GPS relevé sur le terrain est un autre champ |
-| `sous_plaque`, `pco` | `zone_id`, `pco_id` | rapprochés du réseau par leur code normalisé ; un code inconnu est signalé, jamais créé |
+| `sous_plaque`, `splitter`, `pco` | `zone_id`, `pco_id` | rapprochés du réseau par leur code normalisé ; un code inconnu est signalé, jamais créé ; le splitter du fichier est contrôlé contre celui du PCO (il n'est pas enregistré sur la commande) |
 | `sn_ont`, `ligne_fixe` | `ont_serial`, `fixed_line` | la box attribuée après l'étude ; texte, jamais un nombre |
 | `date_enregistrement`, `date_envoi` | `registered_at`, `sent_to_contractor_at` | vraies dates (les numéros de série Excel sont convertis) |
 | `etude_technique` | `initial_study_raw`, `initial_study` | « SANS PCO » = étude réalisée, « AVEC PCO » = étude à réaliser ; libellé inconnu proposé à la correspondance |
@@ -76,4 +76,4 @@ Une **commande** par abonnement, clé **ID client** (ancien RAB ; une seule comm
 
 Statut interne (`status`) : reçue → en étude → étudiée (faisable, non faisable, client absent) → installation programmée → installée, reportée ou échec → activée ; chaque changement écrit une ligne d'historique. Une commande dont l'étude initiale est « SANS PCO » démarre « étudiée (faisable) », « AVEC PCO » démarre « reçue ».
 
-**Pas encore construit** : l'import lui-même (analyse, écran de revue, validation), les écrans, les droits d'accès et les interventions.
+**Import (02/11)** : premier temps construit (`CustomerImportAnalyzer`, `POST /customer-imports` puis `GET /customer-imports/{lot}`) : chaque ligne est analysée, classée ok, à corriger ou refusée avec ses anomalies, sans rien créer. **Pas encore construit** : la revue à l'écran (exclure des lignes), la validation qui crée ou met à jour les commandes, les écrans et les interventions.

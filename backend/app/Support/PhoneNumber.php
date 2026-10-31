@@ -15,6 +15,8 @@ final class PhoneNumber
     public static function normalize(string|int|float|null $raw): array
     {
         $text = is_float($raw) && floor($raw) === $raw ? (string) (int) $raw : trim((string) $raw);
+        // Un nombre exporté par Excel peut arriver sous la forme « 707123456.0 ».
+        $text = preg_replace('/^(\d+)[.,]0+$/', '$1', $text) ?? $text;
         $digits = preg_replace('/\D+/', '', ltrim($text, '*+ ')) ?? '';
 
         if ($digits === '') {

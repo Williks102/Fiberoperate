@@ -50,7 +50,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/plaques", label: "Plaques", description: "Une plaque et tout ce qu'on y déploie : sous-plaques, SRO, splitters et PCO." },
       { href: "/sous-plaques", label: "Sous-plaques", description: "Ajouter ou corriger une sous-plaque.", roles: ["admin", "be_manager", "technician"], skills: ["drawing"] },
       { href: "/sro", label: "SRO", description: "Ajouter ou corriger une SRO : son numéro, son GPS et son départ de l'OLT.", roles: ["admin", "be_manager", "technician"], skills: ["drawing"] },
-      { href: "/splitters", label: "Splitters", description: "Ajouter ou corriger un splitter (JDV).", roles: ["admin", "be_manager", "technician"], skills: ["drawing"] },
+      { href: "/splitters", label: "Splitters", description: "Ajouter ou corriger un splitter.", roles: ["admin", "be_manager", "technician"], skills: ["drawing"] },
       { href: "/pco", label: "PCO", description: "Les boîtiers : chercher un PCO, voir son statut et ses coordonnées.", roles: ["admin", "be_manager", "technician"], skills: ["drawing", "survey"] },
       { href: "/olt", label: "OLT", description: "Les équipements de tête.", roles: ["admin", "dg", "dt", "supervisor", "coordinator", "be_manager"] },
     ],
