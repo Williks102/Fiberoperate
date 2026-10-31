@@ -18,7 +18,7 @@ export type Stage = "instances" | "raccordables" | "raccordes";
 const STATUSES: Record<Stage, { value: OrderStatusValue; label: string }[]> = {
   instances: [
     { value: "received", label: "Reçue" },
-    { value: "in_study", label: "En étude" },
+    { value: "in_study", label: "Étude programmée" },
     { value: "studied", label: "Étude sans client raccordable" },
   ],
   raccordables: [
