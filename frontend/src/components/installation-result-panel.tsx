@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { Field, inputClass } from "@/components/field";
 import { ApiError, apiFetch } from "@/lib/api";
+import { useAuth } from "@/lib/auth/auth-context";
 import { getToken } from "@/lib/auth/token";
+import { submitOperation } from "@/lib/offline/submit";
 import type { CustomerOrder } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
 
@@ -16,6 +18,7 @@ const RESULTS: { value: Result; label: string }[] = [
 
 /** Issue de la visite d'installation : installé, reporté ou en échec (motif obligatoire). La box est attribuée avant par le coordinateur. */
 export function InstallationResultPanel({ order, onDone }: { order: CustomerOrder; onDone: () => void }) {
+  const { user } = useAuth();
   const reasons = useApi<{ data: { id: string; label: string }[] }>("/customer-orders/outcome-reasons");
   const [result, setResult] = useState<Result | "">("");
   const [reasonId, setReasonId] = useState("");
@@ -31,19 +34,16 @@ export function InstallationResultPanel({ order, onDone }: { order: CustomerOrde
       return;
     }
     setBusy(true);
+    const payload = { result, reason_id: result === "installed" ? null : reasonId || null, observation: observation.trim() || null };
     try {
-      await apiFetch(
-        `/customer-orders/${order.id}/installation-result`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            result,
-            reason_id: result === "installed" ? null : reasonId || null,
-            observation: observation.trim() || null,
-          }),
-        },
-        getToken(),
-      );
+      if (user?.role === "technician") {
+        // Le technicien saisit sur le terrain : la saisie est gardée sur le téléphone puis envoyée, même si le réseau lâche.
+        const outcome = await submitOperation({ type: "installation.result", customer_order_id: order.id, payload, client_name: order.name });
+        if (outcome.state === "applied") onDone();
+        else if (outcome.state !== "queued") setErrors({ form: outcome.message });
+        return; // « en attente » : la fiche l'indique d'elle-même
+      }
+      await apiFetch(`/customer-orders/${order.id}/installation-result`, { method: "POST", body: JSON.stringify(payload) }, getToken());
       onDone();
     } catch (err) {
       if (err instanceof ApiError) {

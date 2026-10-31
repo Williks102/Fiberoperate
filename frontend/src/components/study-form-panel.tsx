@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { Field, inputClass } from "@/components/field";
 import { ApiError, apiFetch } from "@/lib/api";
+import { useAuth } from "@/lib/auth/auth-context";
 import { getToken } from "@/lib/auth/token";
+import { submitOperation } from "@/lib/offline/submit";
 import { useDebounced } from "@/lib/use-debounced";
 import type { CustomerOrder } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
@@ -25,6 +27,7 @@ const digits = (v: string) => v.replace(/\D/g, "");
 
 /** Formulaire d'étude : résultat, PCO de rattachement, poteaux par type, distance proposée (poteaux × écart), observations. */
 export function StudyFormPanel({ order, showInternal, onDone }: { order: CustomerOrder; showInternal: boolean; onDone: () => void }) {
+  const { user } = useAuth();
   const defaults = useApi<{ data: { pole_spacing_m: number; counted_pole_types: string[] } }>("/customer-orders/study-defaults");
   const [result, setResult] = useState<Result | "">("");
   const [pcoSearch, setPcoSearch] = useState("");
@@ -76,6 +79,13 @@ export function StudyFormPanel({ order, showInternal, onDone }: { order: Custome
     }
     setBusy(true);
     try {
+      if (user?.role === "technician") {
+        // Le technicien saisit sur le terrain : la saisie est gardée sur le téléphone puis envoyée, même si le réseau lâche.
+        const outcome = await submitOperation({ type: "study.result", customer_order_id: order.id, payload: body, client_name: order.name });
+        if (outcome.state === "applied") onDone();
+        else if (outcome.state !== "queued") setErrors({ form: outcome.message });
+        return; // « en attente » : la fiche l'indique d'elle-même
+      }
       await apiFetch(`/customer-orders/${order.id}/study-result`, { method: "POST", body: JSON.stringify(body) }, getToken());
       onDone();
     } catch (err) {

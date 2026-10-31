@@ -9,12 +9,15 @@ export function SyncStatus({
   syncing,
   lastSyncAt,
   error,
+  pending = 0,
   onRefresh,
 }: {
   online: boolean;
   syncing: boolean;
   lastSyncAt: string | null;
   error: string | null;
+  /** Résultats saisis sur ce téléphone et pas encore confirmés par le serveur. */
+  pending?: number;
   onRefresh: () => void;
 }) {
   return (
@@ -30,6 +33,11 @@ export function SyncStatus({
           Actualiser
         </button>
       </div>
+      {pending > 0 && (
+        <p className="text-sm font-medium text-amber-900">
+          {pending} résultat{pending > 1 ? "s" : ""} en attente d&apos;envoi : {pending > 1 ? "ils partiront" : "il partira"} automatiquement dès que le réseau est là.
+        </p>
+      )}
       {error && <p className="text-sm text-amber-900">{error}</p>}
     </div>
   );

@@ -3,11 +3,16 @@
 import Link from "next/link";
 import { AsyncList } from "@/components/async-list";
 import { SyncStatus } from "@/components/sync-status";
+import { UnsentOutcomes } from "@/components/unsent-outcomes";
 import { Badge } from "@/components/ui/badge";
 import { clientName, visitDay } from "@/lib/format";
+import { pendingOrderIds } from "@/lib/offline/outbox";
+import { useLive } from "@/lib/offline/use-live";
 import { useVisits } from "@/lib/offline/use-visits";
 import type { Visit } from "@/lib/types";
 import type { ApiState } from "@/lib/use-api";
+
+const NO_ORDERS: string[] = [];
 
 /**
  * Les visites du technicien : ses études et installations à faire, avec de quoi joindre le client et le retrouver.
@@ -15,6 +20,7 @@ import type { ApiState } from "@/lib/use-api";
  */
 export default function MesVisitesPage() {
   const { visits, lastSyncAt, syncing, error, online, refresh } = useVisits();
+  const pending = useLive(pendingOrderIds, NO_ORDERS);
 
   // Même habillage que les autres listes (squelettes, message vide, erreur), alimenté par la copie locale.
   const state: ApiState<{ data: Visit[] }> =
@@ -27,7 +33,9 @@ export default function MesVisitesPage() {
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">Mes visites</h1>
-      <SyncStatus online={online} syncing={syncing} lastSyncAt={lastSyncAt} error={visits && visits.length > 0 ? error : null} onRefresh={() => void refresh()} />
+      <SyncStatus online={online} syncing={syncing} lastSyncAt={lastSyncAt} error={visits && visits.length > 0 ? error : null} pending={pending.length} onRefresh={() => void refresh()} />
+
+      <UnsentOutcomes />
 
       <AsyncList state={state} reload={() => void refresh()} empty="Aucune visite prévue pour l'instant. Le coordinateur vous confiera les prochaines.">
         {(visits) => (
@@ -67,7 +75,9 @@ export default function MesVisitesPage() {
                         Appeler {phone}
                       </a>
                     ))}
-                    {online ? (
+                    {pending.includes(visit.order.id) ? (
+                      <span className="flex h-11 items-center rounded-lg bg-amber-50 px-4 text-sm font-medium text-amber-900">Résultat en attente d&apos;envoi</span>
+                    ) : online ? (
                       <Link href={`/clients/${visit.order.id}`} className="flex h-11 items-center rounded-lg bg-primary px-4 text-sm font-medium text-white hover:bg-primary-hover">
                         {visit.type === "study" ? "Saisir l'étude" : "Saisir l'installation"}
                       </Link>

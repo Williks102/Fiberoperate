@@ -11,6 +11,7 @@ import { ItemIcon, NavIcon } from "@/components/nav-icons";
 import { NotificationBell } from "@/components/notification-bell";
 import { MobileDrawer } from "@/components/mobile-drawer";
 import { useAuth } from "@/lib/auth/auth-context";
+import { SyncEngineRunner } from "@/components/sync-engine-runner";
 import { groupsFor, HOME, isActive, isGroupActive } from "@/lib/navigation";
 
 /** Mise en page connectée : barre latérale sur PC et tablette, barre du bas sur téléphone. */
@@ -19,6 +20,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeMenu = useCallback(() => {
     setMenuOpen(false);
@@ -39,8 +41,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const groups = groupsFor(user.role, user.skills);
   const logoutAndLeave = async () => {
-    await logout();
-    router.replace("/login");
+    try {
+      await logout();
+      setLogoutError(null);
+      router.replace("/login");
+    } catch (error) {
+      setLogoutError(error instanceof Error ? error.message : "Déconnexion impossible.");
+    }
   };
   // Entrée active : fond bleu clair, repère à gauche ; le texte seul ne porte jamais l'information (icône + libellé + état).
   const linkClass = (active: boolean) =>
@@ -48,6 +55,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-1 flex-col md:flex-row">
+      <SyncEngineRunner />
       <aside className="hidden w-60 shrink-0 flex-col border-r border-slate-200 bg-white md:flex">
         <div className="flex h-16 items-center border-b border-slate-100 px-4">
           <BrandName />
@@ -96,7 +104,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </span>
         </header>
 
-        <main className="mx-auto w-full max-w-6xl flex-1 p-4 pb-24 sm:p-6 md:pb-6">{children}</main>
+        <main className="mx-auto w-full max-w-6xl flex-1 p-4 pb-24 sm:p-6 md:pb-6">
+          {logoutError && (
+            <p role="alert" className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+              {logoutError}
+            </p>
+          )}
+          {children}
+        </main>
       </div>
 
       <BottomBar role={user.role} skills={user.skills} pathname={pathname} />
