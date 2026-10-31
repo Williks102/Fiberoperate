@@ -27,6 +27,15 @@ export interface OutcomeRow {
   seen: 0 | 1;
 }
 
+/** Un PCO gardé sur le poste pour choisir le rattachement d'une étude sans réseau (`search` : code sans séparateurs, pour chercher). */
+export interface PcoRow {
+  id: string;
+  code: string;
+  zone: string | null;
+  splitter: string | null;
+  search: string;
+}
+
 /** Données du poste : la copie locale des visites du technicien, et quelques réglages (dernier utilisateur, dernière mise à jour). */
 export interface MetaRow {
   key: string;
@@ -38,11 +47,13 @@ class TerrainDb extends Dexie {
   meta!: Table<MetaRow, string>;
   outbox!: Table<OutboxRow, string>;
   outcomes!: Table<OutcomeRow, string>;
+  pcos!: Table<PcoRow, string>;
 
   constructor() {
     super("ftth-terrain");
     this.version(1).stores({ visits: "id, planned_date", meta: "key" });
     this.version(2).stores({ visits: "id, planned_date", meta: "key", outbox: "client_uuid, occurred_at, customer_order_id", outcomes: "client_uuid, seen" });
+    this.version(3).stores({ visits: "id, planned_date", meta: "key", outbox: "client_uuid, occurred_at, customer_order_id", outcomes: "client_uuid, seen", pcos: "id" });
   }
 }
 

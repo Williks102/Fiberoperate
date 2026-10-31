@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Field, inputClass } from "@/components/field";
 import { ApiError, apiFetch } from "@/lib/api";
 import { useAuth } from "@/lib/auth/auth-context";
 import { getToken } from "@/lib/auth/token";
 import { submitOperation } from "@/lib/offline/submit";
+import { useLive } from "@/lib/offline/use-live";
+import { readStudyDefaults, searchPcos, type StudyDefaults } from "@/lib/offline/visits";
 import { useDebounced } from "@/lib/use-debounced";
 import type { CustomerOrder } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
@@ -23,12 +25,19 @@ const POLES = [
   { key: "metal_poles_to_install", label: "Métalliques à installer", type: "metal" },
 ] as const;
 
+type Choice = { id: string; code: string; zone: string | null; splitter: string | null };
+const NO_CHOICES: Choice[] = [];
+
 const digits = (v: string) => v.replace(/\D/g, "");
 
 /** Formulaire d'étude : résultat, PCO de rattachement, poteaux par type, distance proposée (poteaux × écart), observations. */
-export function StudyFormPanel({ order, showInternal, onDone }: { order: CustomerOrder; showInternal: boolean; onDone: () => void }) {
+export function StudyFormPanel({ order, showInternal, onDone }: { order: Pick<CustomerOrder, "id" | "name">; showInternal: boolean; onDone: () => void }) {
   const { user } = useAuth();
-  const defaults = useApi<{ data: { pole_spacing_m: number; counted_pole_types: string[] } }>("/customer-orders/study-defaults");
+  // Le technicien lit ses listes sur le téléphone (elles marchent sans réseau) ; les autres rôles, sur le serveur.
+  const onPhone = user?.role === "technician";
+  const remoteDefaults = useApi<{ data: StudyDefaults }>(onPhone ? null : "/customer-orders/study-defaults");
+  const localDefaults = useLive<StudyDefaults | null>(readStudyDefaults, null);
+  const defaults = onPhone ? localDefaults : remoteDefaults.status === "ok" ? remoteDefaults.data.data : null;
   const [result, setResult] = useState<Result | "">("");
   const [pcoSearch, setPcoSearch] = useState("");
   const [pco, setPco] = useState<{ id: string; code: string } | null>(null);
@@ -42,12 +51,15 @@ export function StudyFormPanel({ order, showInternal, onDone }: { order: Custome
   const [busy, setBusy] = useState(false);
   const q = useDebounced(pcoSearch.trim());
 
-  const spacing = defaults.status === "ok" ? defaults.data.data.pole_spacing_m : 50;
-  const counted = defaults.status === "ok" ? defaults.data.data.counted_pole_types : ["concrete", "metal"];
+  const spacing = defaults?.pole_spacing_m ?? 50;
+  const counted = defaults?.counted_pole_types ?? ["concrete", "metal"];
   const suggested = POLES.filter((p) => counted.includes(p.type)).reduce((sum, p) => sum + Number(digits(poles[p.key] ?? "") || 0), 0) * spacing;
   const shownDistance = distance ?? String(suggested);
 
-  const choices = useApi<{ data: { id: string; code: string; zone: string | null; splitter: string | null }[] }>(`/customer-orders/study-pcos?${new URLSearchParams(q ? { q } : {})}`);
+  const remoteChoices = useApi<{ data: Choice[] }>(onPhone ? null : `/customer-orders/study-pcos?${new URLSearchParams(q ? { q } : {})}`);
+  const searchLocal = useMemo(() => () => searchPcos(q), [q]);
+  const localChoices = useLive<Choice[]>(searchLocal, NO_CHOICES);
+  const choices = onPhone ? localChoices : remoteChoices.status === "ok" ? remoteChoices.data.data : NO_CHOICES;
 
   function locate() {
     navigator.geolocation?.getCurrentPosition(
@@ -134,9 +146,12 @@ export function StudyFormPanel({ order, showInternal, onDone }: { order: Custome
             <Field id="pco-search" label="PCO de rattachement" hint={pco ? `Choisi : ${pco.code}` : "Tapez le code (ex. FAY03 ou PCO001) puis touchez un PCO."} error={errors.pco_id}>
               <input id="pco-search" type="search" value={pcoSearch} onChange={(e) => setPcoSearch(e.target.value)} className={inputClass} aria-invalid={!!errors.pco_id} />
             </Field>
-            {choices.status === "ok" && (
+            {choices.length === 0 && onPhone && (
+              <p className="text-sm text-slate-700">Aucun PCO sur ce téléphone pour cette recherche. La liste se télécharge avec vos visites, quand le réseau est là.</p>
+            )}
+            {choices.length > 0 && (
               <ul className="max-h-48 space-y-1 overflow-y-auto">
-                {choices.data.data.map((c) => (
+                {choices.map((c) => (
                   <li key={c.id}>
                     <button type="button" onClick={() => setPco({ id: c.id, code: c.code })} className={`flex min-h-11 w-full items-center justify-between rounded-lg border px-3 text-left text-sm ${pco?.id === c.id ? "border-primary bg-primary-soft" : "border-slate-200"}`}>
                       <span className="font-medium">{c.code}</span>

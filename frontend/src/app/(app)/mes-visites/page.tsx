@@ -77,12 +77,10 @@ export default function MesVisitesPage() {
                     ))}
                     {pending.includes(visit.order.id) ? (
                       <span className="flex h-11 items-center rounded-lg bg-amber-50 px-4 text-sm font-medium text-amber-900">Résultat en attente d&apos;envoi</span>
-                    ) : online ? (
-                      <Link href={`/clients/${visit.order.id}`} className="flex h-11 items-center rounded-lg bg-primary px-4 text-sm font-medium text-white hover:bg-primary-hover">
+                    ) : (
+                      <Link href={`/mes-visites/saisie?visit=${visit.id}`} className="flex h-11 items-center rounded-lg bg-primary px-4 text-sm font-medium text-white hover:bg-primary-hover">
                         {visit.type === "study" ? "Saisir l'étude" : "Saisir l'installation"}
                       </Link>
-                    ) : (
-                      <span className="flex h-11 items-center rounded-lg bg-slate-100 px-4 text-sm text-slate-700">La saisie demande du réseau</span>
                     )}
                   </div>
                 </li>

@@ -4,10 +4,14 @@
 //   ou met plus de 4 secondes à répondre.
 // - jamais l'API (autre origine), jamais autre chose qu'un GET : les données de l'API (clients, visites) ne passent JAMAIS par ce
 //   cache, elles sont gardées dans IndexedDB par l'application et effacées à la déconnexion.
-const VERSION = "v2";
+const VERSION = "v3";
 const STATIC = `ftth-static-${VERSION}`;
 const PAGES = `ftth-pages-${VERSION}`;
 const SLOW_NETWORK_MS = 4000;
+
+// Écran de saisie d'une visite : une seule page pour toutes les visites (la visite se choisit par `?visit=`), donc la copie gardée
+// sert pour n'importe quelle visite, même jamais ouverte.
+const SHARED_PAGES = ["/mes-visites/saisie"];
 
 const OFFLINE_PAGE = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hors ligne</title>
 <style>body{font-family:system-ui,sans-serif;margin:0;display:grid;place-items:center;min-height:100vh;background:#f8fafc;color:#0f172a}main{max-width:22rem;padding:1.5rem;text-align:center}a{display:inline-block;margin-top:1rem;padding:.75rem 1.25rem;border-radius:.5rem;background:#0369a1;color:#fff;text-decoration:none}</style></head>
@@ -42,7 +46,8 @@ function offlineResponse(request) {
 
 async function networkFirst(event, request) {
   const cache = await caches.open(PAGES);
-  const cached = await cache.match(request, { ignoreVary: true });
+  const shared = SHARED_PAGES.includes(new URL(request.url).pathname);
+  const cached = await cache.match(request, { ignoreVary: true, ignoreSearch: shared });
 
   const network = fetch(request).then((response) => {
     if (response.ok) event.waitUntil(cache.put(request, response.clone()));

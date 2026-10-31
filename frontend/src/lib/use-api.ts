@@ -9,12 +9,14 @@ type Settled<T> = { key: string; data?: T; error?: string };
 export type ApiState<T> = { status: "loading" } | { status: "error"; message: string } | { status: "ok"; data: T };
 
 /** GET sur l'API avec états chargement / erreur / ok et nouvel essai. */
-export function useApi<T>(path: string): ApiState<T> & { reload: () => void } {
+/** `path` à `null` : rien n'est demandé (l'écran lit ses données ailleurs, par exemple sur le poste). */
+export function useApi<T>(path: string | null): ApiState<T> & { reload: () => void } {
   const [tick, setTick] = useState(0);
   const [settled, setSettled] = useState<Settled<T> | null>(null);
   const key = `${path}#${tick}`;
 
   useEffect(() => {
+    if (path === null) return;
     let cancelled = false;
     apiFetch<T>(path, {}, getToken())
       .then((data) => !cancelled && setSettled({ key, data }))

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 
 /** Pages à ouvrir une fois en ligne pour qu'elles soient disponibles sans réseau (le technicien n'a pas à les visiter d'abord). */
-const WARM_PAGES = ["/", "/mes-visites"];
+const WARM_PAGES = ["/", "/mes-visites", "/mes-visites/saisie"];
 const WARMED = "ftth.pages-warmed";
 
 export function ServiceWorkerRegister() {
