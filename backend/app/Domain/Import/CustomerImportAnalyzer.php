@@ -15,6 +15,7 @@ use App\Support\PhoneNumber;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * Analyse d'un fichier de clients (premier temps de l'import) : aucune commande n'est créée ni modifiée.
@@ -34,7 +35,34 @@ final class CustomerImportAnalyzer
         'sn_ont', 'ligne_fixe', 'date_enregistrement', 'date_envoi', 'etude_technique', 'distance', 'etat_ligne', 'commentaire',
     ];
 
+    /** Colonnes lues en plus du modèle quand le fichier vient de l'opérateur (fichier de suivi des instances). */
+    public const OPERATOR_COLUMNS = ['ville', 'commune', 'avancement', 'problemes', 'besoin_poteaux_beton', 'besoin_poteaux_metalliques'];
+
     public const REQUIRED = ['id_client', 'nom'];
+
+    /** En-têtes du fichier de l'opérateur (normalisés) → colonnes du modèle. */
+    public const ALIASES = [
+        'numero_abonnement' => 'id_client',
+        'nom_client' => 'nom',
+        'localisation' => 'adresse',
+        'latitude_client' => 'latitude',
+        'longitude_client' => 'longitude',
+        'zone_pco_sro_olt' => 'sous_plaque',
+        'jdv_hub' => 'splitter',
+        'distance_pco_client' => 'distance',
+        'besoin_en_poteau_betons' => 'besoin_poteaux_beton',
+        'besoin_en_poteau_metalliques' => 'besoin_poteaux_metalliques',
+        'etat_de_ligne' => 'etat_ligne',
+    ];
+
+    /** En-têtes à texte libre, reconnus par leur début. */
+    public const PREFIX_ALIASES = [
+        'date_d_enregistrement' => 'date_enregistrement',
+        'date_d_envoi' => 'date_envoi',
+        'avancement' => 'avancement',
+        'problemes' => 'problemes',
+        'commentaires' => 'commentaire',
+    ];
 
     /** @var Collection<string, Collection<int, Zone>> */
     private Collection $zones;
@@ -50,7 +78,7 @@ final class CustomerImportAnalyzer
 
     public static function parse(string $content): CsvTable
     {
-        return CsvTable::fromContent($content, self::COLUMNS, self::REQUIRED, self::MAX_ROWS);
+        return CsvTable::fromContent($content, [...self::COLUMNS, ...self::OPERATOR_COLUMNS], self::REQUIRED, self::MAX_ROWS, self::ALIASES, self::PREFIX_ALIASES, ignoreUnknown: true);
     }
 
     public function analyse(CsvTable $table, User $by, string $fileName): ImportBatch
@@ -76,8 +104,11 @@ final class CustomerImportAnalyzer
             $rows[] = ['line' => $row['line'], 'status' => $status, 'action' => $action, 'data' => $data, 'anomalies' => $anomalies];
         }
 
-        return DB::transaction(function () use ($by, $fileName, $counts, $rows) {
-            $batch = ImportBatch::create(['type' => 'customers', 'file_name' => $fileName, 'counts' => $counts + ['rows' => count($rows)], 'created_by' => $by->id]);
+        return DB::transaction(function () use ($by, $fileName, $counts, $rows, $table) {
+            $batch = ImportBatch::create([
+                'type' => 'customers', 'file_name' => $fileName, 'created_by' => $by->id,
+                'counts' => $counts + ['rows' => count($rows), 'ignored_columns' => $table->ignoredColumns],
+            ]);
             foreach (array_chunk($rows, 200) as $chunk) {
                 $batch->rows()->createMany($chunk);
             }
@@ -124,7 +155,10 @@ final class CustomerImportAnalyzer
             $add('error', 'Le nom est vide.');
         }
 
-        $data = ['customer_ref' => $ref, 'name' => $name, 'account_number' => $get('compte') ?: null, 'address_raw' => $get('adresse') ?: null];
+        $data = [
+            'customer_ref' => $ref, 'name' => $name, 'account_number' => $get('compte') ?: null, 'address_raw' => $get('adresse') ?: null,
+            'city' => $get('ville') ?: null, 'commune' => $get('commune') ?: null,
+        ];
 
         $ft = $get('ft');
         $data['ft_line'] = $ft ?: null;
@@ -162,7 +196,7 @@ final class CustomerImportAnalyzer
 
         [$data['declared_latitude'], $data['declared_longitude']] = $this->coordinates($get('latitude'), $get('longitude'), $add);
 
-        $this->network($data, $get('sous_plaque'), $get('splitter'), $get('pco'), $add);
+        $unlinked = $this->network($data, $get('sous_plaque'), $get('splitter'), $get('pco'), $add);
 
         $data['ont_serial'] = $get('sn_ont') ?: null;
         $fixed = preg_replace('/^(\d+)[.,]0+$/', '$1', $get('ligne_fixe')) ?? '';
@@ -193,7 +227,13 @@ final class CustomerImportAnalyzer
         }
 
         $data['operator_line_status'] = $get('etat_ligne') ?: null;
-        $data['observation'] = $get('commentaire') ?: null;
+        $data['observation'] = $this->observation($v, $unlinked);
+
+        // Un client déjà raccordé (avancement « raccordé ») est importé comme installé, pas comme à raccorder.
+        if (Str::ascii(mb_strtolower($get('avancement'))) === 'raccorde') {
+            $data['initial_status'] = 'installed';
+            $add('info', 'Avancement « raccordé » : le client sera importé comme déjà installé.');
+        }
 
         return [$data, $anomalies];
     }
@@ -203,6 +243,11 @@ final class CustomerImportAnalyzer
     {
         if ($lat === '' && $lon === '') {
             return [null, null];
+        }
+        // Les deux valeurs dans une seule cellule (« 5.845397;-5.475435 ») : lues, et signalées.
+        if ($lon === '' && preg_match('/^(-?\d+(?:[.,]\d+)?)\s*[;\s]\s*(-?\d+(?:[.,]\d+)?)$/', $lat, $m)) {
+            [$lat, $lon] = [$m[1], $m[2]];
+            $add('info', 'Latitude et longitude lues dans une seule cellule.');
         }
         $latitude = is_numeric($x = str_replace(',', '.', $lat)) ? (float) $x : null;
         $longitude = is_numeric($y = str_replace(',', '.', $lon)) ? (float) $y : null;
@@ -227,9 +272,11 @@ final class CustomerImportAnalyzer
      * Rattache la ligne au réseau (sous-plaque, PCO) et contrôle le splitter du fichier ; rien n'est créé.
      *
      * @param  array<string, mixed>  $data
+     * @return list<string> codes du fichier qui n'ont pu être rattachés au réseau (gardés dans l'observation)
      */
-    private function network(array &$data, string $zoneCode, string $splitter, string $pcoCode, callable $add): void
+    private function network(array &$data, string $zoneCode, string $splitter, string $pcoCode, callable $add): array
     {
+        $unlinked = [];
         $data['zone_id'] = null;
         $data['pco_id'] = null;
 
@@ -263,9 +310,15 @@ final class CustomerImportAnalyzer
 
         $data['pco_id'] = $pco?->id;
         $data['zone_id'] = $zone?->id ?? $pco?->zone_id;
+        if ($zoneCode !== '' && $zone === null) {
+            $unlinked[] = "Sous-plaque (fichier) : {$zoneCode}";
+        }
+        if ($pcoCode !== '' && $pco === null) {
+            $unlinked[] = "PCO (fichier) : {$pcoCode}";
+        }
 
         if ($splitter !== '' && $data['zone_id'] !== null) {
-            $wanted = CodeNormalizer::generic($splitter);
+            $wanted = CodeNormalizer::zone($splitter); // « HUB 01 » et « HUB001 » désignent le même splitter
             $actual = $pco?->jdv?->code_normalized;
             if ($pco !== null && $actual !== null && $actual !== $wanted) {
                 $add('warning', "Le splitter du fichier (« {$splitter} ») diffère de celui du PCO (« {$pco->jdv->code} »).");
@@ -273,6 +326,29 @@ final class CustomerImportAnalyzer
                 $add('warning', "Splitter « {$splitter} » inconnu dans cette sous-plaque.");
             }
         }
+
+        return $unlinked;
+    }
+
+    /**
+     * Observation de la commande : le commentaire du fichier, puis les colonnes de suivi de l'opérateur qui n'ont pas de champ
+     * propre (avancement, problèmes, besoin en poteaux) et les codes réseau qu'on n'a pas pu rattacher. Rien n'est perdu.
+     *
+     * @param  array<string, string>  $v
+     * @param  list<string>  $unlinked
+     */
+    private function observation(array $v, array $unlinked): ?string
+    {
+        $parts = array_filter([
+            $v['commentaire'] ?? '',
+            ($v['avancement'] ?? '') !== '' ? "Avancement : {$v['avancement']}" : '',
+            ($v['problemes'] ?? '') !== '' ? "Problèmes : {$v['problemes']}" : '',
+            ($v['besoin_poteaux_beton'] ?? '') !== '' ? "Besoin poteaux béton : {$v['besoin_poteaux_beton']}" : '',
+            ($v['besoin_poteaux_metalliques'] ?? '') !== '' ? "Besoin poteaux métalliques : {$v['besoin_poteaux_metalliques']}" : '',
+            ...$unlinked,
+        ], fn ($part) => $part !== '');
+
+        return $parts === [] ? null : implode(' · ', $parts);
     }
 
     /** Date ISO, jj/mm/aaaa ou numéro de série Excel ; une date illisible est signalée, jamais devinée. */

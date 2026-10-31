@@ -15,6 +15,7 @@ interface Counts {
   create: number;
   update: number;
   rows: number;
+  ignored_columns?: string[];
   result?: { created: number; updated: number; excluded: number; rejected: number };
 }
 
@@ -60,7 +61,7 @@ export function CustomerImport() {
       <div className="space-y-1">
         <h1 className="text-xl font-semibold">Importer les clients</h1>
         <p className="text-sm text-slate-700">
-          Un fichier CSV, une ligne par client. Rien n&apos;est créé avant votre validation ; un ID client déjà connu est mis à jour.{" "}
+          Le fichier des instances de l&apos;opérateur (CSV), tel quel, ou notre modèle. Une ligne par client. Rien n&apos;est créé avant votre validation ; un ID client déjà connu est mis à jour.{" "}
           <a href="/modeles-import/clients.csv" download className="underline">
             Télécharger le modèle
           </a>
@@ -164,6 +165,11 @@ function Review({ initial, onRestart }: { initial: Batch; onRestart: () => void 
         <p className="text-sm text-slate-700">
           Fichier <span className="font-medium text-ink">{batch.file_name}</span> · {counts.create} création(s), {counts.update} mise(s) à jour
         </p>
+        {counts.ignored_columns && counts.ignored_columns.length > 0 && (
+          <p className="text-sm text-slate-700">
+            <span className="font-medium text-ink">Colonnes non importées :</span> {counts.ignored_columns.join(", ")}. Vérifiez qu&apos;aucune colonne utile n&apos;y figure (un en-tête mal écrit serait ignoré).
+          </p>
+        )}
         <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {tiles.map(([label, value, color]) => (
             <div key={label} className="rounded-xl border border-slate-200 p-3">
