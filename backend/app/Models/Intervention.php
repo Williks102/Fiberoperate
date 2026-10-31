@@ -14,7 +14,7 @@ class Intervention extends Model
 {
     use HasUuids, SoftDeletes;
 
-    protected $fillable = ['client_uuid', 'type', 'customer_order_id', 'technician_id', 'planned_date', 'status', 'observation', 'created_by'];
+    protected $fillable = ['client_uuid', 'type', 'customer_order_id', 'technician_id', 'planned_date', 'status', 'observation', 'outcome', 'reason_id', 'created_by'];
 
     protected function casts(): array
     {
@@ -28,6 +28,11 @@ class Intervention extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(CustomerOrder::class, 'customer_order_id');
+    }
+
+    public function reason(): BelongsTo
+    {
+        return $this->belongsTo(OutcomeReason::class, 'reason_id');
     }
 
     public function technician(): BelongsTo

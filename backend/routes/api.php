@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\BlockReasonController;
 use App\Http\Controllers\Api\V1\CustomerImportController;
 use App\Http\Controllers\Api\V1\CustomerOrderController;
 use App\Http\Controllers\Api\V1\InstallationPlanningController;
+use App\Http\Controllers\Api\V1\InstallationResultController;
 use App\Http\Controllers\Api\V1\JdvController;
 use App\Http\Controllers\Api\V1\NetworkImportController;
 use App\Http\Controllers\Api\V1\NotificationController;
@@ -70,6 +71,8 @@ Route::prefix('v1')->group(function () {
         Route::get('customer-orders/installation-technicians', [InstallationPlanningController::class, 'technicians']);
         Route::post('customer-orders/{order}/study', [StudyPlanningController::class, 'store']);
         Route::post('customer-orders/{order}/installation', [InstallationPlanningController::class, 'store']);
+        Route::get('customer-orders/outcome-reasons', [InstallationResultController::class, 'reasons']);
+        Route::post('customer-orders/{order}/installation-result', [InstallationResultController::class, 'store']);
         Route::post('customer-orders/{order}/study-result', [StudyResultController::class, 'store']);
         Route::apiResource('customer-orders', CustomerOrderController::class)->only(['index', 'show']);
         Route::get('block-reasons', [BlockReasonController::class, 'index']);

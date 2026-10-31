@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { StudyFormPanel } from "@/components/study-form-panel";
+import { InstallationResultPanel } from "@/components/installation-result-panel";
 import { PlanningPanel } from "@/components/planning-panel";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -53,6 +54,9 @@ function Detail({ order, reload }: { order: CustomerOrder; reload: () => void })
   const planned = order.interventions?.find((i) => i.type === "study" && i.status === "planned");
   const readyForInstallation =
     order.status.value === "appointment_set" || order.status.value === "postponed" || order.status.value === "failed" || (order.status.value === "studied" && order.study_result === "feasible");
+  const plannedInstall = order.interventions?.find((i) => i.type === "customer_connection" && i.status === "planned");
+  const canRecordInstall =
+    order.status.value === "appointment_set" && !!plannedInstall && (canPlan || (user?.role === "technician" && plannedInstall.technician_id === user.id));
   const canRecord = order.status.value === "in_study" && !!planned && (canPlan || (user?.role === "technician" && planned.technician_id === user.id));
 
   return (
@@ -68,6 +72,8 @@ function Detail({ order, reload }: { order: CustomerOrder; reload: () => void })
       {canPlan && order.status.value === "received" && <PlanningPanel mode="study" order={order} onDone={reload} />}
 
       {canPlan && readyForInstallation && <PlanningPanel mode="installation" order={order} reprogram={order.status.value === "appointment_set"} onDone={reload} />}
+
+      {canRecordInstall && <InstallationResultPanel order={order} onDone={reload} />}
 
       {canRecord && <StudyFormPanel order={order} showInternal={canPlan} onDone={reload} />}
 
@@ -125,6 +131,8 @@ function Detail({ order, reload }: { order: CustomerOrder; reload: () => void })
             {order.interventions.map((i) => (
               <li key={i.id} className="text-sm">
                 <span className="font-medium">{i.type === "study" ? "Étude" : "Installation"}</span> · {formatDate(i.planned_date)} · {i.technician ?? "—"} · {i.status_label}
+                {i.outcome ? ` · ${i.outcome === "installed" ? "Installé" : i.outcome === "postponed" ? "Reporté" : "Échec"}` : ""}
+                {i.reason ? ` : ${i.reason}` : ""}
                 {i.observation ? <span className="block text-slate-700">{i.observation}</span> : null}
               </li>
             ))}

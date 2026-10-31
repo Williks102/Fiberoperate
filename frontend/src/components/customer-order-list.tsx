@@ -39,6 +39,28 @@ const TEXTS: Record<Stage, { title: string; empty: string }> = {
   raccordes: { title: "Suivi raccordement", empty: "Aucun client raccordé pour l'instant." },
 };
 
+/** Prochaine visite prévue, sinon motif du dernier report ou échec. */
+function Visit({ order }: { order: CustomerOrder }) {
+  const planned = order.interventions?.find((i) => i.status === "planned");
+  if (planned) {
+    return (
+      <p className="text-sm font-medium text-primary-ink">
+        {planned.type === "study" ? "Étude" : "Installation"} prévue le {formatDate(planned.planned_date)} · {planned.technician ?? "—"}
+      </p>
+    );
+  }
+  const missed = order.interventions?.find((i) => i.outcome === "postponed" || i.outcome === "failed");
+  if (missed?.reason) {
+    return (
+      <p className="text-sm font-medium text-amber-900">
+        {missed.outcome === "postponed" ? "Reportée" : "Échec"} : {missed.reason}
+      </p>
+    );
+  }
+
+  return null;
+}
+
 const STAGE_PAGES: Record<Stage, string> = { instances: "Instances", raccordables: "Raccordables", raccordes: "Suivi raccordement" };
 
 /** Recherche dans toutes les étapes : montre les clients trouvés ailleurs que dans la liste affichée, avec leur étape. */
@@ -153,11 +175,7 @@ export function CustomerOrderList({ stage }: { stage: Stage }) {
                       {order.customer_ref}
                       {order.phone_1 ? ` · ${order.phone_1}` : ""}
                     </p>
-                    {order.interventions?.[0] && (
-                      <p className="text-sm font-medium text-primary-ink">
-                        {order.interventions[0].type === "study" ? "Étude" : "Installation"} prévue le {formatDate(order.interventions[0].planned_date)} · {order.interventions[0].technician ?? "—"}
-                      </p>
-                    )}
+                    <Visit order={order} />
                     <p className="text-sm text-slate-700">
                       {order.pco ? `PCO ${order.pco.code}` : order.zone ? `Sous-plaque ${order.zone.code}` : "Pas encore rattaché à un PCO"}
                     </p>

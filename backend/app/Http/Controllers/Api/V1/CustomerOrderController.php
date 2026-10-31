@@ -30,14 +30,14 @@ class CustomerOrderController extends ApiResourceController
 
     protected function load(Model $model): Model
     {
-        return $model->load(['zone:id,code', 'pco:id,code', 'history.author:id,name', 'interventions.technician:id,name', 'studies']);
+        return $model->load(['zone:id,code', 'pco:id,code', 'history.author:id,name', 'interventions.technician:id,name', 'interventions.reason', 'studies']);
     }
 
     protected function filters(Request $request, Builder $query): void
     {
         $status = OrderStatus::tryFrom((string) $request->query('status'));
 
-        $query->with(['zone:id,code', 'pco:id,code', 'interventions' => fn ($q) => $q->where('status', 'planned')->with('technician:id,name')])
+        $query->with(['zone:id,code', 'pco:id,code', 'interventions' => fn ($q) => $q->where(fn ($w) => $w->where('status', 'planned')->orWhereIn('outcome', ['postponed', 'failed']))->with(['technician:id,name', 'reason'])])
             ->when($request->query('stage'), fn ($q, $stage) => $this->stage($q, (string) $stage))
             ->when($status, fn ($q) => $q->where('status', $status->value))
             ->when($request->query('zone_id'), fn ($q, $id) => $q->where('zone_id', $id))
