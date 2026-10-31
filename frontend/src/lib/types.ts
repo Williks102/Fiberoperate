@@ -173,6 +173,7 @@ export interface CustomerOrder {
   declared_longitude: string | null;
   distance_m: number | null;
   status: { value: OrderStatusValue; label: string };
+  stage: "instances" | "raccordables" | "raccordes";
   study_result: "feasible" | "not_feasible" | "customer_absent" | null;
   initial_study: "done" | "to_do" | null;
   initial_study_raw: string | null;

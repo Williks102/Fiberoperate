@@ -22,6 +22,7 @@ class CustomerOrderResource extends JsonResource
             'declared_longitude' => $this->declared_longitude,
             'distance_m' => $this->distance_m,
             'status' => ['value' => $this->status->value, 'label' => $this->status->label()],
+            'stage' => $this->stage(),
             'study_result' => $this->study_result?->value,
             'initial_study' => $this->initial_study?->value,
             'initial_study_raw' => $this->initial_study_raw,

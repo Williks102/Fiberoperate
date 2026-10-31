@@ -62,6 +62,17 @@ class CustomerOrder extends Model
         return $this->hasMany(OrderStatusHistory::class)->orderBy('created_at');
     }
 
+    /** Étape du raccordement : instances, raccordables ou raccordes (même découpage que le filtre `stage` de l'API). */
+    public function stage(): string
+    {
+        return match ($this->status) {
+            OrderStatus::Received, OrderStatus::InStudy => 'instances',
+            OrderStatus::Studied => $this->study_result === StudyResult::Feasible ? 'raccordables' : 'instances',
+            OrderStatus::AppointmentSet, OrderStatus::Postponed, OrderStatus::Failed => 'raccordables',
+            OrderStatus::Installed, OrderStatus::Activated => 'raccordes',
+        };
+    }
+
     /** Change le statut et écrit la ligne d'historique dans la même transaction (le statut n'est pas modifiable en masse). */
     public function changeStatus(OrderStatus $to, ?User $by = null, ?string $observation = null, ?string $device = null, ?StudyResult $result = null): OrderStatusHistory
     {
