@@ -38,7 +38,7 @@ class MyVisitsTest extends TestCase
     {
         $order = CustomerOrder::create(['customer_ref' => $ref, 'name' => "Client {$ref}"]);
         $order->changeStatus(OrderStatus::Studied, result: StudyResult::Feasible);
-        app(PlanInstallation::class)($order, $tech, now()->parse($date), $this->user(Role::Coordinator, "Coord {$ref}"));
+        app(PlanInstallation::class)($order, $tech, now()->parse($date), $this->user(Role::Coordinator, "Coord {$ref}"), "SN{$ref}", '27'.str_pad((string) crc32($ref), 8, '0'));
     }
 
     public function test_a_technician_sees_only_their_own_planned_visits_oldest_first(): void

@@ -22,7 +22,7 @@ class AssignBoxRequest extends FormRequest
 
     public function rules(): array
     {
-        return $this->boxRules(oneRequired: true);
+        return $this->boxRules();
     }
 
     public function messages(): array

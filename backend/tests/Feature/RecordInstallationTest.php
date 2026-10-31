@@ -35,7 +35,7 @@ class RecordInstallationTest extends TestCase
     {
         $order = CustomerOrder::create(['customer_ref' => $ref, 'name' => 'Koné Awa']);
         $order->changeStatus(OrderStatus::Studied, result: StudyResult::Feasible);
-        app(PlanInstallation::class)($order, $tech, now(), $this->user(Role::Coordinator, "Coord {$ref}"));
+        app(PlanInstallation::class)($order, $tech, now(), $this->user(Role::Coordinator, "Coord {$ref}"), 'SN'.$ref, '27'.str_pad((string) crc32($ref), 8, '0'));
 
         return $order->fresh();
     }
@@ -121,7 +121,7 @@ class RecordInstallationTest extends TestCase
             ->assertJsonPath('data.0.status.value', 'postponed')
             ->assertJsonPath('data.0.interventions.0.reason', 'Accès impossible');
 
-        $this->postJson("/api/v1/customer-orders/{$order->id}/installation", ['technician_id' => $tech->id, 'planned_date' => now()->addDay()->toDateString()])
+        $this->postJson("/api/v1/customer-orders/{$order->id}/installation", ['technician_id' => $tech->id, 'planned_date' => now()->addDay()->toDateString(), 'ont_serial' => 'SNRAB1', 'fixed_line' => '2721234567'])
             ->assertOk()->assertJsonPath('data.status.value', 'appointment_set');
         $this->assertSame(2, Intervention::count());
     }

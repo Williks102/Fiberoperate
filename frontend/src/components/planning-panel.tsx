@@ -119,10 +119,10 @@ export function PlanningPanel({ mode, order, reprogram = false, onDone }: { mode
         )}
         {mode === "installation" && (
           <>
-            <Field id="plan-ont" label="N° de série de l'ONT (la box)" error={errors.ont_serial}>
+            <Field id="plan-ont" label="N° de série de l'ONT (la box), obligatoire" error={errors.ont_serial}>
               <input id="plan-ont" value={ontSerial} onChange={(e) => setOntSerial(e.target.value)} autoCapitalize="characters" className={inputClass} aria-invalid={!!errors.ont_serial} />
             </Field>
-            <Field id="plan-fixed" label="Numéro fixe" hint="De 8 à 12 chiffres. La box peut aussi être attribuée plus tard." error={errors.fixed_line}>
+            <Field id="plan-fixed" label="Numéro fixe, obligatoire" hint="De 8 à 12 chiffres." error={errors.fixed_line}>
               <input id="plan-fixed" type="tel" inputMode="numeric" value={fixedLine} onChange={(e) => setFixedLine(e.target.value)} className={inputClass} aria-invalid={!!errors.fixed_line} />
             </Field>
           </>
@@ -133,7 +133,7 @@ export function PlanningPanel({ mode, order, reprogram = false, onDone }: { mode
           </Field>
         </div>
         <div className="sm:col-span-2">
-          <button type="submit" disabled={busy || technicianId === ""} className="h-11 rounded-lg bg-primary px-6 font-medium text-white hover:bg-primary-hover disabled:opacity-60">
+          <button type="submit" disabled={busy || technicianId === "" || (mode === "installation" && (ontSerial.trim() === "" || fixedLine.trim() === ""))} className="h-11 rounded-lg bg-primary px-6 font-medium text-white hover:bg-primary-hover disabled:opacity-60">
             {busy ? "Enregistrement…" : reprogram ? "Reprogrammer" : text.button}
           </button>
         </div>

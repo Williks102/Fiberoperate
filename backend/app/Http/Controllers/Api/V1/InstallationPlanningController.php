@@ -39,10 +39,10 @@ class InstallationPlanningController extends Controller
             User::query()->findOrFail($request->validated('technician_id')),
             Carbon::createFromFormat('Y-m-d', $request->validated('planned_date')),
             $request->user(),
-            $request->validated('observation'),
-            $request->validated('reason'),
             $request->validated('ont_serial'),
             $request->validated('fixed_line'),
+            $request->validated('observation'),
+            $request->validated('reason'),
         );
 
         return new CustomerOrderResource($model->fresh()->load(['zone:id,code', 'pco:id,code', 'history.author:id,name', 'interventions.technician:id,name', 'studies']));

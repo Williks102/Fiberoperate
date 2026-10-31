@@ -56,8 +56,8 @@ class AssignBoxTest extends TestCase
         foreach ([OrderStatus::AppointmentSet, OrderStatus::Postponed, OrderStatus::Failed] as $i => $status) {
             $order = CustomerOrder::create(['customer_ref' => "R{$i}", 'name' => 'Yao']);
             $order->changeStatus($status);
-            $this->putJson($this->url($order), ['ont_serial' => "SN{$i}"])->assertOk()->assertJsonPath('data.status.value', $status->value);
-            $this->putJson($this->url($order), ['fixed_line' => "2721234{$i}00"])->assertOk()->assertJsonPath('data.ont_serial', null);
+            $this->putJson($this->url($order), ['ont_serial' => "SN{$i}", 'fixed_line' => "2721234{$i}00"])->assertOk()->assertJsonPath('data.status.value', $status->value);
+            $this->putJson($this->url($order), ['ont_serial' => "SN{$i}B", 'fixed_line' => "2721234{$i}00"])->assertOk()->assertJsonPath('data.ont_serial', "SN{$i}B");
         }
     }
 
@@ -71,20 +71,22 @@ class AssignBoxTest extends TestCase
         $installed->changeStatus(OrderStatus::Installed);
 
         foreach ([$received, $notFeasible, $installed] as $order) {
-            $this->putJson($this->url($order), ['ont_serial' => 'SN1'])->assertUnprocessable()->assertJsonValidationErrors('status');
+            $this->putJson($this->url($order), ['ont_serial' => 'SN1', 'fixed_line' => '2721234567'])->assertUnprocessable()->assertJsonValidationErrors('status');
         }
         $this->assertNull($received->fresh()->ont_serial);
     }
 
-    public function test_a_serial_or_a_line_cannot_belong_to_two_clients_and_one_of_the_two_is_needed(): void
+    public function test_a_serial_or_a_line_cannot_belong_to_two_clients_and_both_are_mandatory(): void
     {
         Sanctum::actingAs($this->user(Role::Coordinator, 'Coord'));
         $first = $this->connectable('R1');
         $second = $this->connectable('R2');
         $this->putJson($this->url($first), ['ont_serial' => 'SN1', 'fixed_line' => '2721234567'])->assertOk();
 
-        $this->putJson($this->url($second), ['ont_serial' => 'SN1'])->assertUnprocessable()->assertJsonValidationErrors('ont_serial');
-        $this->putJson($this->url($second), ['fixed_line' => '2721234567'])->assertUnprocessable()->assertJsonValidationErrors('fixed_line');
+        $this->putJson($this->url($second), ['ont_serial' => 'SN1', 'fixed_line' => '2729999999'])->assertUnprocessable()->assertJsonValidationErrors('ont_serial');
+        $this->putJson($this->url($second), ['ont_serial' => 'SN2', 'fixed_line' => '2721234567'])->assertUnprocessable()->assertJsonValidationErrors('fixed_line');
+        $this->putJson($this->url($second), ['ont_serial' => 'SN2'])->assertUnprocessable()->assertJsonValidationErrors('fixed_line');
+        $this->putJson($this->url($second), ['fixed_line' => '2729999999'])->assertUnprocessable()->assertJsonValidationErrors('ont_serial');
         $this->putJson($this->url($second), [])->assertUnprocessable()->assertJsonValidationErrors(['ont_serial', 'fixed_line']);
         $this->putJson($this->url($second), ['fixed_line' => '123'])->assertUnprocessable()->assertJsonValidationErrors('fixed_line');
         $this->putJson($this->url($first), ['ont_serial' => 'SN1', 'fixed_line' => '2721234567'])->assertOk(); // son propre numéro : pas un doublon
@@ -98,7 +100,7 @@ class AssignBoxTest extends TestCase
 
         foreach ([$tech, $this->user(Role::Dg, 'DG'), $this->user(Role::Dt, 'DT'), $this->user(Role::Supervisor, 'Superviseur'), $this->user(Role::BeManager, 'BE')] as $other) {
             Sanctum::actingAs($other);
-            $this->putJson($this->url($order), ['ont_serial' => 'SN1'])->assertForbidden();
+            $this->putJson($this->url($order), ['ont_serial' => 'SN1', 'fixed_line' => '2721234567'])->assertForbidden();
         }
         $this->assertNull($order->fresh()->ont_serial);
     }
@@ -109,7 +111,7 @@ class AssignBoxTest extends TestCase
         $tech->skills()->create(['mission_type' => MissionType::CustomerConnection->value]);
         $coordinator = $this->user(Role::Coordinator, 'Coord');
         $order = $this->connectable();
-        app(PlanInstallation::class)($order, $tech, now(), $coordinator);
+        app(PlanInstallation::class)($order, $tech, now(), $coordinator, 'SN-OLD', '2700000000');
         Sanctum::actingAs($coordinator);
         $this->putJson($this->url($order), ['ont_serial' => 'SN9', 'fixed_line' => '2721234567'])->assertOk();
 

@@ -43,7 +43,11 @@ class PlanInstallationTest extends TestCase
 
     private function payload(User $tech, array $extra = []): array
     {
-        return ['technician_id' => $tech->id, 'planned_date' => now()->addDays(3)->toDateString()] + $extra;
+        static $n = 0;
+        $n++;
+
+        // La box (n° de série et numéro fixe) est obligatoire ; chaque appel en donne une différente (une box = un client).
+        return $extra + ['technician_id' => $tech->id, 'planned_date' => now()->addDays(3)->toDateString(), 'ont_serial' => "SN{$n}", 'fixed_line' => sprintf('27%08d', $n)];
     }
 
     public function test_coordinator_schedules_the_installation_of_a_connectable_client(): void
@@ -184,20 +188,35 @@ class PlanInstallationTest extends TestCase
         $this->assertStringContainsString('Box : SN ONT HWTC1234, ligne fixe 2721234567', $note);
     }
 
-    public function test_scheduling_without_a_box_keeps_the_box_already_given_and_checks_uniqueness(): void
+    public function test_the_box_is_mandatory_unique_and_well_formed(): void
     {
         Sanctum::actingAs($this->user(Role::Coordinator, 'Coord'));
         $tech = $this->user(Role::Technician, 'Tech', MissionType::CustomerConnection);
         $taken = $this->connectable('R0');
         $taken->forceFill(['ont_serial' => 'SN0', 'fixed_line' => '2721111111'])->save();
         $order = $this->connectable('R1');
-        $order->forceFill(['ont_serial' => 'SN1'])->save();
+        $date = now()->addDay()->toDateString();
 
+        $this->postJson($this->url($order), ['technician_id' => $tech->id, 'planned_date' => $date])->assertUnprocessable()->assertJsonValidationErrors(['ont_serial', 'fixed_line']);
+        $this->postJson($this->url($order), ['technician_id' => $tech->id, 'planned_date' => $date, 'ont_serial' => 'SN1'])->assertUnprocessable()->assertJsonValidationErrors('fixed_line');
+        $this->postJson($this->url($order), ['technician_id' => $tech->id, 'planned_date' => $date, 'fixed_line' => '2721234567'])->assertUnprocessable()->assertJsonValidationErrors('ont_serial');
         $this->postJson($this->url($order), $this->payload($tech, ['ont_serial' => 'SN0']))->assertUnprocessable()->assertJsonValidationErrors('ont_serial');
+        $this->postJson($this->url($order), $this->payload($tech, ['fixed_line' => '2721111111']))->assertUnprocessable()->assertJsonValidationErrors('fixed_line');
         $this->postJson($this->url($order), $this->payload($tech, ['fixed_line' => '12']))->assertUnprocessable()->assertJsonValidationErrors('fixed_line');
-        $this->assertSame(OrderStatus::Studied, $order->fresh()->status);
 
-        $this->postJson($this->url($order), $this->payload($tech))->assertOk()->assertJsonPath('data.ont_serial', 'SN1')->assertJsonPath('data.fixed_line', null);
-        $this->assertSame('SN1', $order->fresh()->ont_serial);
+        $this->assertSame(OrderStatus::Studied, $order->fresh()->status);
+        $this->assertSame(0, Intervention::count());
+    }
+
+    public function test_rescheduling_keeps_the_same_box_without_clashing_with_itself(): void
+    {
+        Sanctum::actingAs($this->user(Role::Coordinator, 'Coord'));
+        $tech = $this->user(Role::Technician, 'Tech', MissionType::CustomerConnection);
+        $order = $this->connectable();
+        $box = ['ont_serial' => 'SN77', 'fixed_line' => '2721234567'];
+        $this->postJson($this->url($order), $this->payload($tech, $box))->assertOk();
+
+        $this->postJson($this->url($order), $this->payload($tech, $box + ['reason' => 'Client absent']))->assertOk()
+            ->assertJsonPath('data.ont_serial', 'SN77');
     }
 }

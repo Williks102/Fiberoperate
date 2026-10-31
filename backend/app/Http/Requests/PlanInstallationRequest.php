@@ -22,7 +22,7 @@ class PlanInstallationRequest extends FormRequest
 
     public function rules(): array
     {
-        return $this->boxRules(oneRequired: false) + [
+        return $this->boxRules() + [
             'technician_id' => ['required', 'uuid', Rule::exists('users', 'id')],
             'planned_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:today'],
             'observation' => ['nullable', 'string', 'max:1000'],

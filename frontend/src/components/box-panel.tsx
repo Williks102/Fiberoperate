@@ -45,14 +45,14 @@ export function BoxPanel({ order, onDone }: { order: CustomerOrder; onDone: () =
         </p>
       )}
       <form onSubmit={submit} className="grid gap-3 sm:grid-cols-2" noValidate>
-        <Field id="ont-serial" label="N° de série de l'ONT" error={errors.ont_serial}>
+        <Field id="ont-serial" label="N° de série de l'ONT, obligatoire" error={errors.ont_serial}>
           <input id="ont-serial" value={ontSerial} onChange={(e) => setOntSerial(e.target.value)} autoCapitalize="characters" className={inputClass} aria-invalid={!!errors.ont_serial} />
         </Field>
-        <Field id="fixed-line" label="Numéro fixe" hint="De 8 à 12 chiffres." error={errors.fixed_line}>
+        <Field id="fixed-line" label="Numéro fixe, obligatoire" hint="De 8 à 12 chiffres." error={errors.fixed_line}>
           <input id="fixed-line" type="tel" inputMode="numeric" value={fixedLine} onChange={(e) => setFixedLine(e.target.value)} className={inputClass} aria-invalid={!!errors.fixed_line} />
         </Field>
         <div className="sm:col-span-2">
-          <button type="submit" disabled={busy || (ontSerial.trim() === "" && fixedLine.trim() === "")} className="h-11 rounded-lg bg-primary px-6 font-medium text-white hover:bg-primary-hover disabled:opacity-60">
+          <button type="submit" disabled={busy || ontSerial.trim() === "" || fixedLine.trim() === ""} className="h-11 rounded-lg bg-primary px-6 font-medium text-white hover:bg-primary-hover disabled:opacity-60">
             {busy ? "Enregistrement…" : assigned ? "Enregistrer la box" : "Attribuer la box"}
           </button>
         </div>
