@@ -200,3 +200,23 @@ export interface CustomerOrder {
   }[];
   history?: { from: OrderStatusValue | null; to: OrderStatusValue; to_label: string; observation: string | null; author: string | null; at: string | null }[];
 }
+
+export interface Visit {
+  id: string;
+  type: "study" | "customer_connection";
+  planned_date: string;
+  observation: string | null;
+  order: {
+    id: string;
+    customer_ref: string;
+    name: string;
+    phone_1: string | null;
+    phone_2: string | null;
+    address_raw: string | null;
+    declared_latitude: string | null;
+    declared_longitude: string | null;
+    status: OrderStatusValue;
+    zone: string | null;
+    pco: string | null;
+  };
+}

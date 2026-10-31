@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\CustomerOrderController;
 use App\Http\Controllers\Api\V1\InstallationPlanningController;
 use App\Http\Controllers\Api\V1\InstallationResultController;
 use App\Http\Controllers\Api\V1\JdvController;
+use App\Http\Controllers\Api\V1\MyVisitController;
 use App\Http\Controllers\Api\V1\NetworkImportController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\OltController;
@@ -65,6 +66,7 @@ Route::prefix('v1')->group(function () {
         Route::get('customer-imports/{batch}', [CustomerImportController::class, 'show']);
         Route::patch('customer-imports/{batch}/rows/{row}', [CustomerImportController::class, 'exclude']);
         Route::post('customer-imports/{batch}/validate', [CustomerImportController::class, 'validateBatch']);
+        Route::get('my-visits', [MyVisitController::class, 'index']);
         Route::get('customer-orders/study-technicians', [StudyPlanningController::class, 'technicians']);
         Route::get('customer-orders/study-defaults', [StudyResultController::class, 'defaults']);
         Route::get('customer-orders/study-pcos', [StudyResultController::class, 'pcos']);
