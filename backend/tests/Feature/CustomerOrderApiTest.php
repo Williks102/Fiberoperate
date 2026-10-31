@@ -46,7 +46,7 @@ class CustomerOrderApiTest extends TestCase
         $this->getJson('/api/v1/customer-orders')->assertOk()->assertJsonCount(2, 'data');
         $this->getJson('/api/v1/customer-orders?status=in_study')->assertOk()
             ->assertJsonCount(1, 'data')->assertJsonPath('data.0.customer_ref', 'RAB002')
-            ->assertJsonPath('data.0.status.label', 'En étude');
+            ->assertJsonPath('data.0.status.label', 'Étude programmée');
         $this->getJson('/api/v1/customer-orders?q=KONÉ')->assertJsonCount(1, 'data');
         $this->getJson('/api/v1/customer-orders?q=0707123456')->assertJsonCount(1, 'data')->assertJsonPath('data.0.name', 'Koné Awa');
         $this->getJson('/api/v1/customer-orders?q=rab002')->assertJsonCount(1, 'data');
@@ -59,7 +59,7 @@ class CustomerOrderApiTest extends TestCase
     {
         $this->login(Role::Coordinator);
         $this->order('R1', 'Nouveau');
-        $this->order('R2', 'En étude', OrderStatus::InStudy);
+        $this->order('R2', 'Client R2', OrderStatus::InStudy);
         $absent = $this->order('R3', 'Absent');
         $absent->changeStatus(OrderStatus::Studied, result: StudyResult::CustomerAbsent);
         $ok = $this->order('R4', 'Raccordable');
@@ -91,7 +91,7 @@ class CustomerOrderApiTest extends TestCase
 
         $this->getJson("/api/v1/customer-orders/{$order->id}")->assertOk()
             ->assertJsonPath('data.history.0.to', 'in_study')
-            ->assertJsonPath('data.history.0.to_label', 'En étude');
+            ->assertJsonPath('data.history.0.to_label', 'Étude programmée');
     }
 
     public function test_access_by_role_and_skill(): void
