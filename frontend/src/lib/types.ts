@@ -183,5 +183,6 @@ export interface CustomerOrder {
   observation: string | null;
   zone?: { id: string; code: string } | null;
   pco?: { id: string; code: string } | null;
+  interventions?: { id: string; type: string; status: string; status_label: string; planned_date: string; technician: string | null; observation: string | null }[];
   history?: { from: OrderStatusValue | null; to: OrderStatusValue; to_label: string; observation: string | null; author: string | null; at: string | null }[];
 }

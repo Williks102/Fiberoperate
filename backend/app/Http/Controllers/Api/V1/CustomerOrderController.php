@@ -30,7 +30,7 @@ class CustomerOrderController extends ApiResourceController
 
     protected function load(Model $model): Model
     {
-        return $model->load(['zone:id,code', 'pco:id,code', 'history.author:id,name']);
+        return $model->load(['zone:id,code', 'pco:id,code', 'history.author:id,name', 'interventions.technician:id,name']);
     }
 
     protected function filters(Request $request, Builder $query): void
