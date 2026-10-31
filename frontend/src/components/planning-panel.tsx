@@ -40,6 +40,8 @@ export function PlanningPanel({ mode, order, reprogram = false, onDone }: { mode
   const text = MODES[mode];
   const technicians = useApi<{ data: { id: string; name: string }[] }>(text.technicians);
   const [reason, setReason] = useState("");
+  const [ontSerial, setOntSerial] = useState(order.ont_serial ?? "");
+  const [fixedLine, setFixedLine] = useState(order.fixed_line ?? "");
   const [technicianId, setTechnicianId] = useState("");
   const [date, setDate] = useState(today());
   const [observation, setObservation] = useState("");
@@ -53,7 +55,7 @@ export function PlanningPanel({ mode, order, reprogram = false, onDone }: { mode
     try {
       await apiFetch(
         `/customer-orders/${order.id}/${text.endpoint}`,
-        { method: "POST", body: JSON.stringify({ technician_id: technicianId, planned_date: date, observation: observation.trim() || null, reason: reason.trim() || null }) },
+        { method: "POST", body: JSON.stringify({ technician_id: technicianId, planned_date: date, observation: observation.trim() || null, reason: reason.trim() || null, ...(mode === "installation" ? { ont_serial: ontSerial.trim() || null, fixed_line: fixedLine.trim() || null } : {}) }) },
         getToken(),
       );
       onDone();
@@ -114,6 +116,16 @@ export function PlanningPanel({ mode, order, reprogram = false, onDone }: { mode
               <input id="reason" value={reason} onChange={(e) => setReason(e.target.value)} className={inputClass} aria-invalid={!!errors.reason} />
             </Field>
           </div>
+        )}
+        {mode === "installation" && (
+          <>
+            <Field id="plan-ont" label="N° de série de l'ONT (la box)" error={errors.ont_serial}>
+              <input id="plan-ont" value={ontSerial} onChange={(e) => setOntSerial(e.target.value)} autoCapitalize="characters" className={inputClass} aria-invalid={!!errors.ont_serial} />
+            </Field>
+            <Field id="plan-fixed" label="Numéro fixe" hint="De 8 à 12 chiffres. La box peut aussi être attribuée plus tard." error={errors.fixed_line}>
+              <input id="plan-fixed" type="tel" inputMode="numeric" value={fixedLine} onChange={(e) => setFixedLine(e.target.value)} className={inputClass} aria-invalid={!!errors.fixed_line} />
+            </Field>
+          </>
         )}
         <div className="sm:col-span-2">
           <Field id="observation" label="Observation (facultatif)" error={errors.observation}>

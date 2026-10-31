@@ -166,4 +166,38 @@ class PlanInstallationTest extends TestCase
             ->assertJsonPath('data.0.interventions.0.technician', 'Tech Raccordement')
             ->assertJsonPath('data.0.interventions.0.status', 'planned');
     }
+
+    public function test_the_box_is_given_at_the_same_time_as_the_installation_is_scheduled(): void
+    {
+        Sanctum::actingAs($this->user(Role::Coordinator, 'Coord'));
+        $tech = $this->user(Role::Technician, 'Tech', MissionType::CustomerConnection);
+        $order = $this->connectable();
+
+        $this->postJson($this->url($order), $this->payload($tech, ['ont_serial' => 'hwtc 1234', 'fixed_line' => '27 21 23 45 67']))->assertOk()
+            ->assertJsonPath('data.status.value', 'appointment_set')
+            ->assertJsonPath('data.ont_serial', 'HWTC1234')
+            ->assertJsonPath('data.fixed_line', '2721234567')
+            ->assertJsonCount(2, 'data.history'); // une seule ligne pour la programmation et la box
+
+        $note = $order->fresh()->history()->get()->last()->observation;
+        $this->assertStringContainsString('Installation programmée : Tech', $note);
+        $this->assertStringContainsString('Box : SN ONT HWTC1234, ligne fixe 2721234567', $note);
+    }
+
+    public function test_scheduling_without_a_box_keeps_the_box_already_given_and_checks_uniqueness(): void
+    {
+        Sanctum::actingAs($this->user(Role::Coordinator, 'Coord'));
+        $tech = $this->user(Role::Technician, 'Tech', MissionType::CustomerConnection);
+        $taken = $this->connectable('R0');
+        $taken->forceFill(['ont_serial' => 'SN0', 'fixed_line' => '2721111111'])->save();
+        $order = $this->connectable('R1');
+        $order->forceFill(['ont_serial' => 'SN1'])->save();
+
+        $this->postJson($this->url($order), $this->payload($tech, ['ont_serial' => 'SN0']))->assertUnprocessable()->assertJsonValidationErrors('ont_serial');
+        $this->postJson($this->url($order), $this->payload($tech, ['fixed_line' => '12']))->assertUnprocessable()->assertJsonValidationErrors('fixed_line');
+        $this->assertSame(OrderStatus::Studied, $order->fresh()->status);
+
+        $this->postJson($this->url($order), $this->payload($tech))->assertOk()->assertJsonPath('data.ont_serial', 'SN1')->assertJsonPath('data.fixed_line', null);
+        $this->assertSame('SN1', $order->fresh()->ont_serial);
+    }
 }

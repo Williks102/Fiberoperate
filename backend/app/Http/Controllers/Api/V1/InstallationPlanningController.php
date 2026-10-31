@@ -41,6 +41,8 @@ class InstallationPlanningController extends Controller
             $request->user(),
             $request->validated('observation'),
             $request->validated('reason'),
+            $request->validated('ont_serial'),
+            $request->validated('fixed_line'),
         );
 
         return new CustomerOrderResource($model->fresh()->load(['zone:id,code', 'pco:id,code', 'history.author:id,name', 'interventions.technician:id,name', 'studies']));

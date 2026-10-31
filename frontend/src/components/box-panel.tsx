@@ -6,7 +6,7 @@ import { ApiError, apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth/token";
 import type { CustomerOrder } from "@/lib/types";
 
-/** Box du client : le coordinateur lui attribue le numéro de série de l'ONT et le numéro fixe, avant l'installation. */
+/** Box du client, une fois l'installation programmée : le coordinateur corrige le numéro de série de l'ONT et le numéro fixe (la box se donne à la programmation). */
 export function BoxPanel({ order, onDone }: { order: CustomerOrder; onDone: () => void }) {
   const [ontSerial, setOntSerial] = useState(order.ont_serial ?? "");
   const [fixedLine, setFixedLine] = useState(order.fixed_line ?? "");
@@ -38,7 +38,7 @@ export function BoxPanel({ order, onDone }: { order: CustomerOrder; onDone: () =
       <h2 id="box" className="text-lg font-semibold">
         {assigned ? "Box du client" : "Attribuer la box"}
       </h2>
-      <p className="text-sm text-slate-700">Le numéro de série de l&apos;ONT et le numéro fixe sont donnés au technicien avant l&apos;installation. Modifiables jusqu&apos;à l&apos;installation.</p>
+      <p className="text-sm text-slate-700">Donnée en même temps que la programmation de l&apos;installation ; corrigez-la ici si besoin, jusqu&apos;à l&apos;installation.</p>
       {(errors.form || errors.status) && (
         <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">
           {errors.form ?? errors.status}

@@ -22,13 +22,13 @@ use Illuminate\Validation\ValidationException;
  */
 class PlanInstallation
 {
-    public function __invoke(CustomerOrder $order, User $technician, CarbonInterface $date, User $by, ?string $observation = null, ?string $reason = null): Intervention
+    public function __invoke(CustomerOrder $order, User $technician, CarbonInterface $date, User $by, ?string $observation = null, ?string $reason = null, ?string $ontSerial = null, ?string $fixedLine = null): Intervention
     {
         if (! $technician->hasRole(Role::Technician) || ! $technician->is_active || ! $technician->hasSkill(MissionType::CustomerConnection)) {
             throw ValidationException::withMessages(['technician_id' => "Ce technicien n'est pas habilité au raccordement client."]);
         }
 
-        return DB::transaction(function () use ($order, $technician, $date, $by, $observation, $reason) {
+        return DB::transaction(function () use ($order, $technician, $date, $by, $observation, $reason, $ontSerial, $fixedLine) {
             $order = CustomerOrder::query()->lockForUpdate()->findOrFail($order->getKey());
             $reprogramming = $order->status === OrderStatus::AppointmentSet;
 
@@ -56,11 +56,15 @@ class PlanInstallation
                 'created_by' => $by->getKey(),
             ]);
 
+            // La box se donne en même temps que la programmation ; une valeur absente ne change pas celle déjà attribuée.
+            $order->forceFill(['ont_serial' => $ontSerial ?? $order->ont_serial, 'fixed_line' => $fixedLine ?? $order->fixed_line])->save();
+            $box = implode(', ', array_filter([$ontSerial ? "SN ONT {$ontSerial}" : null, $fixedLine ? "ligne fixe {$fixedLine}" : null]));
+
             $label = $reprogramming ? 'Installation reprogrammée' : 'Installation programmée';
             $order->changeStatus(
                 OrderStatus::AppointmentSet,
                 $by,
-                "{$label} : {$technician->name} le {$date->format('d/m/Y')}".($reprogramming ? " (motif : {$reason})" : ''),
+                "{$label} : {$technician->name} le {$date->format('d/m/Y')}".($reprogramming ? " (motif : {$reason})" : '').($box !== '' ? " · Box : {$box}" : ''),
             );
 
             return $intervention;
