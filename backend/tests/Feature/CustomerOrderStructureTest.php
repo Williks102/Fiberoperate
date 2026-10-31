@@ -61,7 +61,7 @@ class CustomerOrderStructureTest extends TestCase
         $order->changeStatus(OrderStatus::Studied, $user, 'Étude faite', 'tablette-3', StudyResult::Feasible);
 
         $history = $order->history()->get();
-        $this->assertSame([$history[0]->from_status === null ? 'received' : $history[0]->from_status->value, 'in_study'], [$history[0]->from_status->value, $history[0]->to_status->value]);
+        $this->assertSame([OrderStatus::Received, OrderStatus::InStudy], [$history[0]->from_status, $history[0]->to_status]);
         $this->assertSame([OrderStatus::InStudy, OrderStatus::Studied], $history->map->to_status->all());
         $this->assertSame('tablette-3', $history[1]->device);
         $this->assertSame($user->id, $history[1]->changed_by);
