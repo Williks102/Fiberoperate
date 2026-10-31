@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\DocumentType;
 use App\Enums\ProjectPhase;
 use App\Enums\Role;
 use App\Models\Project;
@@ -15,7 +16,7 @@ class ProjectPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(Role::Admin, Role::Dg, Role::Dt, Role::BeManager, Role::Supervisor);
+        return $user->hasRole(Role::Admin, Role::Dg, Role::Dt, Role::BeManager, Role::Supervisor) || $user->seesWholeNetwork();
     }
 
     public function view(User $user, Project $project): bool
@@ -27,6 +28,18 @@ class ProjectPolicy
     public function submit(User $user, Project $project): bool
     {
         return $project->phase === ProjectPhase::PreProject && ($user->hasRole(Role::Admin) || $user->isBeMember());
+    }
+
+    /** Documents du projet (plans, KMZ, AVP, justificatif) : tous ceux qui voient le projet, y compris le superviseur de la plaque. */
+    public function viewDocuments(User $user, Project $project): bool
+    {
+        return $this->view($user, $project);
+    }
+
+    /** Ajout d'une version : le BE et l'administrateur ; le DT seulement pour le justificatif d'accord du client. */
+    public function uploadDocument(User $user, Project $project, ?DocumentType $type = null): bool
+    {
+        return $user->hasRole(Role::Admin) || $user->isBeMember() || ($type === DocumentType::ClientProof && $user->hasRole(Role::Dt));
     }
 
     /** Devis du projet (prix, quantités) : direction, administration et BE ; pas le superviseur. */
