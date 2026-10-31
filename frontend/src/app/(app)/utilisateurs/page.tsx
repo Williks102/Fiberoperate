@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { AsyncList } from "@/components/async-list";
+import { inputClass } from "@/components/field";
 import { Pager } from "@/components/pager";
 import { useAuth } from "@/lib/auth/auth-context";
 import { MISSION_LABELS, ROLE_LABELS } from "@/lib/labels";
@@ -49,7 +50,7 @@ export default function UtilisateursPage() {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="h-11 w-full rounded-lg border border-slate-300 px-3 text-base"
+            className={inputClass}
           />
         </div>
         <div className="space-y-1 sm:w-56">
@@ -63,7 +64,7 @@ export default function UtilisateursPage() {
               setRole(e.target.value as "" | Role);
               setPage(1);
             }}
-            className="h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-base"
+            className={inputClass}
           >
             <option value="">Tous les rôles</option>
             {(Object.keys(ROLE_LABELS) as Role[]).map((r) => (
