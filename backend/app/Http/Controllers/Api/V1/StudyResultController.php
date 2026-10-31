@@ -45,6 +45,23 @@ class StudyResultController extends Controller
         ])]);
     }
 
+    /**
+     * Tous les PCO, en liste compacte et paginée : le téléphone du technicien les garde pour choisir le PCO de rattachement d'une
+     * étude sans réseau.
+     */
+    public function catalog(Request $request): JsonResponse
+    {
+        $this->authorize('viewAny', CustomerOrder::class);
+
+        $page = Pco::query()->with(['zone:id,code', 'jdv:id,code'])->orderBy('code_normalized')->orderBy('id')
+            ->paginate(min(max($request->integer('per_page', 500), 1), 1000));
+
+        return response()->json([
+            'data' => $page->getCollection()->map(fn (Pco $p) => ['id' => $p->id, 'code' => $p->code, 'zone' => $p->zone?->code, 'splitter' => $p->jdv?->code])->values(),
+            'meta' => ['current_page' => $page->currentPage(), 'last_page' => $page->lastPage(), 'total' => $page->total()],
+        ]);
+    }
+
     public function store(RecordStudyRequest $request, RecordStudy $recordStudy, string $order): CustomerOrderResource
     {
         $model = CustomerOrder::query()->findOrFail($order);

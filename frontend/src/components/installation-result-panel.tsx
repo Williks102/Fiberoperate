@@ -6,8 +6,12 @@ import { ApiError, apiFetch } from "@/lib/api";
 import { useAuth } from "@/lib/auth/auth-context";
 import { getToken } from "@/lib/auth/token";
 import { submitOperation } from "@/lib/offline/submit";
+import { useLive } from "@/lib/offline/use-live";
+import { readReasons, type OutcomeReason } from "@/lib/offline/visits";
 import type { CustomerOrder } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
+
+const NO_REASONS: OutcomeReason[] = [];
 
 type Result = "installed" | "postponed" | "failed";
 const RESULTS: { value: Result; label: string }[] = [
@@ -17,9 +21,12 @@ const RESULTS: { value: Result; label: string }[] = [
 ];
 
 /** Issue de la visite d'installation : installé, reporté ou en échec (motif obligatoire). La box est attribuée avant par le coordinateur. */
-export function InstallationResultPanel({ order, onDone }: { order: CustomerOrder; onDone: () => void }) {
+export function InstallationResultPanel({ order, onDone }: { order: Pick<CustomerOrder, "id" | "name">; onDone: () => void }) {
   const { user } = useAuth();
-  const reasons = useApi<{ data: { id: string; label: string }[] }>("/customer-orders/outcome-reasons");
+  // Le technicien lit les motifs sur le téléphone (ils marchent sans réseau) ; les autres rôles, sur le serveur.
+  const onPhone = user?.role === "technician";
+  const remoteReasons = useApi<{ data: OutcomeReason[] }>(onPhone ? null : "/customer-orders/outcome-reasons");
+  const localReasons = useLive<OutcomeReason[]>(readReasons, NO_REASONS);
   const [result, setResult] = useState<Result | "">("");
   const [reasonId, setReasonId] = useState("");
   const [observation, setObservation] = useState("");
@@ -57,7 +64,7 @@ export function InstallationResultPanel({ order, onDone }: { order: CustomerOrde
     }
   }
 
-  const list = reasons.status === "ok" ? reasons.data.data : [];
+  const list = onPhone ? localReasons : remoteReasons.status === "ok" ? remoteReasons.data.data : NO_REASONS;
 
   return (
     <section aria-labelledby="install-result" className="space-y-4 rounded-xl border border-slate-300 bg-white p-4">

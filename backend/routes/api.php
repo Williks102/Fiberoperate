@@ -71,6 +71,7 @@ Route::prefix('v1')->group(function () {
         Route::post('sync/push', [FieldSyncController::class, 'push']);
         Route::get('customer-orders/study-technicians', [StudyPlanningController::class, 'technicians']);
         Route::get('customer-orders/study-defaults', [StudyResultController::class, 'defaults']);
+        Route::get('customer-orders/pco-catalog', [StudyResultController::class, 'catalog']);
         Route::get('customer-orders/study-pcos', [StudyResultController::class, 'pcos']);
         Route::get('customer-orders/installation-technicians', [InstallationPlanningController::class, 'technicians']);
         Route::post('customer-orders/{order}/study', [StudyPlanningController::class, 'store']);

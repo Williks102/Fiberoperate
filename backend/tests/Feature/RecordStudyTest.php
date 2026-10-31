@@ -194,4 +194,20 @@ class RecordStudyTest extends TestCase
         Sanctum::actingAs($this->user(Role::Supervisor, 'Superviseur'));
         $this->getJson('/api/v1/customer-orders/study-pcos')->assertForbidden();
     }
+
+    public function test_the_pco_catalog_is_paginated_and_compact_for_the_offline_phone(): void
+    {
+        $this->pco('FAY03');
+        $this->pco('ABB01');
+        Sanctum::actingAs($this->user(Role::Technician, 'Tech', MissionType::Study));
+
+        $this->getJson('/api/v1/customer-orders/pco-catalog')->assertOk()
+            ->assertJsonCount(2, 'data')->assertJsonPath('meta.total', 2)->assertJsonPath('meta.last_page', 1)
+            ->assertJsonPath('data.0.zone', 'ABB01')->assertJsonPath('data.0.splitter', 'SPL001')
+            ->assertJsonMissingPath('data.0.latitude');
+        $this->getJson('/api/v1/customer-orders/pco-catalog?per_page=1&page=2')->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('meta.last_page', 2);
+
+        Sanctum::actingAs($this->user(Role::Supervisor, 'Superviseur'));
+        $this->getJson('/api/v1/customer-orders/pco-catalog')->assertForbidden();
+    }
 }
