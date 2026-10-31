@@ -5,6 +5,8 @@ import { Field, inputClass } from "@/components/field";
 import { ApiError, apiFetch } from "@/lib/api";
 import { useAuth } from "@/lib/auth/auth-context";
 import { getToken } from "@/lib/auth/token";
+import { PhotoCapture } from "@/components/photo-capture";
+import { attachPhotos } from "@/lib/offline/photos";
 import { submitOperation } from "@/lib/offline/submit";
 import { useLive } from "@/lib/offline/use-live";
 import { readReasons, type OutcomeReason } from "@/lib/offline/visits";
@@ -32,6 +34,7 @@ export function InstallationResultPanel({ order, onDone }: { order: Pick<Custome
   const [observation, setObservation] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [photoIds, setPhotoIds] = useState<string[]>([]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,12 +43,17 @@ export function InstallationResultPanel({ order, onDone }: { order: Pick<Custome
       setErrors({ result: "Indiquez le résultat de l'installation." });
       return;
     }
+    if (onPhone && photoIds.length === 0) {
+      setErrors({ photos: "Ajoutez au moins une photo : elle est obligatoire." });
+      return;
+    }
     setBusy(true);
     const payload = { result, reason_id: result === "installed" ? null : reasonId || null, observation: observation.trim() || null };
     try {
       if (user?.role === "technician") {
         // Le technicien saisit sur le terrain : la saisie est gardée sur le téléphone puis envoyée, même si le réseau lâche.
-        const outcome = await submitOperation({ type: "installation.result", customer_order_id: order.id, payload, client_name: order.name });
+        await attachPhotos(photoIds);
+        const outcome = await submitOperation({ type: "installation.result", customer_order_id: order.id, payload: { ...payload, photo_uuids: photoIds }, client_name: order.name });
         if (outcome.state === "applied") onDone();
         else if (outcome.state !== "queued") setErrors({ form: outcome.message });
         return; // « en attente » : la fiche l'indique d'elle-même
@@ -111,6 +119,15 @@ export function InstallationResultPanel({ order, onDone }: { order: Pick<Custome
         <Field id="install-observation" label="Observation (facultatif)" error={errors.observation}>
           <textarea id="install-observation" rows={2} value={observation} onChange={(e) => setObservation(e.target.value)} className={inputClass + " h-auto py-2"} />
         </Field>
+
+        {onPhone && <PhotoCapture
+            orderId={order.id}
+            onChange={(ids) => {
+              setPhotoIds(ids);
+              setErrors((current) => Object.fromEntries(Object.entries(current).filter(([key]) => key !== "photos"))); // la photo est prise : le rappel disparaît
+            }}
+            error={errors.photos}
+          />}
 
         <button type="submit" disabled={busy} className="h-11 rounded-lg bg-primary px-6 font-medium text-white hover:bg-primary-hover disabled:opacity-60">
           {busy ? "Enregistrement…" : "Enregistrer le résultat"}

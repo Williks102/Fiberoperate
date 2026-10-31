@@ -5,6 +5,7 @@ import { ApiError, apiFetch } from "@/lib/api";
 import type { User } from "@/lib/types";
 import { pushOutbox } from "@/lib/offline/engine";
 import { countPending } from "@/lib/offline/outbox";
+import { countPendingPhotos, uploadPendingPhotos } from "@/lib/offline/photos";
 import { clearLocalData, loadUser, saveUser } from "@/lib/offline/visits";
 import { clearToken, getToken, setToken } from "./token";
 
@@ -16,10 +17,10 @@ interface AuthState {
   logout: () => Promise<void>;
 }
 
-/** Des résultats saisis sur le terrain n'ont pas encore été envoyés : se déconnecter les effacerait. */
+/** Des résultats ou des photos du terrain n'ont pas encore été envoyés : se déconnecter les effacerait. */
 export class UnsentResultsError extends Error {
   constructor() {
-    super("Des résultats saisis sur ce téléphone n'ont pas encore été envoyés. Reconnectez-vous au réseau, puis réessayez.");
+    super("Des résultats ou des photos saisis sur ce téléphone n'ont pas encore été envoyés. Reconnectez-vous au réseau, puis réessayez.");
   }
 }
 
@@ -70,9 +71,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     // Jamais de déconnexion qui perdrait une saisie : on tente d'abord l'envoi, et on refuse s'il en reste.
-    if ((await countPending().catch(() => 0)) > 0) {
+    const unsent = async () => (await countPending().catch(() => 0)) + (await countPendingPhotos().catch(() => 0));
+    if ((await unsent()) > 0) {
       await pushOutbox().catch(() => {});
-      if ((await countPending().catch(() => 0)) > 0) throw new UnsentResultsError();
+      await uploadPendingPhotos().catch(() => {});
+      if ((await unsent()) > 0) throw new UnsentResultsError();
     }
     const token = getToken();
     clearToken();

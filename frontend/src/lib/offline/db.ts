@@ -36,6 +36,23 @@ export interface PcoRow {
   search: string;
 }
 
+/**
+ * Photo prise sur le terrain, gardée sur le téléphone jusqu'à son envoi à Cloudinary puis son enregistrement par l'API. Une photo
+ * n'est envoyée qu'une fois « rattachée » à un résultat saisi (sinon elle est jetée après un jour : photo abandonnée).
+ */
+export interface PhotoRow {
+  client_uuid: string;
+  customer_order_id: string;
+  blob: Blob;
+  width: number;
+  height: number;
+  hash: string;
+  taken_at: string;
+  attached: 0 | 1;
+  attempts: number;
+  last_error: string | null;
+}
+
 /** Données du poste : la copie locale des visites du technicien, et quelques réglages (dernier utilisateur, dernière mise à jour). */
 export interface MetaRow {
   key: string;
@@ -48,12 +65,14 @@ class TerrainDb extends Dexie {
   outbox!: Table<OutboxRow, string>;
   outcomes!: Table<OutcomeRow, string>;
   pcos!: Table<PcoRow, string>;
+  photos!: Table<PhotoRow, string>;
 
   constructor() {
     super("ftth-terrain");
     this.version(1).stores({ visits: "id, planned_date", meta: "key" });
     this.version(2).stores({ visits: "id, planned_date", meta: "key", outbox: "client_uuid, occurred_at, customer_order_id", outcomes: "client_uuid, seen" });
     this.version(3).stores({ visits: "id, planned_date", meta: "key", outbox: "client_uuid, occurred_at, customer_order_id", outcomes: "client_uuid, seen", pcos: "id" });
+    this.version(4).stores({ visits: "id, planned_date", meta: "key", outbox: "client_uuid, occurred_at, customer_order_id", outcomes: "client_uuid, seen", pcos: "id", photos: "client_uuid, attached" });
   }
 }
 

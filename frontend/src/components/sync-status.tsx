@@ -10,6 +10,7 @@ export function SyncStatus({
   lastSyncAt,
   error,
   pending = 0,
+  pendingPhotos = 0,
   onRefresh,
 }: {
   online: boolean;
@@ -18,6 +19,8 @@ export function SyncStatus({
   error: string | null;
   /** Résultats saisis sur ce téléphone et pas encore confirmés par le serveur. */
   pending?: number;
+  /** Photos prises sur ce téléphone et pas encore enregistrées par le serveur. */
+  pendingPhotos?: number;
   onRefresh: () => void;
 }) {
   return (
@@ -36,6 +39,11 @@ export function SyncStatus({
       {pending > 0 && (
         <p className="text-sm font-medium text-amber-900">
           {pending} résultat{pending > 1 ? "s" : ""} en attente d&apos;envoi : {pending > 1 ? "ils partiront" : "il partira"} automatiquement dès que le réseau est là.
+        </p>
+      )}
+      {pendingPhotos > 0 && (
+        <p className="text-sm font-medium text-amber-900">
+          {pendingPhotos} photo{pendingPhotos > 1 ? "s" : ""} en attente d&apos;envoi : {pendingPhotos > 1 ? "elles partiront" : "elle partira"} dès que le réseau est assez bon.
         </p>
       )}
       {error && <p className="text-sm text-amber-900">{error}</p>}
