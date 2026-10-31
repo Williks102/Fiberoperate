@@ -25,6 +25,8 @@ export function errorMessage(status: number, body: ErrorBody | null): string {
   // Seuls les refus métier de l'API (avec un code) sont déjà rédigés en français.
   if (status === 403 && body?.code && body.message) return body.message;
   if (status === 403) return "Vous n'avez pas le droit d'effectuer cette action.";
+  // Un 503 volontaire de l'API (fonction pas encore configurée, avec un code) est déjà rédigé en français.
+  if (status === 503 && body?.code && body.message) return body.message;
   const firstValidation = body?.errors ? Object.values(body.errors)[0]?.[0] : undefined;
   if (firstValidation) return firstValidation;
   if (status >= 500) return "Le serveur a rencontré un problème. Réessayez dans un instant.";

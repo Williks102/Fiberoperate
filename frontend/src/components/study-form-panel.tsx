@@ -5,7 +5,9 @@ import { Field, inputClass } from "@/components/field";
 import { ApiError, apiFetch } from "@/lib/api";
 import { useAuth } from "@/lib/auth/auth-context";
 import { getToken } from "@/lib/auth/token";
+import { attachPhotos } from "@/lib/offline/photos";
 import { submitOperation } from "@/lib/offline/submit";
+import { PhotoCapture } from "@/components/photo-capture";
 import { useLive } from "@/lib/offline/use-live";
 import { readStudyDefaults, searchPcos, type StudyDefaults } from "@/lib/offline/visits";
 import { useDebounced } from "@/lib/use-debounced";
@@ -49,6 +51,7 @@ export function StudyFormPanel({ order, showInternal, onDone }: { order: Pick<Cu
   const [position, setPosition] = useState<{ latitude: number; longitude: number } | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [photoIds, setPhotoIds] = useState<string[]>([]);
   const q = useDebounced(pcoSearch.trim());
 
   const spacing = defaults?.pole_spacing_m ?? 50;
@@ -89,11 +92,16 @@ export function StudyFormPanel({ order, showInternal, onDone }: { order: Pick<Cu
       for (const p of POLES) body[p.key] = Number(digits(poles[p.key] ?? "") || 0);
       body.distance_m = Number(digits(shownDistance) || 0);
     }
+    if (onPhone && photoIds.length === 0) {
+      setErrors({ photos: "Ajoutez au moins une photo : elle est obligatoire." });
+      return;
+    }
     setBusy(true);
     try {
       if (user?.role === "technician") {
         // Le technicien saisit sur le terrain : la saisie est gardée sur le téléphone puis envoyée, même si le réseau lâche.
-        const outcome = await submitOperation({ type: "study.result", customer_order_id: order.id, payload: body, client_name: order.name });
+        await attachPhotos(photoIds);
+        const outcome = await submitOperation({ type: "study.result", customer_order_id: order.id, payload: { ...body, photo_uuids: photoIds }, client_name: order.name });
         if (outcome.state === "applied") onDone();
         else if (outcome.state !== "queued") setErrors({ form: outcome.message });
         return; // « en attente » : la fiche l'indique d'elle-même
@@ -195,6 +203,15 @@ export function StudyFormPanel({ order, showInternal, onDone }: { order: Pick<Cu
             <textarea id="internal" rows={2} value={internal} onChange={(e) => setInternal(e.target.value)} className={inputClass + " h-auto py-2"} />
           </Field>
         )}
+
+        {onPhone && <PhotoCapture
+            orderId={order.id}
+            onChange={(ids) => {
+              setPhotoIds(ids);
+              setErrors((current) => Object.fromEntries(Object.entries(current).filter(([key]) => key !== "photos"))); // la photo est prise : le rappel disparaît
+            }}
+            error={errors.photos}
+          />}
 
         <div className="space-y-1.5">
           <button type="button" onClick={locate} className="h-11 rounded-lg border border-slate-300 px-4 text-sm font-medium">

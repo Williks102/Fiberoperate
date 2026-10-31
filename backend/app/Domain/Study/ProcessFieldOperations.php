@@ -143,6 +143,16 @@ class ProcessFieldOperations
             return [['conflict', 'NOT_ASSIGNED', "Cette visite n'est plus la vôtre (reprogrammée, confiée à un autre technicien ou déjà saisie) : votre saisie n'a pas été appliquée."], []];
         }
 
+        // Photo obligatoire pour toute étude et toute installation saisie sur le terrain (décision du client) : la saisie doit déclarer
+        // au moins une photo ; les photos elles-mêmes peuvent arriver après (envoi en arrière-plan, réseau faible).
+        $photos = Validator::make($op['payload'], ['photo_uuids' => ['required', 'array', 'min:1', 'max:6'], 'photo_uuids.*' => ['uuid']], [
+            'photo_uuids.required' => 'Une photo est obligatoire : ajoutez-en au moins une.',
+            'photo_uuids.min' => 'Une photo est obligatoire : ajoutez-en au moins une.',
+        ]);
+        if ($photos->fails()) {
+            return [['rejected', 'PHOTO_REQUIRED', $photos->errors()->first()], []];
+        }
+
         $validator = Validator::make($op['payload'], $isStudy ? ResultRules::study() : ResultRules::installation(), $isStudy ? ResultRules::studyMessages() : ResultRules::installationMessages());
         $validator->after(function ($validator) use ($op, $isStudy) {
             $payload = $op['payload'];

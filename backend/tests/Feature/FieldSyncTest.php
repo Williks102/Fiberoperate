@@ -73,7 +73,10 @@ class FieldSyncTest extends TestCase
 
     private function op(string $type, CustomerOrder $order, array $payload, array $extra = []): array
     {
-        return $extra + ['client_uuid' => (string) Str::uuid(), 'type' => $type, 'customer_order_id' => $order->id, 'occurred_at' => now()->subHours(3)->toIso8601String(), 'device' => 'Téléphone Koffi', 'payload' => $payload];
+        // Toute saisie du terrain déclare au moins une photo (obligatoire) ; un test qui veut tester l'absence la fournit à null.
+        $payload += ['photo_uuids' => [(string) Str::uuid()]];
+
+        return $extra + ['client_uuid' => (string) Str::uuid(), 'type' => $type, 'customer_order_id' => $order->id, 'occurred_at' => now()->subHours(3)->toIso8601String(), 'device' => 'Téléphone Koffi', 'payload' => array_filter($payload, fn ($v) => $v !== null)];
     }
 
     private function push(array ...$operations)
@@ -228,5 +231,33 @@ class FieldSyncTest extends TestCase
 
         $this->app['auth']->forgetGuards();
         $this->postJson('/api/v1/sync/push', ['operations' => [$op]])->assertUnauthorized();
+    }
+
+    public function test_a_field_result_without_a_photo_is_rejected_and_kept_for_both_studies_and_installations(): void
+    {
+        $study = $this->inStudy('PH1');
+        $install = $this->scheduled('PH2');
+        Sanctum::actingAs($this->tech);
+
+        $this->push(
+            $this->op('study.result', $study, ['result' => 'customer_absent', 'photo_uuids' => null]),
+            $this->op('installation.result', $install, ['result' => 'installed', 'photo_uuids' => []]),
+        )->assertOk()
+            ->assertJsonPath('data.0.status', 'rejected')->assertJsonPath('data.0.error_code', 'PHOTO_REQUIRED')
+            ->assertJsonPath('data.1.status', 'rejected')->assertJsonPath('data.1.error_code', 'PHOTO_REQUIRED');
+
+        $this->assertSame(OrderStatus::InStudy, $study->fresh()->status);
+        $this->assertSame(OrderStatus::AppointmentSet, $install->fresh()->status);
+        $this->assertSame(2, FieldOperation::where('status', 'rejected')->count(), 'la saisie est gardée, jamais perdue');
+    }
+
+    public function test_photos_must_be_uuids_and_at_most_six(): void
+    {
+        $order = $this->inStudy('PH3');
+        Sanctum::actingAs($this->tech);
+
+        $this->push($this->op('study.result', $order, ['result' => 'customer_absent', 'photo_uuids' => ['pas-un-uuid']]))->assertJsonPath('data.0.error_code', 'PHOTO_REQUIRED');
+        $this->push($this->op('study.result', $order, ['result' => 'customer_absent', 'photo_uuids' => array_map(fn () => (string) Str::uuid(), range(1, 7))]))->assertJsonPath('data.0.error_code', 'PHOTO_REQUIRED');
+        $this->push($this->op('study.result', $order, ['result' => 'customer_absent', 'photo_uuids' => array_map(fn () => (string) Str::uuid(), range(1, 6))]))->assertJsonPath('data.0.status', 'applied');
     }
 }

@@ -1,4 +1,5 @@
 import { pushOutbox } from "./engine";
+import { uploadPendingPhotos } from "./photos";
 import { enqueue, type NewOperation, type SubmitOutcome } from "./outbox";
 import { getDb } from "./db";
 
@@ -11,6 +12,8 @@ export async function submitOperation(operation: NewOperation): Promise<SubmitOu
   const row = await enqueue(operation);
 
   if (typeof navigator === "undefined" || navigator.onLine) await pushOutbox().catch(() => {});
+
+  void uploadPendingPhotos().catch(() => {}); // les photos partent en arrière-plan, sans faire attendre l'écran
 
   const db = getDb();
   if (await db.outbox.get(row.client_uuid)) return { state: "queued" };

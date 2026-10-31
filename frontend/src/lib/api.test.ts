@@ -15,6 +15,8 @@ describe("errorMessage", () => {
   });
 
   it("remplace le refus générique de Laravel (anglais) par un message français", () => {
+    expect(errorMessage(503, { message: "L'envoi de photos n'est pas encore configuré.", code: "PHOTOS_NOT_CONFIGURED" })).toBe("L'envoi de photos n'est pas encore configuré.");
+    expect(errorMessage(503, { message: "Service Unavailable" })).toBe("Le serveur a rencontré un problème. Réessayez dans un instant.");
     expect(errorMessage(403, { message: "This action is unauthorized." })).toBe("Vous n'avez pas le droit d'effectuer cette action.");
   });
 

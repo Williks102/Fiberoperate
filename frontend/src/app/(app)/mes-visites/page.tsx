@@ -7,6 +7,7 @@ import { UnsentOutcomes } from "@/components/unsent-outcomes";
 import { Badge } from "@/components/ui/badge";
 import { clientName, visitDay } from "@/lib/format";
 import { pendingOrderIds } from "@/lib/offline/outbox";
+import { countPendingPhotos } from "@/lib/offline/photos";
 import { useLive } from "@/lib/offline/use-live";
 import { useVisits } from "@/lib/offline/use-visits";
 import type { Visit } from "@/lib/types";
@@ -21,6 +22,7 @@ const NO_ORDERS: string[] = [];
 export default function MesVisitesPage() {
   const { visits, lastSyncAt, syncing, error, online, refresh } = useVisits();
   const pending = useLive(pendingOrderIds, NO_ORDERS);
+  const pendingPhotos = useLive(countPendingPhotos, 0);
 
   // Même habillage que les autres listes (squelettes, message vide, erreur), alimenté par la copie locale.
   const state: ApiState<{ data: Visit[] }> =
@@ -33,7 +35,7 @@ export default function MesVisitesPage() {
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">Mes visites</h1>
-      <SyncStatus online={online} syncing={syncing} lastSyncAt={lastSyncAt} error={visits && visits.length > 0 ? error : null} pending={pending.length} onRefresh={() => void refresh()} />
+      <SyncStatus online={online} syncing={syncing} lastSyncAt={lastSyncAt} error={visits && visits.length > 0 ? error : null} pending={pending.length} pendingPhotos={pendingPhotos} onRefresh={() => void refresh()} />
 
       <UnsentOutcomes />
 
