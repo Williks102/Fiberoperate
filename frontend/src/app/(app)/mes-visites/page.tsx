@@ -2,20 +2,34 @@
 
 import Link from "next/link";
 import { AsyncList } from "@/components/async-list";
+import { SyncStatus } from "@/components/sync-status";
 import { Badge } from "@/components/ui/badge";
 import { clientName, visitDay } from "@/lib/format";
-import type { Paged, Visit } from "@/lib/types";
-import { useApi } from "@/lib/use-api";
+import { useVisits } from "@/lib/offline/use-visits";
+import type { Visit } from "@/lib/types";
+import type { ApiState } from "@/lib/use-api";
 
-/** Les visites du technicien : ses études et installations à faire, avec de quoi joindre le client et le retrouver. */
+/**
+ * Les visites du technicien : ses études et installations à faire, avec de quoi joindre le client et le retrouver.
+ * Elles sont lues sur le téléphone : elles restent visibles sans réseau, avec l'heure de la dernière mise à jour.
+ */
 export default function MesVisitesPage() {
-  const { reload, ...state } = useApi<Paged<Visit>>("/my-visits?per_page=100");
+  const { visits, lastSyncAt, syncing, error, online, refresh } = useVisits();
+
+  // Même habillage que les autres listes (squelettes, message vide, erreur), alimenté par la copie locale.
+  const state: ApiState<{ data: Visit[] }> =
+    visits === null
+      ? { status: "loading" }
+      : visits.length === 0 && lastSyncAt === null && error
+        ? { status: "error", message: `${error} Ouvrez l'application une première fois avec du réseau pour charger vos visites.` }
+        : { status: "ok", data: { data: visits } };
 
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">Mes visites</h1>
+      <SyncStatus online={online} syncing={syncing} lastSyncAt={lastSyncAt} error={visits && visits.length > 0 ? error : null} onRefresh={() => void refresh()} />
 
-      <AsyncList state={state} reload={reload} empty="Aucune visite prévue pour l'instant. Le coordinateur vous confiera les prochaines.">
+      <AsyncList state={state} reload={() => void refresh()} empty="Aucune visite prévue pour l'instant. Le coordinateur vous confiera les prochaines.">
         {(visits) => (
           <ul className="space-y-3">
             {visits.map((visit) => {
@@ -53,9 +67,13 @@ export default function MesVisitesPage() {
                         Appeler {phone}
                       </a>
                     ))}
-                    <Link href={`/clients/${visit.order.id}`} className="flex h-11 items-center rounded-lg bg-primary px-4 text-sm font-medium text-white hover:bg-primary-hover">
-                      {visit.type === "study" ? "Saisir l'étude" : "Saisir l'installation"}
-                    </Link>
+                    {online ? (
+                      <Link href={`/clients/${visit.order.id}`} className="flex h-11 items-center rounded-lg bg-primary px-4 text-sm font-medium text-white hover:bg-primary-hover">
+                        {visit.type === "study" ? "Saisir l'étude" : "Saisir l'installation"}
+                      </Link>
+                    ) : (
+                      <span className="flex h-11 items-center rounded-lg bg-slate-100 px-4 text-sm text-slate-700">La saisie demande du réseau</span>
+                    )}
                   </div>
                 </li>
               );
