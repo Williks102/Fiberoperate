@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ProjectKind;
 use App\Enums\ProjectPhase;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -22,7 +23,7 @@ class Project extends Model
 
     protected function casts(): array
     {
-        return ['phase' => ProjectPhase::class, 'phase_changed_at' => 'datetime'];
+        return ['phase' => ProjectPhase::class, 'kind' => ProjectKind::class, 'phase_changed_at' => 'datetime'];
     }
 
     public function plaque(): BelongsTo
@@ -39,7 +40,10 @@ class Project extends Model
     public static function startFor(Plaque $plaque, User $by): self
     {
         return DB::transaction(function () use ($plaque, $by) {
+            // Un projet sur une plaque déjà déployée (un projet précédent existe) est une désaturation.
+            $kind = self::query()->where('plaque_id', $plaque->id)->exists() ? ProjectKind::Desaturation : ProjectKind::Deployment;
             $project = self::create(['plaque_id' => $plaque->id]);
+            $project->forceFill(['kind' => $kind]);
             $project->forceFill(['phase_changed_at' => now()])->save();
             $project->history()->create(['from_phase' => null, 'to_phase' => ProjectPhase::PreProject, 'changed_by' => $by->id]);
 

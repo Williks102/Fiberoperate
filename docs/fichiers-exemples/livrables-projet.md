@@ -43,7 +43,7 @@ Feuille « BON MATERIEL » : formulaire du client (« Demande Sortie Matériel �
 
 Les quantités suivent le réseau : **38 boîtiers PCO de 8 ports** pour 38 PCO, 45 mini-modules splitter 1:8, câbles aériens, boîtes d'épissure, feuillard et boucles inox, pinces d'ancrage, étiquettes.
 
-Feuille masquée « BOM » : suivi par SRO (`SRO N° : ABB02`), avec par colonnes `D01`…`D04` et `T01`…`T03` (sous le titre « TRANSPORT » pour les `T`) : **quantité totale, réalisé, restant, %**. Les `D` ressemblent à de la **distribution** et les `T` à du **transport** : cela remet en cause la note « D = division » de `CLAUDE.md` (à confirmer).
+Feuille masquée « BOM » : suivi par SRO (`SRO N° : ABB02`), avec par colonnes `D01`…`D04` et `T01`…`T03` (sous le titre « TRANSPORT » pour les `T`) : **quantité totale, réalisé, restant, %**. Le client a précisé que `D` et `T` ne sont **ni distribution ni transport** : la note « D = division » de `CLAUDE.md` reste en vigueur, le sens de `T` reste inconnu.
 
 Conséquence : c'est le sujet du **lot 7 (matériel et stock)**, à ne pas anticiper : demande de sortie par sous-plaque, livré / restant.
 
@@ -53,7 +53,7 @@ Format AutoCAD : l'application ne le lit pas (ni la lecture ni l'aperçu). Il es
 ## Réponses du client (31/10/2026)
 - **`SPL/TR05` est la SRO** de la sous-plaque : le code d'une SRO n'est donc pas toujours de la forme `ABB456` (ici avec une barre oblique). Le champ reste libre.
 - **`PEP01` et `PEP02`** : à ignorer pour l'instant.
-- **Une sous-plaque peut avoir une ancienne SRO et en recevoir une nouvelle** (cas du projet de désaturation) : le lien « une SRO par sous-plaque » devra s'assouplir (plusieurs SRO par sous-plaque, et chaque splitter rattaché à la sienne). Pas encore construit : voir la question 1 ci-dessous.
+- **Désaturation (31/10)** : c'est **un nouveau projet sur la même plaque**, ouvert une fois le précédent en exploitation. Une sous-plaque peut donc avoir une ancienne SRO et en recevoir une nouvelle. En réalité, **on laisse un port de la SRO vide** pour ce déploiement futur. Construit : plusieurs projets par plaque (un seul en cours). **Pas encore construit** : plusieurs SRO par sous-plaque, rattachement de chaque splitter à sa SRO, et suivi des ports libres de la SRO.
 - **Le catalogue de prix est commun à tous les projets.**
 
 ## Constats sur le bordereau (à la lecture du fichier)
@@ -62,7 +62,6 @@ Format AutoCAD : l'application ne le lit pas (ni la lecture ni l'aperçu). Il es
 - Cinq lignes n'ont pas de prix unitaire.
 
 ## Questions ouvertes
-1. **Désaturation** : le projet de désaturation d'une SRO sur une plaque déjà déployée est-il un **nouveau projet sur la même plaque** (aujourd'hui, une plaque n'a qu'un projet) ? La nouvelle SRO reprend-elle une partie des PCO de l'ancienne ?
-2. **Lettres `D` et `T`** du fichier de matériel : distribution et transport ?
+1. **Désaturation** : la nouvelle SRO reprend-elle une partie des PCO de l'ancienne ? Faut-il suivre les **ports libres** d'une SRO (combien de ports, lesquels sont réservés) ?
+2. **Lettre `T`** du fichier de matériel : que désigne-t-elle ?
 3. **Mise à jour du catalogue** : qui le fait, à quelle fréquence ? (réservé à l'administrateur dans l'application).
-4. **Taille d'un DWG** et durée de conservation des versions.

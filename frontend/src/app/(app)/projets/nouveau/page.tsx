@@ -37,8 +37,11 @@ export default function NouveauProjetPage() {
   const projects = useApi<Paged<Project>>("/projects?per_page=100");
   const olts = useApi<Paged<Olt>>("/olts?per_page=100");
   // Une plaque qui a déjà un projet n'est plus proposée (l'API le refuserait de toute façon).
-  const taken = new Set(projects.status === "ok" ? projects.data.data.map((p) => p.plaque_id) : []);
-  const freePlaques = plaques.status === "ok" ? plaques.data.data.filter((p) => !taken.has(p.id)) : [];
+  const allProjects = projects.status === "ok" ? projects.data.data : [];
+  // Une plaque a un seul projet en cours ; une fois le précédent en exploitation, on peut en ouvrir un autre (désaturation).
+  const busy = new Set(allProjects.filter((p) => p.phase !== "in_operation").map((p) => p.plaque_id));
+  const deployed = new Set(allProjects.map((p) => p.plaque_id));
+  const freePlaques = plaques.status === "ok" ? plaques.data.data.filter((p) => !busy.has(p.id)) : [];
   const setRow = (i: number, patch: Partial<ZoneRow>) => setRows((prev) => prev.map((r, j) => (j === i ? { ...r, ...patch } : r)));
 
   async function onSubmit(event: React.FormEvent) {
@@ -96,17 +99,19 @@ export default function NouveauProjetPage() {
         {existing ? (
           <section className="space-y-3">
             <h2 className="text-base font-semibold">Plaque existante</h2>
-            <Field id="plaque" label="Plaque sans projet" error={errors.plaque_id?.[0]}>
+            <p className="text-sm text-zinc-700">Une plaque déjà déployée reçoit un projet de désaturation, une fois son projet précédent en exploitation.</p>
+            <Field id="plaque" label="Plaque" error={errors.plaque_id?.[0]}>
               <select id="plaque" value={plaqueId} onChange={(e) => setPlaqueId(e.target.value)} className={inputClass} required>
                 <option value="">Choisir une plaque</option>
                 {freePlaques.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
+                    {deployed.has(p.id) ? " (désaturation)" : ""}
                   </option>
                 ))}
               </select>
             </Field>
-            {plaques.status === "ok" && projects.status === "ok" && freePlaques.length === 0 && <p className="text-sm text-zinc-700">Toutes les plaques ont déjà un projet.</p>}
+            {plaques.status === "ok" && projects.status === "ok" && freePlaques.length === 0 && <p className="text-sm text-zinc-700">Toutes les plaques ont un projet en cours.</p>}
             <button type="button" onClick={() => setExisting(false)} className="h-11 rounded-lg border border-zinc-300 px-4 text-sm font-medium">
               Créer une nouvelle plaque
             </button>

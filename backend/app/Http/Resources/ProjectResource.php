@@ -34,6 +34,8 @@ class ProjectResource extends JsonResource
                     ],
                 ])->values(),
             ] : null),
+            'kind' => $this->kind->value,
+            'kind_label' => $this->kind->label(),
             'phase' => $this->phase->value,
             // Actions du circuit de validation permises à l'utilisateur dans la phase courante (fiche seulement).
             'actions' => $this->whenLoaded('history', fn () => [

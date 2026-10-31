@@ -137,6 +137,9 @@ export interface ProjectNetwork {
 
 export interface Project {
   id: string;
+  /** Déploiement d'une plaque, ou désaturation (nouveau projet sur une plaque déjà déployée). */
+  kind: "deployment" | "desaturation";
+  kind_label: string;
   plaque_id: string;
   plaque: { id: string; name: string } | null;
   phase: ProjectPhase;

@@ -52,7 +52,7 @@ class ProjectsApiTest extends TestCase
         Project::startFor($plaque, User::first());
 
         $this->postJson('/api/v1/projects', ['plaque_id' => $plaque->id])
-            ->assertStatus(422)->assertJsonPath('errors.plaque_id.0', 'Cette plaque a déjà un projet.');
+            ->assertStatus(422)->assertJsonPath('errors.plaque_id.0', 'Cette plaque a déjà un projet en cours : le suivant (désaturation) s\'ouvre une fois le précédent en exploitation.');
         $this->postJson('/api/v1/projects', [])->assertStatus(422)->assertJsonValidationErrors('plaque_id');
         $this->postJson('/api/v1/projects', ['plaque_id' => '019a0000-0000-7000-8000-000000000000'])->assertStatus(422);
         $this->assertSame(1, Project::count());
@@ -194,5 +194,27 @@ class ProjectsApiTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.network.zones.0.pcos', 4)
             ->assertJsonPath('data.network.zones.0.progress', ['to_pull' => 1, 'pulled' => 1, 'spliced' => 1, 'activated' => 1, 'measured' => 1]);
+    }
+
+    public function test_a_desaturation_is_a_new_project_on_a_plaque_once_the_previous_one_is_in_operation(): void
+    {
+        $this->login(Role::BeManager);
+        $plaque = Plaque::create(['name' => 'FAYA']);
+
+        $first = $this->postJson('/api/v1/projects', ['plaque_id' => $plaque->id])->assertCreated()->assertJsonPath('data.kind', 'deployment')->assertJsonPath('data.kind_label', 'Déploiement');
+        $this->postJson('/api/v1/projects', ['plaque_id' => $plaque->id])->assertStatus(422)->assertJsonValidationErrors('plaque_id');
+
+        Project::findOrFail($first->json('data.id'))->forceFill(['phase' => ProjectPhase::InOperation])->save();
+
+        $this->postJson('/api/v1/projects', ['plaque_id' => $plaque->id])->assertCreated()->assertJsonPath('data.kind', 'desaturation')->assertJsonPath('data.kind_label', 'Désaturation');
+        $this->postJson('/api/v1/projects', ['plaque_id' => $plaque->id])->assertStatus(422);
+        $this->assertSame(2, Project::where('plaque_id', $plaque->id)->count());
+    }
+
+    public function test_a_guided_creation_is_a_deployment(): void
+    {
+        $this->login(Role::Admin);
+
+        $this->postJson('/api/v1/projects', ['plaque_name' => 'ABOBO'])->assertCreated()->assertJsonPath('data.kind', 'deployment');
     }
 }
