@@ -29,7 +29,7 @@ export default function UtilisateursPage() {
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Utilisateurs</h1>
         {canManage && (
-          <Link href="/utilisateurs/nouveau" className="flex h-11 items-center rounded-lg bg-slate-900 px-4 text-sm font-medium text-white">
+          <Link href="/utilisateurs/nouveau" className="flex h-11 items-center rounded-lg bg-primary hover:bg-primary-hover px-4 text-sm font-medium text-white">
             Nouvel utilisateur
           </Link>
         )}
@@ -49,7 +49,7 @@ export default function UtilisateursPage() {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="h-11 w-full rounded-lg border border-zinc-300 px-3 text-base"
+            className="h-11 w-full rounded-lg border border-slate-300 px-3 text-base"
           />
         </div>
         <div className="space-y-1 sm:w-56">
@@ -63,7 +63,7 @@ export default function UtilisateursPage() {
               setRole(e.target.value as "" | Role);
               setPage(1);
             }}
-            className="h-11 w-full rounded-lg border border-zinc-300 bg-white px-3 text-base"
+            className="h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-base"
           >
             <option value="">Tous les rôles</option>
             {(Object.keys(ROLE_LABELS) as Role[]).map((r) => (
@@ -82,7 +82,7 @@ export default function UtilisateursPage() {
               {users.map((user) => (
                 <li
                   key={user.id}
-                  className="grid gap-1 rounded-xl border border-zinc-200 bg-white p-4 md:grid-cols-[2fr_2fr_1.2fr_auto] md:items-center md:gap-4"
+                  className="grid gap-1 rounded-xl border border-slate-200 bg-white p-4 md:grid-cols-[2fr_2fr_1.2fr_auto] md:items-center md:gap-4"
                 >
                   <span className="font-medium">
                     {canManage ? (
@@ -93,18 +93,18 @@ export default function UtilisateursPage() {
                       user.name
                     )}
                   </span>
-                  <span className="break-all text-sm text-zinc-700">{user.email}</span>
+                  <span className="break-all text-sm text-slate-700">{user.email}</span>
                   <span className="text-sm">
                     {user.role_label}
                     {user.skills && user.skills.length > 0 && (
-                      <span className="block text-xs text-zinc-700">
+                      <span className="block text-xs text-slate-700">
                         {user.skills.map((skill) => MISSION_LABELS[skill]).join(", ")}
                       </span>
                     )}
                   </span>
                   <span
                     className={`w-fit rounded-full px-2 py-0.5 text-xs font-medium ${
-                      user.is_active ? "bg-green-100 text-green-800" : "bg-zinc-200 text-zinc-700"
+                      user.is_active ? "bg-green-100 text-green-800" : "bg-slate-200 text-slate-700"
                     }`}
                   >
                     {user.is_active ? "Actif" : "Désactivé"}

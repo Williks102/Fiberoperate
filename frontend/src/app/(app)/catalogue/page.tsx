@@ -45,7 +45,7 @@ export default function CataloguePage() {
     <div className="space-y-4">
       <div className="space-y-1">
         <h1 className="text-xl font-semibold">Catalogue de prix</h1>
-        <p className="text-sm text-zinc-700">Le bordereau de l&apos;opérateur : les prix unitaires dont le devis d&apos;un projet est fait.</p>
+        <p className="text-sm text-slate-700">Le bordereau de l&apos;opérateur : les prix unitaires dont le devis d&apos;un projet est fait.</p>
       </div>
 
       {user?.role === "admin" && <PriceCatalogImportPanel onImported={() => (reload(), setPage(1))} />}
@@ -87,18 +87,18 @@ export default function CataloguePage() {
           <>
             <ul className="space-y-2">
               {items.map((item) => (
-                <li key={item.id} className="space-y-1 rounded-xl border border-zinc-200 bg-white p-4">
+                <li key={item.id} className="space-y-1 rounded-xl border border-slate-200 bg-white p-4">
                   <p className="flex flex-wrap items-center justify-between gap-2">
                     <span className="font-medium">
-                      {item.ref && <span className="mr-2 text-zinc-700">{item.ref}</span>}
+                      {item.ref && <span className="mr-2 text-slate-700">{item.ref}</span>}
                       {item.designation}
                     </span>
                     <span className="font-medium tabular-nums">
                       {formatFcfa(item.unit_price)}
-                      {item.unit && item.unit_price != null && <span className="text-zinc-700"> / {item.unit}</span>}
+                      {item.unit && item.unit_price != null && <span className="text-slate-700"> / {item.unit}</span>}
                     </span>
                   </p>
-                  <p className="text-sm text-zinc-700">
+                  <p className="text-sm text-slate-700">
                     {item.kind_label} · {item.section}
                   </p>
                 </li>

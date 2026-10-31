@@ -22,7 +22,7 @@ export default function ProjetPage() {
         ← Retour aux projets
       </Link>
 
-      {result.status === "loading" && <div aria-busy="true" className="h-64 animate-pulse rounded-xl bg-zinc-200" />}
+      {result.status === "loading" && <div aria-busy="true" className="h-64 animate-pulse rounded-xl bg-slate-200" />}
 
       {result.status === "error" && (
         <div role="alert" className="space-y-3 rounded-xl bg-red-50 p-4 text-sm text-red-800">
@@ -52,8 +52,8 @@ function ProjectDetail({ project, reload }: { project: Project; reload: () => vo
         <h1 className="text-xl font-semibold">
           {project.kind === "desaturation" ? "Projet de désaturation" : "Projet"} de la plaque {project.plaque?.name ?? "—"}
         </h1>
-        <p className="text-sm text-zinc-700">
-          Phase actuelle : <span className="font-medium text-zinc-900">{project.phase_label}</span> depuis le {formatDateTime(project.phase_changed_at)}
+        <p className="text-sm text-slate-700">
+          Phase actuelle : <span className="font-medium text-ink">{project.phase_label}</span> depuis le {formatDateTime(project.phase_changed_at)}
         </p>
       </header>
 
@@ -68,16 +68,16 @@ function ProjectDetail({ project, reload }: { project: Project; reload: () => vo
         <h2 id="phases" className="text-lg font-semibold">
           Parcours
         </h2>
-        <ol className="space-y-1 rounded-xl border border-zinc-200 bg-white p-3">
+        <ol className="space-y-1 rounded-xl border border-slate-200 bg-white p-3">
           {steps.map((step, i) => (
             <li
               key={step.value}
               aria-current={step.state === "current" ? "step" : undefined}
-              className={`flex min-h-11 items-center gap-3 rounded-lg px-2 text-sm ${step.state === "current" ? "bg-slate-900 font-semibold text-white" : step.state === "done" ? "text-zinc-900" : "text-zinc-700"}`}
+              className={`flex min-h-11 items-center gap-3 rounded-lg px-2 text-sm ${step.state === "current" ? "bg-primary hover:bg-primary-hover font-semibold text-white" : step.state === "done" ? "text-ink" : "text-slate-700"}`}
             >
               <span
                 aria-hidden="true"
-                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${step.state === "current" ? "border-white" : step.state === "done" ? "border-green-700 bg-green-700 text-white" : "border-zinc-400"}`}
+                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${step.state === "current" ? "border-white" : step.state === "done" ? "border-green-700 bg-green-700 text-white" : "border-slate-400"}`}
               >
                 {step.state === "done" ? "✓" : i + 1}
               </span>
@@ -93,15 +93,15 @@ function ProjectDetail({ project, reload }: { project: Project; reload: () => vo
           Historique
         </h2>
         {history.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-zinc-300 p-4 text-sm text-zinc-700">Aucun changement enregistré.</p>
+          <p className="rounded-xl border border-dashed border-slate-300 p-4 text-sm text-slate-700">Aucun changement enregistré.</p>
         ) : (
           <ul className="space-y-2">
             {history.map((line) => (
-              <li key={line.id} className="space-y-1 rounded-xl border border-zinc-200 bg-white p-4 text-sm">
+              <li key={line.id} className="space-y-1 rounded-xl border border-slate-200 bg-white p-4 text-sm">
                 <p className="font-medium">
                   {line.from_phase_label ? `${line.from_phase_label} → ${line.to_phase_label}` : `Projet ouvert en « ${line.to_phase_label} »`}
                 </p>
-                <p className="text-zinc-700">
+                <p className="text-slate-700">
                   {formatDateTime(line.created_at)} · {line.author?.name ?? "Auteur inconnu"}
                 </p>
                 {line.decision && (
@@ -109,7 +109,7 @@ function ProjectDetail({ project, reload }: { project: Project; reload: () => vo
                     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${line.decision === "approved" ? "bg-green-100 text-green-900" : "bg-red-100 text-red-900"}`}>{DECISION_LABELS[line.decision]}</span>
                   </p>
                 )}
-                {line.reason && <p className="text-zinc-900">Motif : {line.reason}</p>}
+                {line.reason && <p className="text-ink">Motif : {line.reason}</p>}
               </li>
             ))}
           </ul>
@@ -140,29 +140,29 @@ function Characteristics({ project }: { project: Project }) {
       </h2>
       <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         {facts.map(([label, value]) => (
-          <div key={label} className="rounded-xl border border-zinc-200 bg-white p-3">
-            <dt className="text-xs text-zinc-700">{label}</dt>
+          <div key={label} className="rounded-xl border border-slate-200 bg-white p-3">
+            <dt className="text-xs text-slate-700">{label}</dt>
             <dd className="font-medium">{value}</dd>
           </div>
         ))}
       </dl>
       {network.zones.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-zinc-300 p-4 text-sm text-zinc-700">Aucune sous-plaque pour l&apos;instant. Ajoutez-les dans « Sous-plaques ».</p>
+        <p className="rounded-xl border border-dashed border-slate-300 p-4 text-sm text-slate-700">Aucune sous-plaque pour l&apos;instant. Ajoutez-les dans « Sous-plaques ».</p>
       ) : (
         <ul className="space-y-2">
           {network.zones.map((zone) => (
-            <li key={zone.id} className="space-y-1 rounded-xl border border-zinc-200 bg-white p-4 text-sm">
+            <li key={zone.id} className="space-y-1 rounded-xl border border-slate-200 bg-white p-4 text-sm">
               <p className="flex flex-wrap items-center justify-between gap-2">
                 <span className="font-medium">{zone.code}</span>
-                <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700">{ZONE_STATUS_LABELS[zone.status]}</span>
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">{ZONE_STATUS_LABELS[zone.status]}</span>
               </p>
-              <p className="text-zinc-700">
+              <p className="text-slate-700">
                 SRO {zone.sro ?? "à créer"} · {zone.splitters} splitters · {zone.pcos} PCO prévus
               </p>
               {zone.pcos > 0 && (
                 <>
                   <ZoneProgress zone={zone} />
-                  <p className="text-zinc-700">
+                  <p className="text-slate-700">
                     Soudés ou activés : {zone.progress.spliced + zone.progress.activated} sur {zone.pcos} · Positions relevées : {zone.progress.measured} sur {zone.pcos}
                   </p>
                 </>
@@ -176,7 +176,7 @@ function Characteristics({ project }: { project: Project }) {
 }
 
 const PROGRESS_STEPS: { key: "to_pull" | "pulled" | "spliced" | "activated"; label: string; color: string }[] = [
-  { key: "to_pull", label: "À tirer", color: "bg-zinc-300" },
+  { key: "to_pull", label: "À tirer", color: "bg-slate-300" },
   { key: "pulled", label: "Tirés", color: "bg-sky-400" },
   { key: "spliced", label: "Soudés", color: "bg-amber-400" },
   { key: "activated", label: "Activés", color: "bg-green-600" },
@@ -186,12 +186,12 @@ const PROGRESS_STEPS: { key: "to_pull" | "pulled" | "spliced" | "activated"; lab
 function ZoneProgress({ zone }: { zone: NonNullable<Project["network"]>["zones"][number] }) {
   return (
     <div className="space-y-1">
-      <div className="flex h-2 overflow-hidden rounded-full bg-zinc-100" aria-hidden="true">
+      <div className="flex h-2 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
         {PROGRESS_STEPS.map((step) => (
           <span key={step.key} className={step.color} style={{ width: `${(zone.progress[step.key] / zone.pcos) * 100}%` }} />
         ))}
       </div>
-      <p className="text-xs text-zinc-700">{PROGRESS_STEPS.map((step) => `${step.label} ${zone.progress[step.key]}`).join(" · ")}</p>
+      <p className="text-xs text-slate-700">{PROGRESS_STEPS.map((step) => `${step.label} ${zone.progress[step.key]}`).join(" · ")}</p>
     </div>
   );
 }

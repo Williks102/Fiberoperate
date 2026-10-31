@@ -18,7 +18,7 @@ export function AsyncList<T>({
     return (
       <ul aria-busy="true" className="space-y-2">
         {[0, 1].map((i) => (
-          <li key={i} className="h-12 animate-pulse rounded-lg bg-zinc-200" />
+          <li key={i} className="h-12 animate-pulse rounded-lg bg-slate-200" />
         ))}
       </ul>
     );
@@ -36,7 +36,7 @@ export function AsyncList<T>({
   }
 
   if (state.data.data.length === 0) {
-    return <p className="rounded-lg border border-dashed border-zinc-300 p-3 text-sm text-zinc-700">{empty}</p>;
+    return <p className="rounded-lg border border-dashed border-slate-300 p-3 text-sm text-slate-700">{empty}</p>;
   }
 
   return <>{children(state.data.data)}</>;

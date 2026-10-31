@@ -26,7 +26,7 @@ export default function SplittersPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Splitters</h1>
-        <Link href="/splitters/nouveau" className="flex h-11 items-center rounded-lg bg-slate-900 px-4 text-sm font-medium text-white">
+        <Link href="/splitters/nouveau" className="flex h-11 items-center rounded-lg bg-primary hover:bg-primary-hover px-4 text-sm font-medium text-white">
           Nouveau splitter
         </Link>
       </div>
@@ -77,13 +77,13 @@ export default function SplittersPage() {
           <>
             <ul className="space-y-2">
               {jdvs.map((jdv) => (
-                <li key={jdv.id} className="space-y-1 rounded-xl border border-zinc-200 bg-white p-4">
+                <li key={jdv.id} className="space-y-1 rounded-xl border border-slate-200 bg-white p-4">
                   <p className="font-medium">
                     <Link href={`/splitters/${jdv.id}`} className="underline-offset-2 hover:underline">
                       {jdv.code}
                     </Link>
                   </p>
-                  <p className="text-sm text-zinc-700">
+                  <p className="text-sm text-slate-700">
                     Sous-plaque {jdv.zone?.code ?? "—"} · Plaque {jdv.zone?.plaque?.name ?? "—"}
                   </p>
                 </li>

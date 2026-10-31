@@ -66,10 +66,10 @@ export function GenerateNetworkPanel({ zone }: { zone: Zone }) {
   }
 
   return (
-    <section className="space-y-3 rounded-xl border border-zinc-200 bg-white p-4">
+    <section className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
       <div>
         <h2 className="text-base font-semibold">Générer le réseau</h2>
-        <p className="text-sm text-zinc-700">
+        <p className="text-sm text-slate-700">
           Crée la SRO, les splitters (SPL001…, 8 PCO chacun) et les PCO ({zone.code}_PCO001…). Possible une seule fois, tant que la sous-plaque n&apos;a ni splitter ni PCO.
           Le technicien du BE ajuste ensuite selon son plan.
         </p>
@@ -96,9 +96,9 @@ export function GenerateNetworkPanel({ zone }: { zone: Zone }) {
             <input id="sro-code" value={sroCode} onChange={(e) => setSroCode(e.target.value)} className={inputClass} required />
           </Field>
         )}
-        {hasSro && <p className="text-sm text-zinc-700">La SRO de cette sous-plaque existe déjà ({sro.data.data[0].code}) : elle est conservée.</p>}
+        {hasSro && <p className="text-sm text-slate-700">La SRO de cette sous-plaque existe déjà ({sro.data.data[0].code}) : elle est conservée.</p>}
 
-        <button type="submit" disabled={submitting || sro.status !== "ok"} className="h-11 rounded-lg bg-slate-900 px-6 font-medium text-white disabled:opacity-60">
+        <button type="submit" disabled={submitting || sro.status !== "ok"} className="h-11 rounded-lg bg-primary hover:bg-primary-hover px-6 font-medium text-white disabled:opacity-60">
           {submitting ? "Génération…" : "Générer le réseau"}
         </button>
       </form>

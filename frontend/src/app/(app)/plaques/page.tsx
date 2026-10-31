@@ -6,7 +6,7 @@ export default function PlaquesPage() {
     <div className="space-y-4">
       <div className="space-y-1">
         <h1 className="text-xl font-semibold">Plaques</h1>
-        <p className="text-sm text-zinc-700">Une plaque, ses sous-plaques, leur SRO, leurs splitters et leurs PCO. Touchez une ligne pour la déplier. Une plaque se crée avec son projet.</p>
+        <p className="text-sm text-slate-700">Une plaque, ses sous-plaques, leur SRO, leurs splitters et leurs PCO. Touchez une ligne pour la déplier. Une plaque se crée avec son projet.</p>
       </div>
       <NetworkTree />
     </div>

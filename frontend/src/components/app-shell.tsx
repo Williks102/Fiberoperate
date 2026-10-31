@@ -29,17 +29,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (loading || !user) {
     return (
       <main className="flex flex-1 items-center justify-center p-6" aria-busy="true">
-        <div className="h-6 w-40 animate-pulse rounded bg-zinc-200" />
+        <div className="h-6 w-40 animate-pulse rounded bg-slate-200" />
       </main>
     );
   }
 
   const groups = groupsFor(user.role, user.skills);
-  const linkClass = (active: boolean) => `flex h-11 items-center rounded-lg px-3 text-sm font-medium ${active ? "bg-slate-900 text-white" : "text-zinc-700 hover:bg-zinc-100"}`;
+  const linkClass = (active: boolean) => `flex h-11 items-center rounded-lg px-3 text-sm font-medium ${active ? "bg-primary hover:bg-primary-hover text-white" : "text-slate-700 hover:bg-slate-100"}`;
 
   return (
     <div className="flex min-h-screen flex-1 flex-col md:flex-row">
-      <aside className="hidden w-56 shrink-0 flex-col border-r border-zinc-200 bg-white md:flex">
+      <aside className="hidden w-56 shrink-0 flex-col border-r border-slate-200 bg-white md:flex">
         <div className="p-4 text-lg font-semibold">FTTH Gestion</div>
         <nav aria-label="Menu principal" className="flex flex-1 flex-col gap-4 overflow-y-auto p-2">
           <Link href={HOME.href} aria-current={isActive(pathname, HOME.href) ? "page" : undefined} className={linkClass(isActive(pathname, HOME.href))}>
@@ -47,7 +47,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Link>
           {groups.map((group) => (
             <div key={group.href} className="space-y-1">
-              <Link href={group.href} className={`block px-3 text-xs font-semibold uppercase tracking-wide ${isGroupActive(pathname, group) ? "text-slate-900" : "text-zinc-700"}`}>
+              <Link href={group.href} className={`block px-3 text-xs font-semibold uppercase tracking-wide ${isGroupActive(pathname, group) ? "text-ink" : "text-slate-700"}`}>
                 {group.label}
               </Link>
               {group.items.map((item) => (
@@ -61,7 +61,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between gap-3 border-b border-zinc-200 bg-white px-4 py-2 sm:px-6">
+        <header className="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-2 sm:px-6">
           <span className="flex items-center gap-2 md:hidden">
             <button
               ref={menuButtonRef}
@@ -70,13 +70,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               aria-haspopup="dialog"
               aria-expanded={menuOpen}
               aria-controls="menu-mobile"
-              className="flex h-11 w-11 items-center justify-center rounded-lg border border-zinc-300"
+              className="flex h-11 w-11 items-center justify-center rounded-lg border border-slate-300"
             >
               <Menu aria-hidden="true" className="h-5 w-5" />
             </button>
             <span className="font-semibold">FTTH Gestion</span>
           </span>
-          <span className="hidden text-sm text-zinc-700 md:block">
+          <span className="hidden text-sm text-slate-700 md:block">
             {user.name} · {user.role_label}
           </span>
           <span className="flex items-center gap-2">
@@ -86,7 +86,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 await logout();
                 router.replace("/login");
               }}
-              className="h-11 rounded-lg border border-zinc-300 px-4 text-sm font-medium"
+              className="h-11 rounded-lg border border-slate-300 px-4 text-sm font-medium"
             >
               Se déconnecter
             </button>

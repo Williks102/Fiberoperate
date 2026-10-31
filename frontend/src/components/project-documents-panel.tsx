@@ -42,7 +42,7 @@ export function ProjectDocumentsPanel({ projectId, plaqueId }: { projectId: stri
     }
   }
 
-  if (state.status === "loading") return <div aria-busy="true" className="h-24 animate-pulse rounded-xl bg-zinc-200" />;
+  if (state.status === "loading") return <div aria-busy="true" className="h-24 animate-pulse rounded-xl bg-slate-200" />;
   if (state.status === "error") return null;
 
   // Un document = un type (et une sous-plaque pour un plan de sous-plaque) ; ses versions du plus récent au plus ancien.
@@ -62,11 +62,11 @@ export function ProjectDocumentsPanel({ projectId, plaqueId }: { projectId: stri
       )}
 
       {groups.size === 0 ? (
-        <p className="rounded-xl border border-dashed border-zinc-300 p-4 text-sm text-zinc-700">Aucun document pour l&apos;instant.</p>
+        <p className="rounded-xl border border-dashed border-slate-300 p-4 text-sm text-slate-700">Aucun document pour l&apos;instant.</p>
       ) : (
         <ul className="space-y-2">
           {[...groups.values()].map((versions) => (
-            <li key={`${versions[0].type}|${versions[0].zone?.id ?? ""}`} className="space-y-2 rounded-xl border border-zinc-200 bg-white p-4 text-sm">
+            <li key={`${versions[0].type}|${versions[0].zone?.id ?? ""}`} className="space-y-2 rounded-xl border border-slate-200 bg-white p-4 text-sm">
               <p className="font-medium">
                 {versions[0].type_label}
                 {versions[0].zone && ` · ${versions[0].zone.code}`}
@@ -74,15 +74,15 @@ export function ProjectDocumentsPanel({ projectId, plaqueId }: { projectId: stri
               <ul className="space-y-2">
                 {versions.map((v, i) => (
                   <li key={v.id} className="flex flex-wrap items-center justify-between gap-2">
-                    <span className={i === 0 ? "" : "text-zinc-700"}>
+                    <span className={i === 0 ? "" : "text-slate-700"}>
                       Version {v.version}
                       {i === 0 && " (la plus récente)"} · {v.file_name} · {formatSize(v.size)}
-                      <span className="block text-xs text-zinc-700">
+                      <span className="block text-xs text-slate-700">
                         {formatDateTime(v.created_at)} · {v.author?.name ?? "auteur inconnu"}
                         {v.comment && ` · ${v.comment}`}
                       </span>
                     </span>
-                    <button onClick={() => download(v)} className="h-11 rounded-lg border border-zinc-300 px-4 font-medium">
+                    <button onClick={() => download(v)} className="h-11 rounded-lg border border-slate-300 px-4 font-medium">
                       Télécharger
                     </button>
                   </li>
@@ -142,10 +142,10 @@ function UploadForm({ projectId, plaqueId, uploadable, onDone }: { projectId: st
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-3 rounded-xl border border-zinc-200 bg-white p-4" noValidate>
+    <form onSubmit={onSubmit} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4" noValidate>
       <h3 className="font-semibold">Ajouter un document ou une nouvelle version</h3>
       {message && (
-        <p role="status" className="rounded-lg bg-zinc-100 p-3 text-sm">
+        <p role="status" className="rounded-lg bg-slate-100 p-3 text-sm">
           {message}
         </p>
       )}
@@ -174,12 +174,12 @@ function UploadForm({ projectId, plaqueId, uploadable, onDone }: { projectId: st
         )}
       </div>
       <Field id="doc-file" label="Fichier" hint="2 Mo au plus : DWG, KMZ, PDF, Excel…" error={errors.file?.[0]}>
-        <input key={fileKey} id="doc-file" type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block w-full rounded-lg border border-zinc-300 bg-white p-2 text-base" />
+        <input key={fileKey} id="doc-file" type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block w-full rounded-lg border border-slate-300 bg-white p-2 text-base" />
       </Field>
       <Field id="doc-comment" label="Commentaire (facultatif)" error={errors.comment?.[0]}>
         <input id="doc-comment" value={comment} onChange={(e) => setComment(e.target.value)} className={inputClass} />
       </Field>
-      <button type="submit" disabled={busy || !file || (needsZone && !zoneId)} className="h-11 rounded-lg bg-slate-900 px-6 font-medium text-white disabled:opacity-60">
+      <button type="submit" disabled={busy || !file || (needsZone && !zoneId)} className="h-11 rounded-lg bg-primary hover:bg-primary-hover px-6 font-medium text-white disabled:opacity-60">
         {busy ? "Envoi…" : "Envoyer"}
       </button>
     </form>

@@ -87,7 +87,7 @@ export default function NouveauProjetPage() {
   return (
     <div className="max-w-2xl space-y-4">
       <h1 className="text-xl font-semibold">Nouveau projet</h1>
-      <p className="text-sm text-zinc-700">La plaque naît avec le projet. Il démarre en phase « Avant-projet ».</p>
+      <p className="text-sm text-slate-700">La plaque naît avec le projet. Il démarre en phase « Avant-projet ».</p>
 
       <form onSubmit={onSubmit} className="space-y-6 pb-24" noValidate>
         {message && (
@@ -99,7 +99,7 @@ export default function NouveauProjetPage() {
         {existing ? (
           <section className="space-y-3">
             <h2 className="text-base font-semibold">Plaque existante</h2>
-            <p className="text-sm text-zinc-700">Une plaque déjà déployée reçoit un projet de désaturation, une fois son projet précédent en exploitation.</p>
+            <p className="text-sm text-slate-700">Une plaque déjà déployée reçoit un projet de désaturation, une fois son projet précédent en exploitation.</p>
             <Field id="plaque" label="Plaque" error={errors.plaque_id?.[0]}>
               <select id="plaque" value={plaqueId} onChange={(e) => setPlaqueId(e.target.value)} className={inputClass} required>
                 <option value="">Choisir une plaque</option>
@@ -111,8 +111,8 @@ export default function NouveauProjetPage() {
                 ))}
               </select>
             </Field>
-            {plaques.status === "ok" && projects.status === "ok" && freePlaques.length === 0 && <p className="text-sm text-zinc-700">Toutes les plaques ont un projet en cours.</p>}
-            <button type="button" onClick={() => setExisting(false)} className="h-11 rounded-lg border border-zinc-300 px-4 text-sm font-medium">
+            {plaques.status === "ok" && projects.status === "ok" && freePlaques.length === 0 && <p className="text-sm text-slate-700">Toutes les plaques ont un projet en cours.</p>}
+            <button type="button" onClick={() => setExisting(false)} className="h-11 rounded-lg border border-slate-300 px-4 text-sm font-medium">
               Créer une nouvelle plaque
             </button>
           </section>
@@ -156,7 +156,7 @@ export default function NouveauProjetPage() {
 
             <section className="space-y-3">
               <h2 className="text-base font-semibold">3. Les sous-plaques</h2>
-              <p className="text-sm text-zinc-700">
+              <p className="text-sm text-slate-700">
                 Indiquez un nombre de PCO pour générer le réseau de la sous-plaque (SRO, splitters de 8 PCO, PCO). Laissez-le vide pour la créer seule. Le technicien du BE ajuste ensuite.
               </p>
               <datalist id="pco-counts">
@@ -165,7 +165,7 @@ export default function NouveauProjetPage() {
                 ))}
               </datalist>
               {rows.map((row, i) => (
-                <div key={i} className="space-y-3 rounded-xl border border-zinc-200 bg-white p-4">
+                <div key={i} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
                   <div className="grid gap-3 sm:grid-cols-3">
                     <Field id={`zone-code-${i}`} label="Sous-plaque" hint="Par exemple ABB01." error={errors[`zones.${i}.code`]?.[0]}>
                       <input id={`zone-code-${i}`} value={row.code} onChange={(e) => setRow(i, { code: e.target.value })} className={inputClass} />
@@ -178,28 +178,28 @@ export default function NouveauProjetPage() {
                     </Field>
                   </div>
                   {rows.length > 1 && (
-                    <button type="button" onClick={() => setRows((prev) => prev.filter((_, j) => j !== i))} className="h-11 rounded-lg border border-zinc-300 px-4 text-sm font-medium">
+                    <button type="button" onClick={() => setRows((prev) => prev.filter((_, j) => j !== i))} className="h-11 rounded-lg border border-slate-300 px-4 text-sm font-medium">
                       Retirer cette sous-plaque
                     </button>
                   )}
                 </div>
               ))}
-              <button type="button" onClick={() => setRows((prev) => [...prev, emptyRow()])} className="h-11 rounded-lg border border-zinc-300 px-4 text-sm font-medium">
+              <button type="button" onClick={() => setRows((prev) => [...prev, emptyRow()])} className="h-11 rounded-lg border border-slate-300 px-4 text-sm font-medium">
                 Ajouter une sous-plaque
               </button>
             </section>
 
-            <button type="button" onClick={() => setExisting(true)} className="block text-sm text-zinc-700 underline underline-offset-2">
+            <button type="button" onClick={() => setExisting(true)} className="block text-sm text-slate-700 underline underline-offset-2">
               Ouvrir le projet d&apos;une plaque existante
             </button>
           </>
         )}
 
-        <div className="fixed inset-x-0 bottom-14 z-10 flex gap-3 border-t border-zinc-200 bg-white p-3 md:static md:border-0 md:p-0">
-          <button type="submit" disabled={submitting || !canSubmit} className="h-11 flex-1 rounded-lg bg-slate-900 font-medium text-white disabled:opacity-60 md:flex-none md:px-6">
+        <div className="fixed inset-x-0 bottom-14 z-10 flex gap-3 border-t border-slate-200 bg-white p-3 md:static md:border-0 md:p-0">
+          <button type="submit" disabled={submitting || !canSubmit} className="h-11 flex-1 rounded-lg bg-primary hover:bg-primary-hover font-medium text-white disabled:opacity-60 md:flex-none md:px-6">
             {submitting ? "Création…" : "Ouvrir le projet"}
           </button>
-          <button type="button" onClick={() => router.push("/projets")} className="h-11 rounded-lg border border-zinc-300 px-4 font-medium">
+          <button type="button" onClick={() => router.push("/projets")} className="h-11 rounded-lg border border-slate-300 px-4 font-medium">
             Retour
           </button>
         </div>

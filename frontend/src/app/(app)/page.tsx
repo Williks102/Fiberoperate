@@ -6,9 +6,9 @@ export default function Home() {
   const { user } = useAuth();
 
   return (
-    <section className="space-y-1 rounded-xl border border-zinc-200 bg-white p-5">
+    <section className="space-y-1 rounded-xl border border-slate-200 bg-white p-5">
       <h1 className="text-xl font-semibold">Bonjour {user?.name}</h1>
-      <p className="text-sm text-zinc-700">
+      <p className="text-sm text-slate-700">
         {user?.role_label} · {user?.email}
       </p>
     </section>

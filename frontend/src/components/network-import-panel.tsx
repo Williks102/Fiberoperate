@@ -73,12 +73,12 @@ export function NetworkImportPanel({ projectId, onImported }: { projectId: strin
   const imported = report?.committed === true;
 
   return (
-    <section aria-labelledby="import" className="space-y-4 rounded-xl border border-zinc-200 bg-white p-4">
+    <section aria-labelledby="import" className="space-y-4 rounded-xl border border-slate-200 bg-white p-4">
       <div className="space-y-1">
         <h2 id="import" className="text-lg font-semibold">
           Importer le réseau (CSV)
         </h2>
-        <p className="text-sm text-zinc-700">
+        <p className="text-sm text-slate-700">
           Un fichier CSV, une ligne par PCO : sous-plaque, SRO, splitter, PCO… Une seule plaque par fichier : celle du projet (la colonne « plaque » peut rester vide). Les éléments déjà connus ne sont jamais modifiés.{" "}
           <a href="/modeles-import/reseau.csv" download className="underline">
             Télécharger le modèle
@@ -100,14 +100,14 @@ export function NetworkImportPanel({ projectId, onImported }: { projectId: strin
             setError(null);
             setConfirming(false);
           }}
-          className="block w-full rounded-lg border border-zinc-300 bg-white p-2 text-base"
+          className="block w-full rounded-lg border border-slate-300 bg-white p-2 text-base"
         />
       </div>
 
       <button
         onClick={() => send("preview")}
         disabled={!file || busy !== null}
-        className="h-11 rounded-lg border border-zinc-300 px-4 font-medium disabled:opacity-60"
+        className="h-11 rounded-lg border border-slate-300 px-4 font-medium disabled:opacity-60"
       >
         {busy === "preview" ? "Vérification…" : "Vérifier le fichier"}
       </button>
@@ -120,7 +120,7 @@ export function NetworkImportPanel({ projectId, onImported }: { projectId: strin
 
       {report && (
         <div className="space-y-3">
-          <section role="status" className="space-y-1 rounded-xl border border-zinc-200 bg-white p-4 text-sm">
+          <section role="status" className="space-y-1 rounded-xl border border-slate-200 bg-white p-4 text-sm">
             <h2 className="font-semibold">{imported ? "Import terminé" : "Résultat de la vérification (rien n'est encore enregistré)"}</h2>
             <p>{report.rows} lignes lues.</p>
             <p>
@@ -135,31 +135,31 @@ export function NetworkImportPanel({ projectId, onImported }: { projectId: strin
           <IssueList title="Avertissements" tone="amber" issues={report.warnings} />
 
           {!imported && toCreate > 0 && !confirming && (
-            <button onClick={() => setConfirming(true)} className="h-11 rounded-lg bg-slate-900 px-6 font-medium text-white">
+            <button onClick={() => setConfirming(true)} className="h-11 rounded-lg bg-primary hover:bg-primary-hover px-6 font-medium text-white">
               Importer
             </button>
           )}
 
           {!imported && confirming && (
-            <div className="space-y-3 rounded-xl border border-zinc-300 bg-white p-4 text-sm">
+            <div className="space-y-3 rounded-xl border border-slate-300 bg-white p-4 text-sm">
               <p>
                 Vous allez créer {report.created.pcos} PCO et leur structure. Cette opération ne peut pas être annulée depuis l&apos;application.
               </p>
               <div className="flex gap-3">
-                <button onClick={() => send("import")} disabled={busy !== null} className="h-11 rounded-lg bg-slate-900 px-6 font-medium text-white disabled:opacity-60">
+                <button onClick={() => send("import")} disabled={busy !== null} className="h-11 rounded-lg bg-primary hover:bg-primary-hover px-6 font-medium text-white disabled:opacity-60">
                   {busy === "import" ? "Import en cours…" : "Oui, importer"}
                 </button>
-                <button onClick={() => setConfirming(false)} disabled={busy !== null} className="h-11 rounded-lg border border-zinc-300 px-4 font-medium">
+                <button onClick={() => setConfirming(false)} disabled={busy !== null} className="h-11 rounded-lg border border-slate-300 px-4 font-medium">
                   Annuler
                 </button>
               </div>
             </div>
           )}
 
-          {!imported && toCreate === 0 && <p className="text-sm text-zinc-700">Rien à créer avec ce fichier.</p>}
+          {!imported && toCreate === 0 && <p className="text-sm text-slate-700">Rien à créer avec ce fichier.</p>}
 
           {imported && (
-            <Link href="/plaques" className="inline-flex h-11 items-center rounded-lg border border-zinc-300 px-6 font-medium">
+            <Link href="/plaques" className="inline-flex h-11 items-center rounded-lg border border-slate-300 px-6 font-medium">
               Voir les plaques
             </Link>
           )}

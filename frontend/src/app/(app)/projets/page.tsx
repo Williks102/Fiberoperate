@@ -30,7 +30,7 @@ export default function ProjetsPage() {
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Projets</h1>
         {canCreate && (
-          <Link href="/projets/nouveau" className="flex h-11 items-center rounded-lg bg-slate-900 px-4 text-sm font-medium text-white">
+          <Link href="/projets/nouveau" className="flex h-11 items-center rounded-lg bg-primary hover:bg-primary-hover px-4 text-sm font-medium text-white">
             Nouveau projet
           </Link>
         )}
@@ -85,7 +85,7 @@ export default function ProjetsPage() {
           <>
             <ul className="space-y-2">
               {projects.map((project) => (
-                <li key={project.id} className="space-y-1 rounded-xl border border-zinc-200 bg-white p-4">
+                <li key={project.id} className="space-y-1 rounded-xl border border-slate-200 bg-white p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="font-medium">
                       <Link href={`/projets/${project.id}`} className="underline-offset-2 hover:underline">
@@ -94,10 +94,10 @@ export default function ProjetsPage() {
                     </p>
                     <span className="flex flex-wrap items-center gap-2">
                       {project.kind === "desaturation" && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">{project.kind_label}</span>}
-                      <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-900">{project.phase_label}</span>
+                      <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-medium text-primary-ink">{project.phase_label}</span>
                     </span>
                   </div>
-                  <p className="text-sm text-zinc-700">Phase depuis le {formatDateTime(project.phase_changed_at)}</p>
+                  <p className="text-sm text-slate-700">Phase depuis le {formatDateTime(project.phase_changed_at)}</p>
                 </li>
               ))}
             </ul>

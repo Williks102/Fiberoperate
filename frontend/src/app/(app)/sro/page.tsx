@@ -26,7 +26,7 @@ export default function SroPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">SRO</h1>
-        <Link href="/sro/nouveau" className="flex h-11 items-center rounded-lg bg-slate-900 px-4 text-sm font-medium text-white">
+        <Link href="/sro/nouveau" className="flex h-11 items-center rounded-lg bg-primary hover:bg-primary-hover px-4 text-sm font-medium text-white">
           Nouvelle SRO
         </Link>
       </div>
@@ -77,16 +77,16 @@ export default function SroPage() {
           <>
             <ul className="space-y-2">
               {sros.map((sro) => (
-                <li key={sro.id} className="space-y-1 rounded-xl border border-zinc-200 bg-white p-4">
+                <li key={sro.id} className="space-y-1 rounded-xl border border-slate-200 bg-white p-4">
                   <p className="font-medium">
                     <Link href={`/sro/${sro.id}`} className="underline-offset-2 hover:underline">
                       {sro.code}
                     </Link>
                   </p>
-                  <p className="text-sm text-zinc-700">
+                  <p className="text-sm text-slate-700">
                     Sous-plaque {sro.zone?.code ?? "—"} · Plaque {sro.zone?.plaque?.name ?? "—"}
                   </p>
-                  <p className="text-sm text-zinc-700">
+                  <p className="text-sm text-slate-700">
                     {sro.olt_slot || sro.olt_port || sro.fiber_strand
                       ? `Départ OLT : slot ${sro.olt_slot ?? "—"} · port ${sro.olt_port ?? "—"} · brin ${sro.fiber_strand ?? "—"}`
                       : "Départ de l'OLT non renseigné"}

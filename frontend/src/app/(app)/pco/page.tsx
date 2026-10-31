@@ -34,7 +34,7 @@ export default function PcoPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">PCO</h1>
-        <Link href="/pco/nouveau" className="flex h-11 items-center rounded-lg bg-slate-900 px-4 text-sm font-medium text-white">
+        <Link href="/pco/nouveau" className="flex h-11 items-center rounded-lg bg-primary hover:bg-primary-hover px-4 text-sm font-medium text-white">
           Nouveau PCO
         </Link>
       </div>
@@ -87,7 +87,7 @@ export default function PcoPage() {
           <>
             <ul className="space-y-2">
               {pcos.map((pco) => (
-                <li key={pco.id} className="space-y-1 rounded-xl border border-zinc-200 bg-white p-4">
+                <li key={pco.id} className="space-y-1 rounded-xl border border-slate-200 bg-white p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="font-medium">
                       <Link href={`/pco/${pco.id}`} className="underline-offset-2 hover:underline">
@@ -96,13 +96,13 @@ export default function PcoPage() {
                     </p>
                     <span className="flex items-center gap-2">
                       {pco.is_blocked && <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-900">Bloqué</span>}
-                      <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-900">{pcoStatusLabel(pco)}</span>
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-ink">{pcoStatusLabel(pco)}</span>
                     </span>
                   </div>
-                  <p className="text-sm text-zinc-700">
+                  <p className="text-sm text-slate-700">
                     Plaque {pco.zone?.plaque?.name ?? "—"} · Sous-plaque {pco.zone?.code ?? "—"} · Splitter {pco.jdv?.code ?? "—"}
                   </p>
-                  <p className="text-sm text-zinc-700">{pco.latitude && pco.longitude ? `GPS : ${pco.latitude}, ${pco.longitude}` : "Pas de coordonnées GPS"}</p>
+                  <p className="text-sm text-slate-700">{pco.latitude && pco.longitude ? `GPS : ${pco.latitude}, ${pco.longitude}` : "Pas de coordonnées GPS"}</p>
                 </li>
               ))}
             </ul>

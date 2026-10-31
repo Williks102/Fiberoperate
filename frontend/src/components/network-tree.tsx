@@ -11,7 +11,7 @@ import { useApi } from "@/lib/use-api";
 const PER_PAGE = 100;
 
 function Badge({ children, tone = "neutral" }: { children: React.ReactNode; tone?: "neutral" | "danger" }) {
-  const colors = tone === "danger" ? "bg-red-100 text-red-800" : "bg-zinc-100 text-zinc-700";
+  const colors = tone === "danger" ? "bg-red-100 text-red-800" : "bg-slate-100 text-slate-700";
   return <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${colors}`}>{children}</span>;
 }
 
@@ -28,7 +28,7 @@ function Node({
   const [open, setOpen] = useState(false);
 
   return (
-    <li className="rounded-xl border border-zinc-200 bg-white">
+    <li className="rounded-xl border border-slate-200 bg-white">
       <button
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
@@ -37,12 +37,12 @@ function Node({
         <span className="font-medium">{title}</span>
         <span className="flex flex-wrap items-center justify-end gap-2">
           {badges}
-          <span aria-hidden="true" className="text-zinc-700">
+          <span aria-hidden="true" className="text-slate-700">
             {open ? "▾" : "▸"}
           </span>
         </span>
       </button>
-      {open && <div className="border-t border-zinc-100 p-3 pl-4">{children}</div>}
+      {open && <div className="border-t border-slate-100 p-3 pl-4">{children}</div>}
     </li>
   );
 }
@@ -55,7 +55,7 @@ function Pcos({ jdvId }: { jdvId: string }) {
       {(pcos) => (
         <ul className="space-y-2">
           {pcos.map((pco) => (
-            <li key={pco.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-zinc-50 px-3 py-2 text-sm">
+            <li key={pco.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-slate-50 px-3 py-2 text-sm">
               <span className="font-medium">{pco.code}</span>
               <span className="flex items-center gap-2">
                 {pco.is_blocked && <Badge tone="danger">Bloqué</Badge>}
@@ -127,12 +127,12 @@ export function NetworkTree() {
         <ul className="space-y-2">
           {plaques.map((plaque) => (
             <Node key={plaque.id} title={`Plaque ${plaque.name}`}>
-              <p className="mb-3 flex flex-wrap items-center justify-between gap-2 text-sm text-zinc-700">
+              <p className="mb-3 flex flex-wrap items-center justify-between gap-2 text-sm text-slate-700">
                 <span>
                   OLT : {plaque.olt?.name ?? "non renseigné"} · Superviseur : {plaque.supervisor?.name ?? "non désigné"}
                 </span>
                 {canEditPlaque && (
-                  <Link href={`/plaques/${plaque.id}`} className="inline-flex h-11 items-center rounded-lg border border-zinc-300 px-4 font-medium text-zinc-900">
+                  <Link href={`/plaques/${plaque.id}`} className="inline-flex h-11 items-center rounded-lg border border-slate-300 px-4 font-medium text-ink">
                     Modifier la plaque
                   </Link>
                 )}

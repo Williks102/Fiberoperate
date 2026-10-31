@@ -65,7 +65,7 @@ export function PlaqueForm({ plaque }: { plaque: Plaque }) {
 
       {isDt ? (
         <>
-          <p className="text-sm text-zinc-700">Plaque {plaque.name}. Le DT désigne le superviseur du déploiement.</p>
+          <p className="text-sm text-slate-700">Plaque {plaque.name}. Le DT désigne le superviseur du déploiement.</p>
           <Field id="supervisor" label="Superviseur (facultatif)" hint="Un superviseur couvre la plaque entière." error={errors.supervisor_id?.[0]}>
             <select id="supervisor" value={supervisorId} onChange={(e) => setSupervisorId(e.target.value)} className={inputClass}>
               <option value="">Aucun</option>
@@ -96,11 +96,11 @@ export function PlaqueForm({ plaque }: { plaque: Plaque }) {
         </>
       )}
 
-      <div className="fixed inset-x-0 bottom-14 z-10 flex gap-3 border-t border-zinc-200 bg-white p-3 md:static md:border-0 md:p-0">
-        <button type="submit" disabled={submitting} className="h-11 flex-1 rounded-lg bg-slate-900 font-medium text-white disabled:opacity-60 md:flex-none md:px-6">
+      <div className="fixed inset-x-0 bottom-14 z-10 flex gap-3 border-t border-slate-200 bg-white p-3 md:static md:border-0 md:p-0">
+        <button type="submit" disabled={submitting} className="h-11 flex-1 rounded-lg bg-primary hover:bg-primary-hover font-medium text-white disabled:opacity-60 md:flex-none md:px-6">
           {submitting ? "Enregistrement…" : "Enregistrer"}
         </button>
-        <button type="button" onClick={() => router.push("/plaques")} className="h-11 rounded-lg border border-zinc-300 px-4 font-medium">
+        <button type="button" onClick={() => router.push("/plaques")} className="h-11 rounded-lg border border-slate-300 px-4 font-medium">
           Retour
         </button>
       </div>

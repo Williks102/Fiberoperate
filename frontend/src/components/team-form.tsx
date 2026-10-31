@@ -99,13 +99,13 @@ export function TeamForm({ team }: { team?: Team }) {
 
       <fieldset className="space-y-2">
         <legend className="text-sm font-medium">Membres</legend>
-        {technicians.status === "loading" && <div aria-busy="true" className="h-11 animate-pulse rounded-lg bg-zinc-200" />}
+        {technicians.status === "loading" && <div aria-busy="true" className="h-11 animate-pulse rounded-lg bg-slate-200" />}
         {technicians.status === "ok" && technicianOptions.length === 0 && (
-          <p className="text-sm text-zinc-700">Aucun technicien actif. Créez d&apos;abord des techniciens dans « Utilisateurs ».</p>
+          <p className="text-sm text-slate-700">Aucun technicien actif. Créez d&apos;abord des techniciens dans « Utilisateurs ».</p>
         )}
         <div className="max-h-72 space-y-2 overflow-y-auto">
           {technicianOptions.map((u) => (
-            <label key={u.id} className="flex min-h-11 items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3">
+            <label key={u.id} className="flex min-h-11 items-center gap-3 rounded-lg border border-slate-200 bg-white px-3">
               <input type="checkbox" checked={memberIds.includes(u.id)} onChange={() => toggleMember(u.id)} className="h-5 w-5" />
               {u.name}
             </label>
@@ -118,11 +118,11 @@ export function TeamForm({ team }: { team?: Team }) {
         )}
       </fieldset>
 
-      <div className="fixed inset-x-0 bottom-14 z-10 flex gap-3 border-t border-zinc-200 bg-white p-3 md:static md:border-0 md:p-0">
-        <button type="submit" disabled={submitting} className="h-11 flex-1 rounded-lg bg-slate-900 font-medium text-white disabled:opacity-60 md:flex-none md:px-6">
+      <div className="fixed inset-x-0 bottom-14 z-10 flex gap-3 border-t border-slate-200 bg-white p-3 md:static md:border-0 md:p-0">
+        <button type="submit" disabled={submitting} className="h-11 flex-1 rounded-lg bg-primary hover:bg-primary-hover font-medium text-white disabled:opacity-60 md:flex-none md:px-6">
           {submitting ? "Enregistrement…" : editing ? "Enregistrer" : "Créer l'équipe"}
         </button>
-        <button type="button" onClick={() => router.push("/equipes")} className="h-11 rounded-lg border border-zinc-300 px-4 font-medium">
+        <button type="button" onClick={() => router.push("/equipes")} className="h-11 rounded-lg border border-slate-300 px-4 font-medium">
           Retour
         </button>
       </div>

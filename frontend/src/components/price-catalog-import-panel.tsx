@@ -46,12 +46,12 @@ export function PriceCatalogImportPanel({ onImported }: { onImported: () => void
   const changes = report ? report.created + report.updated : 0;
 
   return (
-    <section aria-labelledby="import-catalogue" className="space-y-4 rounded-xl border border-zinc-200 bg-white p-4">
+    <section aria-labelledby="import-catalogue" className="space-y-4 rounded-xl border border-slate-200 bg-white p-4">
       <div className="space-y-1">
         <h2 id="import-catalogue" className="text-lg font-semibold">
           Importer le catalogue (CSV)
         </h2>
-        <p className="text-sm text-zinc-700">
+        <p className="text-sm text-slate-700">
           Une ligne par article : référence, type (fourniture ou prestation), rubrique, désignation, unité, prix unitaire en FCFA. Un article déjà connu (même rubrique, référence et désignation) est mis à jour ; aucun article n&apos;est supprimé. Les devis déjà faits gardent leur prix.{" "}
           <a href="/modeles-import/catalogue-prix.csv" download className="underline">
             Télécharger le modèle
@@ -73,11 +73,11 @@ export function PriceCatalogImportPanel({ onImported }: { onImported: () => void
             setError(null);
             setConfirming(false);
           }}
-          className="block w-full rounded-lg border border-zinc-300 bg-white p-2 text-base"
+          className="block w-full rounded-lg border border-slate-300 bg-white p-2 text-base"
         />
       </div>
 
-      <button onClick={() => send("preview")} disabled={!file || busy !== null} className="h-11 rounded-lg border border-zinc-300 px-4 font-medium disabled:opacity-60">
+      <button onClick={() => send("preview")} disabled={!file || busy !== null} className="h-11 rounded-lg border border-slate-300 px-4 font-medium disabled:opacity-60">
         {busy === "preview" ? "Vérification…" : "Vérifier le fichier"}
       </button>
 
@@ -89,7 +89,7 @@ export function PriceCatalogImportPanel({ onImported }: { onImported: () => void
 
       {report && (
         <div className="space-y-3">
-          <p role="status" className="rounded-xl border border-zinc-200 p-4 text-sm">
+          <p role="status" className="rounded-xl border border-slate-200 p-4 text-sm">
             <span className="block font-semibold">{imported ? "Import terminé" : "Résultat de la vérification (rien n'est encore enregistré)"}</span>
             {report.rows} lignes lues · {imported ? "créés" : "à créer"} : {report.created} · {imported ? "mis à jour" : "à mettre à jour"} : {report.updated} · inchangés : {report.unchanged}
           </p>
@@ -109,26 +109,26 @@ export function PriceCatalogImportPanel({ onImported }: { onImported: () => void
           )}
 
           {!imported && changes > 0 && !confirming && (
-            <button onClick={() => setConfirming(true)} className="h-11 rounded-lg bg-slate-900 px-6 font-medium text-white">
+            <button onClick={() => setConfirming(true)} className="h-11 rounded-lg bg-primary hover:bg-primary-hover px-6 font-medium text-white">
               Importer
             </button>
           )}
           {!imported && confirming && (
-            <div className="space-y-3 rounded-xl border border-zinc-300 p-4 text-sm">
+            <div className="space-y-3 rounded-xl border border-slate-300 p-4 text-sm">
               <p>
                 Vous allez créer {report.created} article(s) et en mettre à jour {report.updated}. Les prix du catalogue changeront pour les prochains devis.
               </p>
               <div className="flex gap-3">
-                <button onClick={() => send("import")} disabled={busy !== null} className="h-11 rounded-lg bg-slate-900 px-6 font-medium text-white disabled:opacity-60">
+                <button onClick={() => send("import")} disabled={busy !== null} className="h-11 rounded-lg bg-primary hover:bg-primary-hover px-6 font-medium text-white disabled:opacity-60">
                   {busy === "import" ? "Import en cours…" : "Oui, importer"}
                 </button>
-                <button onClick={() => setConfirming(false)} disabled={busy !== null} className="h-11 rounded-lg border border-zinc-300 px-4 font-medium">
+                <button onClick={() => setConfirming(false)} disabled={busy !== null} className="h-11 rounded-lg border border-slate-300 px-4 font-medium">
                   Annuler
                 </button>
               </div>
             </div>
           )}
-          {!imported && changes === 0 && <p className="text-sm text-zinc-700">Rien à créer ni à modifier avec ce fichier.</p>}
+          {!imported && changes === 0 && <p className="text-sm text-slate-700">Rien à créer ni à modifier avec ce fichier.</p>}
         </div>
       )}
     </section>

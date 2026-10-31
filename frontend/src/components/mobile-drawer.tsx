@@ -67,7 +67,7 @@ export function MobileDrawer({
   if (!open) return null;
 
   const linkClass = (active: boolean, indent = false) =>
-    `flex min-h-12 items-center gap-3 rounded-lg px-3 text-base ${indent ? "ml-6" : "font-semibold"} ${active ? "bg-slate-900 text-white" : "text-zinc-900"}`;
+    `flex min-h-12 items-center gap-3 rounded-lg px-3 text-base ${indent ? "ml-6" : "font-semibold"} ${active ? "bg-primary hover:bg-primary-hover text-white" : "text-ink"}`;
 
   return (
     <div className="fixed inset-0 z-30 md:hidden">
@@ -83,9 +83,9 @@ export function MobileDrawer({
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="font-semibold">{name}</p>
-            <p className="text-sm text-zinc-700">{roleLabel}</p>
+            <p className="text-sm text-slate-700">{roleLabel}</p>
           </div>
-          <button ref={closeRef} onClick={onClose} aria-label="Fermer le menu" className="flex h-11 w-11 items-center justify-center rounded-lg border border-zinc-300">
+          <button ref={closeRef} onClick={onClose} aria-label="Fermer le menu" className="flex h-11 w-11 items-center justify-center rounded-lg border border-slate-300">
             <X aria-hidden="true" className="h-5 w-5" />
           </button>
         </div>
@@ -110,7 +110,7 @@ export function MobileDrawer({
           ))}
         </nav>
 
-        <button onClick={onLogout} className="flex h-12 items-center justify-center gap-2 rounded-lg border border-zinc-300 text-base font-medium">
+        <button onClick={onLogout} className="flex h-12 items-center justify-center gap-2 rounded-lg border border-slate-300 text-base font-medium">
           <LogOut aria-hidden="true" className="h-5 w-5" />
           Se déconnecter
         </button>
