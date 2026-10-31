@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\MissionType;
 use App\Enums\OrderStatus;
 use App\Enums\Role;
+use App\Enums\StudyResult;
 use App\Models\CustomerOrder;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -49,6 +50,29 @@ class CustomerOrderApiTest extends TestCase
         $this->getJson('/api/v1/customer-orders?q=KONÉ')->assertJsonCount(1, 'data');
         $this->getJson('/api/v1/customer-orders?q=0707123456')->assertJsonCount(1, 'data')->assertJsonPath('data.0.name', 'Koné Awa');
         $this->getJson('/api/v1/customer-orders?q=rab002')->assertJsonCount(1, 'data');
+    }
+
+    public function test_stages_split_orders_into_instances_raccordables_and_raccordes(): void
+    {
+        $this->login(Role::Coordinator);
+        $this->order('R1', 'Nouveau');
+        $this->order('R2', 'En étude', OrderStatus::InStudy);
+        $absent = $this->order('R3', 'Absent');
+        $absent->changeStatus(OrderStatus::Studied, result: StudyResult::CustomerAbsent);
+        $ok = $this->order('R4', 'Raccordable');
+        $ok->changeStatus(OrderStatus::Studied, result: StudyResult::Feasible);
+        $this->order('R5', 'Programmé', OrderStatus::AppointmentSet);
+        $this->order('R6', 'Reporté', OrderStatus::Postponed);
+        $this->order('R7', 'Échec', OrderStatus::Failed);
+        $this->order('R8', 'Installé', OrderStatus::Installed);
+        $this->order('R9', 'Activé', OrderStatus::Activated);
+
+        $refs = fn (string $stage) => collect($this->getJson("/api/v1/customer-orders?stage={$stage}&per_page=50")->assertOk()->json('data'))->pluck('customer_ref')->sort()->values()->all();
+
+        $this->assertSame(['R1', 'R2', 'R3'], $refs('instances'));
+        $this->assertSame(['R4', 'R5', 'R6', 'R7'], $refs('raccordables'));
+        $this->assertSame(['R8', 'R9'], $refs('raccordes'));
+        $this->assertSame([], $refs('inconnu'));
     }
 
     public function test_detail_carries_the_status_history(): void

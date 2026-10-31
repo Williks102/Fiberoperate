@@ -42,7 +42,7 @@ describe("menu par activité", () => {
   });
 
   it("montre les clients à la direction, au coordinateur et aux techniciens « étude » ou « raccordement client »", () => {
-    const hasClients = (role: Role, skills: Parameters<typeof groupsFor>[1] = []) => groupsFor(role, skills).some((g) => g.items.some((i) => i.href === "/clients"));
+    const hasClients = (role: Role, skills: Parameters<typeof groupsFor>[1] = []) => groupsFor(role, skills).some((g) => g.items.some((i) => i.href === "/instances"));
 
     for (const role of ["admin", "dg", "dt", "coordinator"] as Role[]) expect(hasClients(role)).toBe(true);
     expect(hasClients("technician", ["study"])).toBe(true);
@@ -50,6 +50,9 @@ describe("menu par activité", () => {
     expect(hasClients("technician", ["deployment"])).toBe(false);
     expect(hasClients("supervisor")).toBe(false);
     expect(hasClients("be_manager")).toBe(false);
+    const hrefs = (role: Role, skills: Parameters<typeof groupsFor>[1] = []) => groupsFor(role, skills).find((g) => g.label === "Raccordement")!.items.map((i) => i.href);
+    expect(hrefs("coordinator")).toEqual(["/instances", "/raccordables", "/suivi-raccordement"]);
+    expect(hrefs("technician", ["study"])).toEqual(["/instances", "/raccordables"]);
   });
 
   it("masque une activité dont aucun écran n'est accessible", () => {

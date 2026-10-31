@@ -24,8 +24,8 @@ export default function ClientPage() {
 
   return (
     <div className="space-y-5">
-      <Link href="/clients" className="inline-flex h-11 items-center text-sm font-medium underline">
-        ← Retour aux clients
+      <Link href="/instances" className="inline-flex h-11 items-center text-sm font-medium underline">
+        ← Retour
       </Link>
 
       {result.status === "loading" && <div aria-busy="true" className="h-64 animate-pulse rounded-xl bg-slate-200" />}

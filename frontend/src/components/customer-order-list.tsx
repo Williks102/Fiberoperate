@@ -7,31 +7,46 @@ import { inputClass } from "@/components/field";
 import { Pager } from "@/components/pager";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth/auth-context";
-import { ORDER_TONES } from "@/lib/labels";
+import { ORDER_TONES, STUDY_RESULT_LABELS } from "@/lib/labels";
 import type { CustomerOrder, OrderStatusValue, Paged } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
 import { useDebounced } from "@/lib/use-debounced";
 
-const STATUSES: { value: OrderStatusValue; label: string }[] = [
-  { value: "received", label: "Reçue" },
-  { value: "in_study", label: "En étude" },
-  { value: "studied", label: "Étudiée" },
-  { value: "appointment_set", label: "Installation programmée" },
-  { value: "installed", label: "Installée" },
-  { value: "postponed", label: "Reportée" },
-  { value: "failed", label: "Échec" },
-  { value: "activated", label: "Activée" },
-];
+export type Stage = "instances" | "raccordables" | "raccordes";
 
-/** Les commandes des clients et leur avancement. */
-export default function ClientsPage() {
+const STATUSES: Record<Stage, { value: OrderStatusValue; label: string }[]> = {
+  instances: [
+    { value: "received", label: "Reçue" },
+    { value: "in_study", label: "En étude" },
+    { value: "studied", label: "Étude sans client raccordable" },
+  ],
+  raccordables: [
+    { value: "studied", label: "Étudiée, à programmer" },
+    { value: "appointment_set", label: "Installation programmée" },
+    { value: "postponed", label: "Reportée" },
+    { value: "failed", label: "Échec" },
+  ],
+  raccordes: [
+    { value: "installed", label: "Installée" },
+    { value: "activated", label: "Activée" },
+  ],
+};
+
+const TEXTS: Record<Stage, { title: string; empty: string }> = {
+  instances: { title: "Instances", empty: "Aucune instance. Importez la liste des clients pour commencer." },
+  raccordables: { title: "Raccordables", empty: "Aucun client raccordable pour l'instant : ils arrivent ici une fois leur étude réalisée." },
+  raccordes: { title: "Suivi raccordement", empty: "Aucun client raccordé pour l'instant." },
+};
+
+/** Une des trois listes du raccordement : instances (étude à faire), raccordables (étude faite), raccordés (installés). */
+export function CustomerOrderList({ stage }: { stage: Stage }) {
   const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
   const q = useDebounced(search.trim());
 
-  const params = new URLSearchParams({ per_page: "20", page: String(page) });
+  const params = new URLSearchParams({ per_page: "20", page: String(page), stage });
   if (q) params.set("q", q);
   if (status) params.set("status", status);
   const { reload, ...state } = useApi<Paged<CustomerOrder>>(`/customer-orders?${params}`);
@@ -40,10 +55,10 @@ export default function ClientsPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">Clients</h1>
-        {canImport && (
+        <h1 className="text-xl font-semibold">{TEXTS[stage].title}</h1>
+        {stage === "instances" && canImport && (
           <Link href="/clients/importer" className="flex h-11 items-center rounded-lg bg-primary px-4 text-sm font-medium text-white hover:bg-primary-hover">
-            Importer des clients
+            Importer les instances
           </Link>
         )}
       </div>
@@ -79,7 +94,7 @@ export default function ClientsPage() {
             className={inputClass}
           >
             <option value="">Tous les avancements</option>
-            {STATUSES.map((s) => (
+            {STATUSES[stage].map((s) => (
               <option key={s.value} value={s.value}>
                 {s.label}
               </option>
@@ -88,7 +103,7 @@ export default function ClientsPage() {
         </div>
       </div>
 
-      <AsyncList state={state} reload={reload} empty={q || status ? "Aucun client ne correspond à votre recherche." : "Aucun client pour l'instant. Importez la liste des clients pour commencer."}>
+      <AsyncList state={state} reload={reload} empty={q || status ? "Aucun client ne correspond à votre recherche." : TEXTS[stage].empty}>
         {(orders) => (
           <>
             <ul className="space-y-2">
@@ -97,7 +112,10 @@ export default function ClientsPage() {
                   <Link href={`/clients/${order.id}`} className="block space-y-1 rounded-xl border border-slate-200 bg-white p-4 hover:border-primary">
                     <div className="flex items-start justify-between gap-3">
                       <p className="font-medium">{order.name}</p>
-                      <Badge tone={ORDER_TONES[order.status.value]}>{order.status.label}</Badge>
+                      <div className="flex flex-wrap justify-end gap-1">
+                        {order.study_result && order.study_result !== "feasible" && <Badge tone="warning">{STUDY_RESULT_LABELS[order.study_result]}</Badge>}
+                        <Badge tone={ORDER_TONES[order.status.value]}>{order.status.label}</Badge>
+                      </div>
                     </div>
                     <p className="text-sm text-slate-700">
                       {order.customer_ref}
