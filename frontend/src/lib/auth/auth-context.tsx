@@ -3,6 +3,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { ApiError, apiFetch } from "@/lib/api";
 import type { User } from "@/lib/types";
+import { pushOutbox } from "@/lib/offline/engine";
+import { countPending } from "@/lib/offline/outbox";
 import { clearLocalData, loadUser, saveUser } from "@/lib/offline/visits";
 import { clearToken, getToken, setToken } from "./token";
 
@@ -12,6 +14,13 @@ interface AuthState {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+}
+
+/** Des résultats saisis sur le terrain n'ont pas encore été envoyés : se déconnecter les effacerait. */
+export class UnsentResultsError extends Error {
+  constructor() {
+    super("Des résultats saisis sur ce téléphone n'ont pas encore été envoyés. Reconnectez-vous au réseau, puis réessayez.");
+  }
 }
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -35,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error instanceof ApiError && error.status === 401) {
           // Jeton refusé : on repart d'une session propre, sans rien laisser des données du poste.
           clearToken();
-          void clearLocalData();
+          void clearLocalData({ keepUnsent: true }); // les résultats pas encore envoyés attendent la reconnexion
 
           return;
         }
@@ -60,6 +69,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const logout = useCallback(async () => {
+    // Jamais de déconnexion qui perdrait une saisie : on tente d'abord l'envoi, et on refuse s'il en reste.
+    if ((await countPending().catch(() => 0)) > 0) {
+      await pushOutbox().catch(() => {});
+      if ((await countPending().catch(() => 0)) > 0) throw new UnsentResultsError();
+    }
     const token = getToken();
     clearToken();
     setUser(null);

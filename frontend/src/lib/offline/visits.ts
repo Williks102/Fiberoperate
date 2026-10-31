@@ -71,15 +71,23 @@ export async function saveUser(user: User): Promise<void> {
 export const loadUser = () => getMeta<User>(USER);
 
 /**
- * Efface tout ce que le poste garde (visites, contacts et adresses des clients, utilisateur). À la déconnexion et quand un autre
- * technicien se connecte : les données d'un technicien ne restent pas sur le téléphone d'un autre.
+ * Efface ce que le poste garde (visites, contacts et adresses des clients, utilisateur). À la déconnexion et quand un autre
+ * technicien se connecte : les données d'un technicien ne restent pas sur le téléphone d'un autre. Avec `keepUnsent` (jeton expiré),
+ * les résultats pas encore envoyés et les saisies non appliquées restent, avec le dernier utilisateur : ils attendent la reconnexion.
  */
-export async function clearLocalData(): Promise<void> {
+export async function clearLocalData(options: { keepUnsent?: boolean } = {}): Promise<void> {
   try {
     const db = getDb();
-    await db.transaction("rw", db.visits, db.meta, async () => {
+    await db.transaction("rw", db.visits, db.meta, db.outbox, db.outcomes, async () => {
       await db.visits.clear();
+      if (options.keepUnsent) {
+        await db.meta.where("key").notEqual(USER).delete();
+
+        return;
+      }
       await db.meta.clear();
+      await db.outbox.clear();
+      await db.outcomes.clear();
     });
   } catch {
     // IndexedDB indisponible (navigation privée) : il n'y a rien à effacer

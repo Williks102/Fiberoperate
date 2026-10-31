@@ -12,6 +12,8 @@ import { useAuth } from "@/lib/auth/auth-context";
 import { clientName, formatDate, formatDateTime } from "@/lib/format";
 import { ORDER_TONES, STUDY_RESULT_LABELS } from "@/lib/labels";
 import type { CustomerOrder } from "@/lib/types";
+import { pendingOrderIds } from "@/lib/offline/outbox";
+import { useLive } from "@/lib/offline/use-live";
 import { useApi } from "@/lib/use-api";
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
@@ -71,8 +73,11 @@ function OnBehalf({ proxy, technician, children }: { proxy: boolean; technician:
   );
 }
 
+const NO_ORDERS: string[] = [];
+
 function Detail({ order, reload }: { order: CustomerOrder; reload: () => void }) {
   const { user } = useAuth();
+  const waiting = useLive(pendingOrderIds, NO_ORDERS).includes(order.id);
   const canPlan = user?.role === "admin" || user?.role === "coordinator";
   const planned = order.interventions?.find((i) => i.type === "study" && i.status === "planned");
   const readyForInstallation =
@@ -98,13 +103,20 @@ function Detail({ order, reload }: { order: CustomerOrder; reload: () => void })
 
       {canPlan && readyForInstallation && <PlanningPanel mode="installation" order={order} reprogram={order.status.value === "appointment_set"} onDone={reload} />}
 
-      {canRecordInstall && (
+      {waiting && (
+        <section role="status" className="space-y-1 rounded-xl border border-amber-300 bg-amber-50 p-4">
+          <h2 className="font-semibold text-amber-900">Résultat enregistré sur ce téléphone</h2>
+          <p className="text-sm text-amber-900">Il est en attente d&apos;envoi et partira automatiquement dès que le réseau est là. Vous n&apos;avez rien à refaire.</p>
+        </section>
+      )}
+
+      {!waiting && canRecordInstall && (
         <OnBehalf proxy={canPlan} technician={plannedInstall?.technician ?? null}>
           <InstallationResultPanel order={order} onDone={reload} />
         </OnBehalf>
       )}
 
-      {canRecord && (
+      {!waiting && canRecord && (
         <OnBehalf proxy={canPlan} technician={planned?.technician ?? null}>
           <StudyFormPanel order={order} showInternal={canPlan} onDone={reload} />
         </OnBehalf>
