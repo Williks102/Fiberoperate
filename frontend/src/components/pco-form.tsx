@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Field, inputClass } from "@/components/field";
+import { Badge } from "@/components/ui/badge";
 import { ApiError, apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth/token";
 import { pcoStatusLabel } from "@/lib/labels";
@@ -198,7 +199,7 @@ export function PcoForm({ pco }: { pco?: Pco }) {
       {editing && pco && (
         <p className="rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-700">
           Statut : <span className="font-medium text-ink">{pcoStatusLabel(pco)}</span>
-          {pco.is_blocked && <span className="ml-2 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-900">Bloqué</span>}
+          {pco.is_blocked && <span className="ml-2"><Badge tone="danger">Bloqué</Badge></span>}
           <span className="mt-1 block text-xs">Le statut ne se modifie pas ici : chaque changement de statut est historisé.</span>
         </p>
       )}

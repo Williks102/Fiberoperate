@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
 import { ProjectActions } from "@/components/project-actions";
 import { ProjectDocumentsPanel } from "@/components/project-documents-panel";
 import { ProjectQuotePanel } from "@/components/project-quote-panel";
 import { NetworkImportPanel } from "@/components/network-import-panel";
 import { useAuth } from "@/lib/auth/auth-context";
 import { formatDateTime } from "@/lib/format";
-import { DECISION_LABELS, phaseProgress, ZONE_STATUS_LABELS } from "@/lib/labels";
+import { DECISION_LABELS, PHASE_TONES, phaseProgress, ZONE_STATUS_LABELS, ZONE_TONES } from "@/lib/labels";
 import type { Project } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
 
@@ -17,7 +18,7 @@ export default function ProjetPage() {
   const result = useApi<{ data: Project }>(`/projects/${id}`);
 
   return (
-    <div className="max-w-2xl space-y-5">
+    <div className="space-y-5">
       <Link href="/projets" className="inline-flex h-11 items-center text-sm font-medium underline">
         ← Retour aux projets
       </Link>
@@ -52,18 +53,22 @@ function ProjectDetail({ project, reload }: { project: Project; reload: () => vo
         <h1 className="text-xl font-semibold">
           {project.kind === "desaturation" ? "Projet de désaturation" : "Projet"} de la plaque {project.plaque?.name ?? "—"}
         </h1>
-        <p className="text-sm text-slate-700">
-          Phase actuelle : <span className="font-medium text-ink">{project.phase_label}</span> depuis le {formatDateTime(project.phase_changed_at)}
+        <p className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
+          <Badge tone={PHASE_TONES[project.phase]}>{project.phase_label}</Badge>
+          depuis le {formatDateTime(project.phase_changed_at)}
         </p>
       </header>
 
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
       <ProjectActions project={project} onDone={reload} />
 
       <Characteristics project={project} />
       <ProjectDocumentsPanel projectId={project.id} plaqueId={project.plaque_id} />
       {canViewQuote && <ProjectQuotePanel projectId={project.id} />}
       {canImport && <NetworkImportPanel projectId={project.id} onImported={reload} />}
-
+        </div>
+        <aside className="space-y-6">
       <section aria-labelledby="phases" className="space-y-2">
         <h2 id="phases" className="text-lg font-semibold">
           Parcours
@@ -106,7 +111,7 @@ function ProjectDetail({ project, reload }: { project: Project; reload: () => vo
                 </p>
                 {line.decision && (
                   <p>
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${line.decision === "approved" ? "bg-green-100 text-green-900" : "bg-red-100 text-red-900"}`}>{DECISION_LABELS[line.decision]}</span>
+                    <Badge tone={line.decision === "approved" ? "success" : "danger"}>{DECISION_LABELS[line.decision]}</Badge>
                   </p>
                 )}
                 {line.reason && <p className="text-ink">Motif : {line.reason}</p>}
@@ -115,6 +120,8 @@ function ProjectDetail({ project, reload }: { project: Project; reload: () => vo
           </ul>
         )}
       </section>
+        </aside>
+      </div>
     </>
   );
 }
@@ -154,7 +161,7 @@ function Characteristics({ project }: { project: Project }) {
             <li key={zone.id} className="space-y-1 rounded-xl border border-slate-200 bg-white p-4 text-sm">
               <p className="flex flex-wrap items-center justify-between gap-2">
                 <span className="font-medium">{zone.code}</span>
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">{ZONE_STATUS_LABELS[zone.status]}</span>
+                <Badge tone={ZONE_TONES[zone.status]}>{ZONE_STATUS_LABELS[zone.status]}</Badge>
               </p>
               <p className="text-slate-700">
                 SRO {zone.sro ?? "à créer"} · {zone.splitters} splitters · {zone.pcos} PCO prévus

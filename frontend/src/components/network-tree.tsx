@@ -4,16 +4,12 @@ import Link from "next/link";
 import { useState } from "react";
 import { AsyncList } from "@/components/async-list";
 import { useAuth } from "@/lib/auth/auth-context";
-import { pcoStatusLabel, ZONE_STATUS_LABELS } from "@/lib/labels";
+import { Badge } from "@/components/ui/badge";
+import { pcoStatusLabel, pcoTone, ZONE_STATUS_LABELS, ZONE_TONES } from "@/lib/labels";
 import type { Jdv, Paged, Pco, Plaque, Zone } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
 
 const PER_PAGE = 100;
-
-function Badge({ children, tone = "neutral" }: { children: React.ReactNode; tone?: "neutral" | "danger" }) {
-  const colors = tone === "danger" ? "bg-red-100 text-red-800" : "bg-slate-100 text-slate-700";
-  return <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${colors}`}>{children}</span>;
-}
 
 /** Ligne dépliable ; les enfants ne sont chargés qu'à l'ouverture. */
 function Node({
@@ -59,7 +55,7 @@ function Pcos({ jdvId }: { jdvId: string }) {
               <span className="font-medium">{pco.code}</span>
               <span className="flex items-center gap-2">
                 {pco.is_blocked && <Badge tone="danger">Bloqué</Badge>}
-                <Badge>{pcoStatusLabel(pco)}</Badge>
+                <Badge tone={pcoTone(pco)}>{pcoStatusLabel(pco)}</Badge>
               </span>
             </li>
           ))}
@@ -101,7 +97,7 @@ function Zones({ plaqueId }: { plaqueId: string }) {
               badges={
                 <>
                   {zone.access_point_label && <Badge>{zone.access_point_label}</Badge>}
-                  <Badge>{ZONE_STATUS_LABELS[zone.status]}</Badge>
+                  <Badge tone={ZONE_TONES[zone.status]}>{ZONE_STATUS_LABELS[zone.status]}</Badge>
                 </>
               }
             >

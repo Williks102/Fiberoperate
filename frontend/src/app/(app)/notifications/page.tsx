@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AsyncList } from "@/components/async-list";
 import { Pager } from "@/components/pager";
+import { Badge } from "@/components/ui/badge";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth/token";
 import { formatDateTime } from "@/lib/format";
@@ -60,7 +61,7 @@ export default function NotificationsPage() {
                   >
                     <span className="flex flex-wrap items-center justify-between gap-2">
                       <span className="font-medium">{n.title}</span>
-                      {!n.read && <span className="rounded-full bg-primary hover:bg-primary-hover px-2 py-0.5 text-xs font-medium text-white">Nouveau</span>}
+                      {!n.read && <Badge tone="info">Nouveau</Badge>}
                     </span>
                     <span className="block text-sm text-slate-700">{n.message}</span>
                     <span className="block text-xs text-slate-700">{formatDateTime(n.created_at)}</span>

@@ -28,7 +28,7 @@ export function BottomBar({ role, skills, pathname }: { role: Role; skills?: Mis
           aria-current={active(entry.href) ? "page" : undefined}
           className="flex h-14 min-w-0 flex-1 items-center justify-center"
         >
-          <span className={`flex h-10 w-14 items-center justify-center rounded-full ${active(entry.href) ? "bg-primary hover:bg-primary-hover text-white" : "text-slate-700"}`}>
+          <span className={`flex h-10 w-14 items-center justify-center rounded-full ${active(entry.href) ? "bg-primary text-white" : "text-slate-700"}`}>
             <NavIcon name={entry.icon} />
           </span>
         </Link>

@@ -5,9 +5,10 @@ import { useState } from "react";
 import { AsyncList } from "@/components/async-list";
 import { inputClass } from "@/components/field";
 import { Pager } from "@/components/pager";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth/auth-context";
 import { formatDateTime } from "@/lib/format";
-import { PROJECT_PHASES } from "@/lib/labels";
+import { PHASE_TONES, PROJECT_PHASES } from "@/lib/labels";
 import type { Paged, Project } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
 import { useDebounced } from "@/lib/use-debounced";
@@ -93,8 +94,8 @@ export default function ProjetsPage() {
                       </Link>
                     </p>
                     <span className="flex flex-wrap items-center gap-2">
-                      {project.kind === "desaturation" && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">{project.kind_label}</span>}
-                      <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-medium text-primary-ink">{project.phase_label}</span>
+                      {project.kind === "desaturation" && <Badge tone="warning">{project.kind_label}</Badge>}
+                      <Badge tone={PHASE_TONES[project.phase]}>{project.phase_label}</Badge>
                     </span>
                   </div>
                   <p className="text-sm text-slate-700">Phase depuis le {formatDateTime(project.phase_changed_at)}</p>

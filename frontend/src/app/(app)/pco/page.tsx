@@ -5,7 +5,8 @@ import { useState } from "react";
 import { AsyncList } from "@/components/async-list";
 import { inputClass } from "@/components/field";
 import { Pager } from "@/components/pager";
-import { PCO_STATUS_LABELS, pcoStatusLabel } from "@/lib/labels";
+import { Badge } from "@/components/ui/badge";
+import { PCO_STATUS_LABELS, pcoStatusLabel, pcoTone } from "@/lib/labels";
 import type { Paged, Pco, PcoStatus, Plaque } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
 import { useDebounced } from "@/lib/use-debounced";
@@ -95,8 +96,8 @@ export default function PcoPage() {
                       </Link>
                     </p>
                     <span className="flex items-center gap-2">
-                      {pco.is_blocked && <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-900">Bloqué</span>}
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-ink">{pcoStatusLabel(pco)}</span>
+                      {pco.is_blocked && <Badge tone="danger">Bloqué</Badge>}
+                      <Badge tone={pcoTone(pco)}>{pcoStatusLabel(pco)}</Badge>
                     </span>
                   </div>
                   <p className="text-sm text-slate-700">

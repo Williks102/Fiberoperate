@@ -1,3 +1,4 @@
+import type { Tone } from "@/components/ui/badge";
 import type { MissionType, Pco, ProjectPhase, Role, ZoneStatus } from "@/lib/types";
 
 export const ZONE_STATUS_LABELS: Record<ZoneStatus, string> = {
@@ -69,3 +70,23 @@ export const MISSION_LABELS: Record<MissionType, string> = {
   drawing: "Dessin et avant-projet",
   survey: "Relevés (survey)",
 };
+
+/** Couleur d'état d'une phase de projet : validations en attente = attention, travaux = information, exploitation = succès. */
+export const PHASE_TONES: Record<ProjectPhase, Tone> = {
+  pre_project: "neutral",
+  be_manager_review: "warning",
+  dt_review: "warning",
+  client_review: "warning",
+  implantation_survey: "info",
+  deployment: "info",
+  as_built_survey: "info",
+  in_operation: "success",
+};
+
+export const ZONE_TONES: Record<ZoneStatus, Tone> = { planned: "neutral", deploying: "info", in_operation: "success", closed: "neutral" };
+
+/** Couleur d'état d'un PCO ; un libellé d'origine sans statut normalisé reste neutre. */
+export function pcoTone(pco: Pick<Pco, "status" | "is_blocked">): Tone {
+  if (pco.is_blocked) return "danger";
+  return pco.status === "activated" ? "success" : pco.status === "spliced" || pco.status === "pulled" ? "info" : "neutral";
+}
