@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { StudyFormPanel } from "@/components/study-form-panel";
-import { StudyPlanningPanel } from "@/components/study-planning-panel";
+import { PlanningPanel } from "@/components/planning-panel";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth/auth-context";
 import { formatDate, formatDateTime } from "@/lib/format";
@@ -51,6 +51,8 @@ function Detail({ order, reload }: { order: CustomerOrder; reload: () => void })
   const { user } = useAuth();
   const canPlan = user?.role === "admin" || user?.role === "coordinator";
   const planned = order.interventions?.find((i) => i.type === "study" && i.status === "planned");
+  const readyForInstallation =
+    order.status.value === "appointment_set" || order.status.value === "postponed" || order.status.value === "failed" || (order.status.value === "studied" && order.study_result === "feasible");
   const canRecord = order.status.value === "in_study" && !!planned && (canPlan || (user?.role === "technician" && planned.technician_id === user.id));
 
   return (
@@ -63,7 +65,9 @@ function Detail({ order, reload }: { order: CustomerOrder; reload: () => void })
         <Badge tone={ORDER_TONES[order.status.value]}>{order.status.label}</Badge>
       </div>
 
-      {canPlan && order.status.value === "received" && <StudyPlanningPanel order={order} onDone={reload} />}
+      {canPlan && order.status.value === "received" && <PlanningPanel mode="study" order={order} onDone={reload} />}
+
+      {canPlan && readyForInstallation && <PlanningPanel mode="installation" order={order} reprogram={order.status.value === "appointment_set"} onDone={reload} />}
 
       {canRecord && <StudyFormPanel order={order} showInternal={canPlan} onDone={reload} />}
 

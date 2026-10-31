@@ -37,7 +37,7 @@ class CustomerOrderController extends ApiResourceController
     {
         $status = OrderStatus::tryFrom((string) $request->query('status'));
 
-        $query->with(['zone:id,code', 'pco:id,code'])
+        $query->with(['zone:id,code', 'pco:id,code', 'interventions' => fn ($q) => $q->where('status', 'planned')->with('technician:id,name')])
             ->when($request->query('stage'), fn ($q, $stage) => $this->stage($q, (string) $stage))
             ->when($status, fn ($q) => $q->where('status', $status->value))
             ->when($request->query('zone_id'), fn ($q, $id) => $q->where('zone_id', $id))
