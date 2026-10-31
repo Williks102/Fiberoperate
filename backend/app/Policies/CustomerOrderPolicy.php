@@ -52,4 +52,11 @@ class CustomerOrderPolicy
     {
         return $user->hasRole(Role::Admin, Role::Coordinator);
     }
+
+    /** Ajouter une photo à une commande : le coordinateur et l'administrateur, ou un technicien qui a (ou a eu) une visite sur cette commande. */
+    public function addPhoto(User $user, CustomerOrder $order): bool
+    {
+        return $user->hasRole(Role::Admin, Role::Coordinator)
+            || ($user->hasRole(Role::Technician) && $order->interventions()->where('technician_id', $user->getKey())->exists());
+    }
 }

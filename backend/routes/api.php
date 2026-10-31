@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\NetworkImportController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\OltController;
 use App\Http\Controllers\Api\V1\PcoController;
+use App\Http\Controllers\Api\V1\PhotoController;
 use App\Http\Controllers\Api\V1\PlaqueController;
 use App\Http\Controllers\Api\V1\PriceItemController;
 use App\Http\Controllers\Api\V1\ProjectController;
@@ -68,6 +69,8 @@ Route::prefix('v1')->group(function () {
         Route::patch('customer-imports/{batch}/rows/{row}', [CustomerImportController::class, 'exclude']);
         Route::post('customer-imports/{batch}/validate', [CustomerImportController::class, 'validateBatch']);
         Route::get('my-visits', [MyVisitController::class, 'index']);
+        Route::post('uploads/sign', [PhotoController::class, 'sign']);
+        Route::post('photos', [PhotoController::class, 'store']);
         Route::post('sync/push', [FieldSyncController::class, 'push']);
         Route::get('customer-orders/study-technicians', [StudyPlanningController::class, 'technicians']);
         Route::get('customer-orders/study-defaults', [StudyResultController::class, 'defaults']);
