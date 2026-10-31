@@ -73,7 +73,7 @@ function Jdvs({ zoneId }: { zoneId: string }) {
   const { reload, ...state } = useApi<Paged<Jdv>>(`/jdvs?zone_id=${zoneId}&per_page=${PER_PAGE}`);
 
   return (
-    <AsyncList state={state} reload={reload} empty="Aucun splitter (JDV) dans cette zone.">
+    <AsyncList state={state} reload={reload} empty="Aucun splitter dans cette sous-plaque.">
       {(jdvs) => (
         <ul className="space-y-2">
           {jdvs.map((jdv) => (
@@ -114,7 +114,7 @@ function Zones({ plaqueId }: { plaqueId: string }) {
   );
 }
 
-/** Plaque → sous-plaques (zones) → splitters (JDV) → PCO, en lecture, dans le périmètre du rôle. */
+/** Plaque → sous-plaques (zones) → splitters → PCO, en lecture, dans le périmètre du rôle. */
 export function NetworkTree() {
   const { user } = useAuth();
   // Administrateur, DT (superviseur), chef du BE et techniciens du BE ouvrent la fiche de modification.

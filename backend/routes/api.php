@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BlockReasonController;
+use App\Http\Controllers\Api\V1\CustomerImportController;
 use App\Http\Controllers\Api\V1\JdvController;
 use App\Http\Controllers\Api\V1\NetworkImportController;
 use App\Http\Controllers\Api\V1\NotificationController;
@@ -55,6 +56,8 @@ Route::prefix('v1')->group(function () {
         Route::get('notifications', [NotificationController::class, 'index']);
         Route::post('notifications/read-all', [NotificationController::class, 'readAll']);
         Route::post('notifications/{notification}/read', [NotificationController::class, 'read']);
+        Route::post('customer-imports', [CustomerImportController::class, 'store']);
+        Route::get('customer-imports/{batch}', [CustomerImportController::class, 'show']);
         Route::get('block-reasons', [BlockReasonController::class, 'index']);
     });
 });

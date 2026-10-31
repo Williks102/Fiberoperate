@@ -9,7 +9,7 @@ import type { Jdv, Paged, Plaque } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
 import { useDebounced } from "@/lib/use-debounced";
 
-/** Administration des splitters (JDV) ; la consultation passe par l'écran Réseau. */
+/** Administration des splitters ; la consultation passe par l'écran Réseau. */
 export default function SplittersPage() {
   const [search, setSearch] = useState("");
   const [plaqueId, setPlaqueId] = useState("");
