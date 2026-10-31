@@ -58,6 +58,8 @@ Route::prefix('v1')->group(function () {
         Route::post('notifications/{notification}/read', [NotificationController::class, 'read']);
         Route::post('customer-imports', [CustomerImportController::class, 'store']);
         Route::get('customer-imports/{batch}', [CustomerImportController::class, 'show']);
+        Route::patch('customer-imports/{batch}/rows/{row}', [CustomerImportController::class, 'exclude']);
+        Route::post('customer-imports/{batch}/validate', [CustomerImportController::class, 'validateBatch']);
         Route::get('block-reasons', [BlockReasonController::class, 'index']);
     });
 });
