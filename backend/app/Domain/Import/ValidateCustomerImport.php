@@ -64,8 +64,9 @@ final class ValidateCustomerImport
             $order->update(array_filter($values, fn ($value) => $value !== null));
             $outcome = 'updated';
         } else {
-            $studied = ($data['initial_study'] ?? null) === 'done';
-            $status = $studied ? OrderStatus::Studied : OrderStatus::Received;
+            $installed = ($data['initial_status'] ?? null) === 'installed';
+            $studied = ! $installed && ($data['initial_study'] ?? null) === 'done';
+            $status = $installed ? OrderStatus::Installed : ($studied ? OrderStatus::Studied : OrderStatus::Received);
 
             $order = new CustomerOrder($values);
             $order->forceFill(['status' => $status, 'study_result' => $studied ? StudyResult::Feasible : null])->save();

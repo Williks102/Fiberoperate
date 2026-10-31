@@ -13,13 +13,16 @@ final class CsvTable
     /**
      * @param  list<array{line: int, values: array<string, string>}>  $rows
      */
-    private function __construct(public readonly array $rows) {}
+    private function __construct(public readonly array $rows, public readonly array $ignoredColumns = []) {}
 
     /**
      * @param  list<string>  $allowed  colonnes acceptées (noms canoniques)
      * @param  list<string>  $required  colonnes obligatoires
+     * @param  array<string, string>  $aliases  en-tête normalisé → nom canonique (fichier d'un opérateur)
+     * @param  array<string, string>  $prefixAliases  début d'en-tête normalisé → nom canonique (en-têtes à texte libre)
+     * @param  bool  $ignoreUnknown  une colonne inconnue est ignorée et signalée (`ignoredColumns`) au lieu de refuser le fichier
      */
-    public static function fromContent(string $content, array $allowed, array $required, int $maxRows): self
+    public static function fromContent(string $content, array $allowed, array $required, int $maxRows, array $aliases = [], array $prefixAliases = [], bool $ignoreUnknown = false): self
     {
         $content = preg_replace('/^\xEF\xBB\xBF/', '', $content) ?? $content;
         if (! mb_check_encoding($content, 'UTF-8')) {
@@ -38,6 +41,7 @@ final class CsvTable
         rewind($stream);
 
         $headers = null;
+        $ignored = [];
         $rows = [];
         $line = 0;
 
@@ -49,7 +53,7 @@ final class CsvTable
             }
 
             if ($headers === null) {
-                $headers = self::readHeaders($record, $allowed, $required);
+                $headers = self::readHeaders($record, $allowed, $required, $aliases, $prefixAliases, $ignoreUnknown, $ignored);
 
                 continue;
             }
@@ -70,11 +74,16 @@ final class CsvTable
             throw new ImportFileException('Le fichier ne contient aucune ligne de données sous les en-têtes.');
         }
 
-        return new self($rows);
+        return new self($rows, $ignored);
     }
 
-    /** @return array<int, string> */
-    private static function readHeaders(array $record, array $allowed, array $required): array
+    /**
+     * @param  array<string, string>  $aliases
+     * @param  array<string, string>  $prefixAliases
+     * @param  list<string>  $ignored  reçoit les colonnes ignorées quand `$ignoreUnknown` ; sinon une colonne inconnue refuse le fichier
+     * @return array<int, string>
+     */
+    private static function readHeaders(array $record, array $allowed, array $required, array $aliases, array $prefixAliases, bool $ignoreUnknown, array &$ignored): array
     {
         $headers = [];
         foreach ($record as $i => $raw) {
@@ -82,7 +91,14 @@ final class CsvTable
             if ($name === '') {
                 continue;
             }
+            $name = $aliases[$name] ?? self::byPrefix($name, $prefixAliases) ?? $name;
             if (! in_array($name, $allowed, true)) {
+                if ($ignoreUnknown) {
+                    $ignored[] = trim((string) $raw);
+                    $ignored = array_values(array_unique($ignored));
+
+                    continue;
+                }
                 throw new ImportFileException('Colonne inconnue : « '.trim((string) $raw).' ». Utilisez les en-têtes du modèle sans les modifier.');
             }
             $headers[$i] = $name;
@@ -94,5 +110,17 @@ final class CsvTable
         }
 
         return $headers;
+    }
+
+    /** @param array<string, string> $prefixAliases */
+    private static function byPrefix(string $name, array $prefixAliases): ?string
+    {
+        foreach ($prefixAliases as $prefix => $canonical) {
+            if (str_starts_with($name, $prefix)) {
+                return $canonical;
+            }
+        }
+
+        return null;
     }
 }

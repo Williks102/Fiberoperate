@@ -77,7 +77,7 @@ class CustomerImportAnalyseTest extends TestCase
         $this->assertSame('done', $row['data']['initial_study']);
         $this->assertSame('SANS PCO', $row['data']['initial_study_raw'], 'les espaces parasites du fichier sont retirés, le libellé reste celui du fichier');
         $this->assertSame(150, $row['data']['distance_m']);
-        $this->assertSame(['ok' => 1, 'to_fix' => 0, 'rejected' => 0, 'create' => 1, 'update' => 0, 'rows' => 1], $batch->counts);
+        $this->assertSame(['ok' => 1, 'to_fix' => 0, 'rejected' => 0, 'create' => 1, 'update' => 0, 'rows' => 1, 'ignored_columns' => []], $batch->counts);
         $this->assertSame(0, CustomerOrder::count());
     }
 
@@ -209,7 +209,7 @@ class CustomerImportAnalyseTest extends TestCase
 
     public function test_file_level_problems_are_refused(): void
     {
-        foreach (['' => 'vide', "id_client;nom\n" => 'aucune ligne', "nom;adresse\nA;B\n" => 'manquante', "id_client;nom;couleur\nA;B;rouge\n" => 'inconnue'] as $content => $expected) {
+        foreach (['' => 'vide', "id_client;nom\n" => 'aucune ligne', "nom;adresse\nA;B\n" => 'manquante'] as $content => $expected) {
             try {
                 CustomerImportAnalyzer::parse((string) $content);
                 $this->fail("Fichier accepté à tort : {$expected}");
@@ -217,5 +217,12 @@ class CustomerImportAnalyseTest extends TestCase
                 $this->assertStringContainsString($expected, $e->getMessage());
             }
         }
+    }
+
+    public function test_an_unknown_column_is_ignored_and_reported_not_refused(): void
+    {
+        $table = CustomerImportAnalyzer::parse("id_client;nom;couleur\nA;B;rouge\n");
+
+        $this->assertSame(['couleur'], $table->ignoredColumns);
     }
 }
