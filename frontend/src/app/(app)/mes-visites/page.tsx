@@ -38,6 +38,13 @@ export default function MesVisitesPage() {
                   </div>
 
                   {visit.order.address_raw && <p className="text-sm">{visit.order.address_raw}</p>}
+                  {visit.type === "customer_connection" && (
+                    <p className="rounded-lg bg-primary-soft p-2 text-sm text-primary-ink">
+                      {visit.order.ont_serial || visit.order.fixed_line
+                        ? `Box : ${[visit.order.ont_serial && `SN ${visit.order.ont_serial}`, visit.order.fixed_line && `ligne fixe ${visit.order.fixed_line}`].filter(Boolean).join(" · ")}`
+                        : "Box pas encore attribuée : demandez-la au coordinateur."}
+                    </p>
+                  )}
                   {visit.observation && <p className="rounded-lg bg-slate-50 p-2 text-sm text-slate-700">{visit.observation}</p>}
 
                   <div className="flex flex-wrap gap-2 pt-1">

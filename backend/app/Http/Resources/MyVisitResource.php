@@ -29,6 +29,8 @@ class MyVisitResource extends JsonResource
                 'status' => $order->status->value,
                 'zone' => $order->zone?->code,
                 'pco' => $order->pco?->code,
+                'ont_serial' => $order->ont_serial,
+                'fixed_line' => $order->fixed_line,
             ],
         ];
     }

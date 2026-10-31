@@ -19,7 +19,7 @@ use Illuminate\Validation\ValidationException;
  */
 class RecordInstallation
 {
-    /** @param array{result: string, reason_id?: ?string, ont_serial?: ?string, fixed_line?: ?string, observation?: ?string} $data */
+    /** @param array{result: string, reason_id?: ?string, observation?: ?string} $data */
     public function __invoke(CustomerOrder $order, User $by, array $data): Intervention
     {
         $result = OrderStatus::from($data['result']);
@@ -52,13 +52,6 @@ class RecordInstallation
                 'reason_id' => $reason?->getKey(),
                 'observation' => $data['observation'] ?? $visit->observation,
             ]);
-
-            if ($result === OrderStatus::Installed) {
-                $order->forceFill([
-                    'ont_serial' => $data['ont_serial'] ?? $order->ont_serial,
-                    'fixed_line' => $data['fixed_line'] ?? $order->fixed_line,
-                ])->save();
-            }
 
             $note = $reason ? $reason->label : null;
             if (! empty($data['observation'])) {

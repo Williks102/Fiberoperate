@@ -22,6 +22,8 @@ class CustomerOrderResource extends JsonResource
             'declared_latitude' => $this->declared_latitude,
             'declared_longitude' => $this->declared_longitude,
             'distance_m' => $this->distance_m,
+            'ont_serial' => $this->ont_serial,
+            'fixed_line' => $this->fixed_line,
             'status' => ['value' => $this->status->value, 'label' => $this->status->label()],
             'stage' => $this->stage(),
             'study_result' => $this->study_result?->value,

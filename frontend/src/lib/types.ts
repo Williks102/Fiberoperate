@@ -172,6 +172,8 @@ export interface CustomerOrder {
   declared_latitude: string | null;
   declared_longitude: string | null;
   distance_m: number | null;
+  ont_serial: string | null;
+  fixed_line: string | null;
   status: { value: OrderStatusValue; label: string };
   stage: "instances" | "raccordables" | "raccordes";
   study_result: "feasible" | "not_feasible" | "customer_absent" | null;
@@ -218,5 +220,7 @@ export interface Visit {
     status: OrderStatusValue;
     zone: string | null;
     pco: string | null;
+    ont_serial: string | null;
+    fixed_line: string | null;
   };
 }

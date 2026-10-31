@@ -63,13 +63,14 @@ class RecordInstallationTest extends TestCase
         $this->getJson('/api/v1/customer-orders/outcome-reasons')->assertForbidden();
     }
 
-    public function test_an_installed_client_keeps_the_ont_and_the_fixed_line_and_moves_to_the_connected_list(): void
+    public function test_an_installed_client_moves_to_the_connected_list_and_keeps_the_box_given_by_the_coordinator(): void
     {
         $tech = $this->user(Role::Technician, 'Tech', MissionType::CustomerConnection);
         $order = $this->scheduled($tech);
+        $order->forceFill(['ont_serial' => 'HWTC12345678', 'fixed_line' => '2721234567'])->save();
         Sanctum::actingAs($tech);
 
-        $this->postJson($this->url($order), ['result' => 'installed', 'ont_serial' => 'HWTC12345678', 'fixed_line' => '2721234567'])->assertOk()
+        $this->postJson($this->url($order), ['result' => 'installed', 'ont_serial' => 'AUTRE'])->assertOk()
             ->assertJsonPath('data.status.value', 'installed')
             ->assertJsonPath('data.stage', 'raccordes')
             ->assertJsonPath('data.interventions.0.status', 'done')
