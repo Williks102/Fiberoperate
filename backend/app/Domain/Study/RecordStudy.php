@@ -11,6 +11,7 @@ use App\Models\Intervention;
 use App\Models\Pco;
 use App\Models\Study;
 use App\Models\User;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -22,9 +23,9 @@ use Illuminate\Validation\ValidationException;
 class RecordStudy
 {
     /** @param array<string, mixed> $data */
-    public function __invoke(CustomerOrder $order, User $by, array $data): Study
+    public function __invoke(CustomerOrder $order, User $by, array $data, ?CarbonInterface $at = null, ?string $device = null): Study
     {
-        return DB::transaction(function () use ($order, $by, $data) {
+        return DB::transaction(function () use ($order, $by, $data, $at, $device) {
             $order = CustomerOrder::query()->lockForUpdate()->findOrFail($order->getKey());
 
             $intervention = Intervention::query()
@@ -51,6 +52,9 @@ class RecordStudy
 
             $pco = $result === StudyResult::Feasible ? Pco::query()->findOrFail($data['pco_id']) : null;
             $study->pco_id = $pco?->getKey();
+            if ($at !== null) {
+                $study->created_at = $at;
+            }
             $study->save();
 
             $intervention->update(['status' => InterventionStatus::Done]);
@@ -62,7 +66,7 @@ class RecordStudy
                 'field_latitude' => $study->field_latitude ?? $order->field_latitude,
                 'field_longitude' => $study->field_longitude ?? $order->field_longitude,
             ])->save();
-            $order->changeStatus(OrderStatus::Studied, $by, $study->problem ?: $study->field_comments, null, $result);
+            $order->changeStatus(OrderStatus::Studied, $by, $study->problem ?: $study->field_comments, $device, $result, $at);
 
             return $study;
         });

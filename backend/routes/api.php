@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BlockReasonController;
 use App\Http\Controllers\Api\V1\CustomerImportController;
 use App\Http\Controllers\Api\V1\CustomerOrderController;
+use App\Http\Controllers\Api\V1\FieldSyncController;
 use App\Http\Controllers\Api\V1\InstallationPlanningController;
 use App\Http\Controllers\Api\V1\InstallationResultController;
 use App\Http\Controllers\Api\V1\JdvController;
@@ -67,6 +68,7 @@ Route::prefix('v1')->group(function () {
         Route::patch('customer-imports/{batch}/rows/{row}', [CustomerImportController::class, 'exclude']);
         Route::post('customer-imports/{batch}/validate', [CustomerImportController::class, 'validateBatch']);
         Route::get('my-visits', [MyVisitController::class, 'index']);
+        Route::post('sync/push', [FieldSyncController::class, 'push']);
         Route::get('customer-orders/study-technicians', [StudyPlanningController::class, 'technicians']);
         Route::get('customer-orders/study-defaults', [StudyResultController::class, 'defaults']);
         Route::get('customer-orders/study-pcos', [StudyResultController::class, 'pcos']);

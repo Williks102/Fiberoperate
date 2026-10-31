@@ -9,6 +9,7 @@ use App\Models\CustomerOrder;
 use App\Models\Intervention;
 use App\Models\OutcomeReason;
 use App\Models\User;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -20,14 +21,14 @@ use Illuminate\Validation\ValidationException;
 class RecordInstallation
 {
     /** @param array{result: string, reason_id?: ?string, observation?: ?string} $data */
-    public function __invoke(CustomerOrder $order, User $by, array $data): Intervention
+    public function __invoke(CustomerOrder $order, User $by, array $data, ?CarbonInterface $at = null, ?string $device = null): Intervention
     {
         $result = OrderStatus::from($data['result']);
         if (! in_array($result, [OrderStatus::Installed, OrderStatus::Postponed, OrderStatus::Failed], true)) {
             throw ValidationException::withMessages(['result' => 'Résultat inconnu : choisissez installé, reporté ou en échec.']);
         }
 
-        return DB::transaction(function () use ($order, $by, $data, $result) {
+        return DB::transaction(function () use ($order, $by, $data, $result, $at, $device) {
             $order = CustomerOrder::query()->lockForUpdate()->findOrFail($order->getKey());
 
             $visit = Intervention::query()
@@ -57,7 +58,7 @@ class RecordInstallation
             if (! empty($data['observation'])) {
                 $note = trim("{$note} — {$data['observation']}", ' —');
             }
-            $order->changeStatus($result, $by, $note ?: null);
+            $order->changeStatus($result, $by, $note ?: null, $device, null, $at);
 
             return $visit;
         });
