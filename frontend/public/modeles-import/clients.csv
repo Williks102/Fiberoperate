@@ -1,0 +1,3 @@
+rab;ft;compte;nom;adresse;contact1;contact2;latitude;longitude;sous_plaque;pco;sn_ont;ligne_fixe;date_enregistrement;date_envoi;etude_technique;distance;etat_ligne;commentaire
+RAB0000000000001;FT0000000001;;Client Exemple Un;Quartier Exemple, près du marché;0707123456;;5.3600;-4.0083;ABB01;ABB01_PCO001;;;2026-10-12;2026-10-14;SANS PCO;150;En cours de raccordement;
+RAB0000000000002;;;Client Exemple Deux;Rue Exemple;*0101234567;0505123456;;;ABB01;ABB01_PCO002;;;2026-10-12;;AVEC PCO;;;Brin 7, 150 m
