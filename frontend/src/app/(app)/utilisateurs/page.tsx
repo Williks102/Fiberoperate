@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { AsyncList } from "@/components/async-list";
 import { Pager } from "@/components/pager";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth/auth-context";
 import { MISSION_LABELS, ROLE_LABELS } from "@/lib/labels";
 import type { Paged, Role, User } from "@/lib/types";
@@ -102,13 +103,7 @@ export default function UtilisateursPage() {
                       </span>
                     )}
                   </span>
-                  <span
-                    className={`w-fit rounded-full px-2 py-0.5 text-xs font-medium ${
-                      user.is_active ? "bg-green-100 text-green-800" : "bg-slate-200 text-slate-700"
-                    }`}
-                  >
-                    {user.is_active ? "Actif" : "Désactivé"}
-                  </span>
+                  <Badge tone={user.is_active ? "success" : "neutral"}>{user.is_active ? "Actif" : "Désactivé"}</Badge>
                 </li>
               ))}
             </ul>
