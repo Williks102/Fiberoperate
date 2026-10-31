@@ -183,6 +183,20 @@ export interface CustomerOrder {
   observation: string | null;
   zone?: { id: string; code: string } | null;
   pco?: { id: string; code: string } | null;
-  interventions?: { id: string; type: string; status: string; status_label: string; planned_date: string; technician: string | null; observation: string | null }[];
+  interventions?: { id: string; technician_id: string; type: string; status: string; status_label: string; planned_date: string; technician: string | null; observation: string | null }[];
+  studies?: {
+    id: string;
+    result: "feasible" | "not_feasible" | "customer_absent";
+    result_label: string;
+    concrete_poles_existing: number;
+    concrete_poles_to_install: number;
+    metal_poles_existing: number;
+    metal_poles_to_install: number;
+    distance_m: number | null;
+    problem: string | null;
+    field_comments: string | null;
+    internal_comments?: string | null;
+    at: string | null;
+  }[];
   history?: { from: OrderStatusValue | null; to: OrderStatusValue; to_label: string; observation: string | null; author: string | null; at: string | null }[];
 }

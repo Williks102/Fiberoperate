@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\ProjectDocumentController;
 use App\Http\Controllers\Api\V1\ProjectQuoteController;
 use App\Http\Controllers\Api\V1\SroController;
 use App\Http\Controllers\Api\V1\StudyPlanningController;
+use App\Http\Controllers\Api\V1\StudyResultController;
 use App\Http\Controllers\Api\V1\TeamController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\ZoneController;
@@ -63,7 +64,10 @@ Route::prefix('v1')->group(function () {
         Route::patch('customer-imports/{batch}/rows/{row}', [CustomerImportController::class, 'exclude']);
         Route::post('customer-imports/{batch}/validate', [CustomerImportController::class, 'validateBatch']);
         Route::get('customer-orders/study-technicians', [StudyPlanningController::class, 'technicians']);
+        Route::get('customer-orders/study-defaults', [StudyResultController::class, 'defaults']);
+        Route::get('customer-orders/study-pcos', [StudyResultController::class, 'pcos']);
         Route::post('customer-orders/{order}/study', [StudyPlanningController::class, 'store']);
+        Route::post('customer-orders/{order}/study-result', [StudyResultController::class, 'store']);
         Route::apiResource('customer-orders', CustomerOrderController::class)->only(['index', 'show']);
         Route::get('block-reasons', [BlockReasonController::class, 'index']);
     });

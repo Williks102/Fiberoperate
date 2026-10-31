@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { StudyFormPanel } from "@/components/study-form-panel";
 import { StudyPlanningPanel } from "@/components/study-planning-panel";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -49,6 +50,8 @@ export default function ClientPage() {
 function Detail({ order, reload }: { order: CustomerOrder; reload: () => void }) {
   const { user } = useAuth();
   const canPlan = user?.role === "admin" || user?.role === "coordinator";
+  const planned = order.interventions?.find((i) => i.type === "study" && i.status === "planned");
+  const canRecord = order.status.value === "in_study" && !!planned && (canPlan || (user?.role === "technician" && planned.technician_id === user.id));
 
   return (
     <>
@@ -61,6 +64,8 @@ function Detail({ order, reload }: { order: CustomerOrder; reload: () => void })
       </div>
 
       {canPlan && order.status.value === "received" && <StudyPlanningPanel order={order} onDone={reload} />}
+
+      {canRecord && <StudyFormPanel order={order} showInternal={canPlan} onDone={reload} />}
 
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="rounded-xl border border-slate-200 bg-white p-4">
@@ -87,6 +92,27 @@ function Detail({ order, reload }: { order: CustomerOrder; reload: () => void })
           </dl>
         </section>
       </div>
+
+      {order.studies && order.studies.length > 0 && (
+        <section className="rounded-xl border border-slate-200 bg-white p-4">
+          <h2 className="font-semibold">Étude</h2>
+          {order.studies.map((st) => (
+            <dl key={st.id} className="divide-y divide-slate-100">
+              <Row label="Résultat">{st.result_label}</Row>
+              {st.result === "feasible" && (
+                <>
+                  <Row label="Poteaux béton">{`${st.concrete_poles_existing} existants · ${st.concrete_poles_to_install} à installer`}</Row>
+                  <Row label="Poteaux métalliques">{`${st.metal_poles_existing} existants · ${st.metal_poles_to_install} à installer`}</Row>
+                  <Row label="Distance">{st.distance_m != null ? `${st.distance_m} m` : null}</Row>
+                </>
+              )}
+              <Row label="Problème rencontré">{st.problem}</Row>
+              <Row label="Commentaires de terrain">{st.field_comments}</Row>
+              {st.internal_comments ? <Row label="Commentaires internes">{st.internal_comments}</Row> : null}
+            </dl>
+          ))}
+        </section>
+      )}
 
       {order.interventions && order.interventions.length > 0 && (
         <section className="rounded-xl border border-slate-200 bg-white p-4">

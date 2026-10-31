@@ -2,8 +2,10 @@
 
 namespace App\Policies;
 
+use App\Enums\InterventionStatus;
 use App\Enums\MissionType;
 use App\Enums\Role;
+use App\Models\CustomerOrder;
 use App\Models\User;
 
 /**
@@ -27,5 +29,13 @@ class CustomerOrderPolicy
     public function plan(User $user): bool
     {
         return $user->hasRole(Role::Admin, Role::Coordinator);
+    }
+
+    /** Saisir le résultat d'une étude : le coordinateur et l'administrateur, ou le technicien à qui l'étude est confiée. */
+    public function recordStudy(User $user, CustomerOrder $order): bool
+    {
+        return $user->hasRole(Role::Admin, Role::Coordinator)
+            || ($user->hasRole(Role::Technician) && $order->interventions()
+                ->where('type', MissionType::Study->value)->where('status', InterventionStatus::Planned->value)->where('technician_id', $user->getKey())->exists());
     }
 }

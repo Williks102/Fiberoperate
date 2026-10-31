@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\Role;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -38,9 +39,24 @@ class CustomerOrderResource extends JsonResource
                 'status' => $i->status->value,
                 'status_label' => $i->status->label(),
                 'planned_date' => $i->planned_date->toDateString(),
+                'technician_id' => $i->technician_id,
                 'technician' => $i->relationLoaded('technician') ? $i->technician?->name : null,
                 'observation' => $i->observation,
             ])),
+            'studies' => $this->whenLoaded('studies', fn () => $this->studies->map(fn ($st) => collect([
+                'id' => $st->id,
+                'result' => $st->result->value,
+                'result_label' => $st->result->label(),
+                'concrete_poles_existing' => $st->concrete_poles_existing,
+                'concrete_poles_to_install' => $st->concrete_poles_to_install,
+                'metal_poles_existing' => $st->metal_poles_existing,
+                'metal_poles_to_install' => $st->metal_poles_to_install,
+                'distance_m' => $st->distance_m,
+                'problem' => $st->problem,
+                'field_comments' => $st->field_comments,
+                'internal_comments' => $st->internal_comments,
+                'at' => $st->created_at?->toIso8601String(),
+            ])->when(! $request->user()->hasRole(Role::Admin, Role::Dg, Role::Dt, Role::Coordinator), fn ($c) => $c->except('internal_comments'))->all())),
             'history' => $this->whenLoaded('history', fn () => $this->history->map(fn ($h) => [
                 'from' => $h->from_status?->value,
                 'to' => $h->to_status->value,
