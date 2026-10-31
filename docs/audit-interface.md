@@ -18,7 +18,7 @@ Méthode : captures de 7 écrans à 390 px (téléphone), 768 px (tablette) et 1
 ## Plan (une PR par étape)
 1. **Charte visuelle** : jetons (couleur principale bleu fibre, repère cyan, fond doux, encre), police Inter embarquée, remplacement des couleurs en dur.
 2. **Coque de l'application** : marque, menu latéral avec icônes, en-tête compact et menu du compte, page de connexion.
-3. **Accueil en tableau de bord** : raccourcis par activité, chiffres clés selon le rôle.
+3. **Accueil** : mot de bienvenue et une carte par activité avec ses écrans (*fait*). Les **chiffres clés par rôle** relèvent des tableaux de bord du **lot 5** : pas avant, faute de données (clients, études, installations).
 4. **Écrans** : badges d'état colorés, fiche projet en deux colonnes sur PC, listes plus aérées.
 5. **Formulaires** : champs et listes déroulantes habillés, barre d'action collée en bas sur téléphone.
 
