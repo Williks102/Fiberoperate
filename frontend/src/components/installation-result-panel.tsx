@@ -14,13 +14,11 @@ const RESULTS: { value: Result; label: string }[] = [
   { value: "failed", label: "Échec" },
 ];
 
-/** Issue de la visite d'installation : installé (n° de série ONT, ligne fixe), reporté ou en échec (motif obligatoire). */
+/** Issue de la visite d'installation : installé, reporté ou en échec (motif obligatoire). La box est attribuée avant par le coordinateur. */
 export function InstallationResultPanel({ order, onDone }: { order: CustomerOrder; onDone: () => void }) {
   const reasons = useApi<{ data: { id: string; label: string }[] }>("/customer-orders/outcome-reasons");
   const [result, setResult] = useState<Result | "">("");
   const [reasonId, setReasonId] = useState("");
-  const [ontSerial, setOntSerial] = useState("");
-  const [fixedLine, setFixedLine] = useState("");
   const [observation, setObservation] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
@@ -41,8 +39,6 @@ export function InstallationResultPanel({ order, onDone }: { order: CustomerOrde
           body: JSON.stringify({
             result,
             reason_id: result === "installed" ? null : reasonId || null,
-            ont_serial: result === "installed" ? ontSerial.trim() || null : null,
-            fixed_line: result === "installed" ? fixedLine.trim() || null : null,
             observation: observation.trim() || null,
           }),
         },
@@ -91,17 +87,6 @@ export function InstallationResultPanel({ order, onDone }: { order: CustomerOrde
             </p>
           )}
         </fieldset>
-
-        {result === "installed" && (
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Field id="ont" label="N° de série ONT (facultatif)" error={errors.ont_serial}>
-              <input id="ont" value={ontSerial} onChange={(e) => setOntSerial(e.target.value)} className={inputClass} />
-            </Field>
-            <Field id="fixed" label="Ligne fixe (facultatif)" error={errors.fixed_line}>
-              <input id="fixed" type="tel" inputMode="numeric" value={fixedLine} onChange={(e) => setFixedLine(e.target.value)} className={inputClass} />
-            </Field>
-          </div>
-        )}
 
         {(result === "postponed" || result === "failed") && (
           <Field id="reason" label={result === "postponed" ? "Motif du report" : "Motif de l'échec"} error={errors.reason_id}>

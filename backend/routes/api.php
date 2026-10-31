@@ -73,6 +73,7 @@ Route::prefix('v1')->group(function () {
         Route::get('customer-orders/installation-technicians', [InstallationPlanningController::class, 'technicians']);
         Route::post('customer-orders/{order}/study', [StudyPlanningController::class, 'store']);
         Route::post('customer-orders/{order}/installation', [InstallationPlanningController::class, 'store']);
+        Route::put('customer-orders/{order}/box', [InstallationPlanningController::class, 'assignBox']);
         Route::get('customer-orders/outcome-reasons', [InstallationResultController::class, 'reasons']);
         Route::post('customer-orders/{order}/installation-result', [InstallationResultController::class, 'store']);
         Route::post('customer-orders/{order}/study-result', [StudyResultController::class, 'store']);

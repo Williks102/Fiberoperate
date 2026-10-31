@@ -46,4 +46,10 @@ class CustomerOrderPolicy
             || ($user->hasRole(Role::Technician) && $order->interventions()
                 ->where('type', MissionType::CustomerConnection->value)->where('status', InterventionStatus::Planned->value)->where('technician_id', $user->getKey())->exists());
     }
+
+    /** Attribuer la box (n° de série ONT et numéro fixe) : le coordinateur et l'administrateur. */
+    public function assignBox(User $user): bool
+    {
+        return $user->hasRole(Role::Admin, Role::Coordinator);
+    }
 }

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Domain\Study\AssignBox;
 use App\Domain\Study\PlanInstallation;
 use App\Enums\MissionType;
 use App\Enums\Role;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AssignBoxRequest;
 use App\Http\Requests\PlanInstallationRequest;
 use App\Http\Resources\CustomerOrderResource;
 use App\Models\CustomerOrder;
@@ -13,7 +15,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 
-/** Programmation de l'installation par le coordinateur : choix du technicien habilité et de la date. */
+/** Programmation de l'installation par le coordinateur (technicien habilité, date) et attribution de la box du client. */
 class InstallationPlanningController extends Controller
 {
     /** Techniciens que l'on peut charger d'une installation : actifs et habilités « raccordement client » (id et nom seulement). */
@@ -42,5 +44,14 @@ class InstallationPlanningController extends Controller
         );
 
         return new CustomerOrderResource($model->fresh()->load(['zone:id,code', 'pco:id,code', 'history.author:id,name', 'interventions.technician:id,name', 'studies']));
+    }
+
+    /** Attribution de la box du client : numéro de série de l'ONT et numéro fixe. */
+    public function assignBox(AssignBoxRequest $request, AssignBox $assignBox, string $order): CustomerOrderResource
+    {
+        $model = CustomerOrder::query()->findOrFail($order);
+        $assignBox($model, $request->user(), $request->validated('ont_serial'), $request->validated('fixed_line'));
+
+        return new CustomerOrderResource($model->fresh()->load(['zone:id,code', 'pco:id,code', 'history.author:id,name', 'interventions.technician:id,name', 'interventions.reason', 'studies']));
     }
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { StudyFormPanel } from "@/components/study-form-panel";
+import { BoxPanel } from "@/components/box-panel";
 import { InstallationResultPanel } from "@/components/installation-result-panel";
 import { PlanningPanel } from "@/components/planning-panel";
 import { Badge } from "@/components/ui/badge";
@@ -93,6 +94,8 @@ function Detail({ order, reload }: { order: CustomerOrder; reload: () => void })
 
       {canPlan && order.status.value === "received" && <PlanningPanel mode="study" order={order} onDone={reload} />}
 
+      {canPlan && readyForInstallation && <BoxPanel key={`${order.ont_serial}-${order.fixed_line}`} order={order} onDone={reload} />}
+
       {canPlan && readyForInstallation && <PlanningPanel mode="installation" order={order} reprogram={order.status.value === "appointment_set"} onDone={reload} />}
 
       {canRecordInstall && (
@@ -126,6 +129,8 @@ function Detail({ order, reload }: { order: CustomerOrder; reload: () => void })
             <Row label="Sous-plaque">{order.zone?.code}</Row>
             <Row label="PCO">{order.pco?.code}</Row>
             <Row label="Résultat de l'étude">{order.study_result ? STUDY_RESULT_LABELS[order.study_result] : null}</Row>
+            <Row label="N° de série ONT">{order.ont_serial}</Row>
+            <Row label="Numéro fixe">{order.fixed_line}</Row>
             <Row label="Distance au PCO">{order.distance_m != null ? `${order.distance_m} m` : null}</Row>
             <Row label="État de ligne opérateur">{order.operator_line_status}</Row>
             <Row label="Observation">{order.observation}</Row>
