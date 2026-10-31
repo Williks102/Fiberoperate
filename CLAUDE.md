@@ -74,6 +74,7 @@ Toute requête est filtrée par rôle **et** périmètre (plaque pour le supervi
 - Chaque création côté client porte un `client_uuid` ; endpoints d'écriture **idempotents** sur ce champ.
 - Le serveur fait foi pour le planning, le terrain fait foi pour l'exécution. Conflits signalés, jamais écrasés silencieusement.
 - Photos : compression locale, envoi en arrière-plan.
+- **Cache du poste (lot 4b)** : base IndexedDB `ftth-terrain` (Dexie, `frontend/src/lib/offline/`) : visites du technicien, motifs, réglages d'étude, dernier utilisateur connu. « Mes visites » se lit d'abord sur le poste et se met à jour dès que le réseau est là, puis toutes les 5 min ; l'état « En ligne / Hors ligne » et l'heure des données sont toujours visibles. Le service worker (`public/sw.js`) ouvre les pages sans réseau (réseau d'abord, copie si coupé ou lent) et **ne met jamais l'API en cache** : les données clients ne vivent que dans IndexedDB, **effacées à la déconnexion** et quand un autre technicien se connecte. Seul un **401** déconnecte : un réseau coupé ou un serveur qui ne répond pas (502 au réveil de Render, 429) garde la session. L'application doit avoir été ouverte une fois en ligne sur le téléphone.
 
 ## Conventions de code
 - UUID, `created_at/updated_at`, suppression logique (`deleted_at`) sur les tables métier.

@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { ApiError, apiFetch } from "@/lib/api";
 import type { User } from "@/lib/types";
+import { clearLocalData, loadUser, saveUser } from "@/lib/offline/visits";
 import { clearToken, getToken, setToken } from "./token";
 
 interface AuthState {
@@ -26,10 +27,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const session = token ? apiFetch<{ data: User }>("/auth/me", {}, token).then((res) => res.data) : Promise.resolve(null);
 
     session
-      .then(setUser)
-      .catch((error) => {
-        // Jeton refusé : on repart d'une session propre. Réseau coupé : on garde le jeton.
-        if (error instanceof ApiError && error.status > 0) clearToken();
+      .then((me) => {
+        setUser(me);
+        if (me) void saveUser(me).catch(() => {}); // dernier utilisateur connu, pour rouvrir l'application sans réseau
+      })
+      .catch(async (error) => {
+        if (error instanceof ApiError && error.status === 401) {
+          // Jeton refusé : on repart d'une session propre, sans rien laisser des données du poste.
+          clearToken();
+          void clearLocalData();
+
+          return;
+        }
+        // Réseau coupé ou serveur qui ne répond pas (réveil, 502, 429…) : le jeton reste valable, on garde le dernier utilisateur connu.
+        const known = token ? await loadUser().catch(() => null) : null;
+        if (known) setUser(known);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -39,6 +51,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       method: "POST",
       body: JSON.stringify({ email, password, device_name: "web" }),
     });
+    // Un autre technicien sur le même téléphone ne retrouve pas les visites du précédent.
+    const previous = await loadUser().catch(() => null);
+    if (previous && previous.id !== res.user.id) await clearLocalData();
+    await saveUser(res.user).catch(() => {});
     setToken(res.token);
     setUser(res.user);
   }, []);
@@ -47,6 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const token = getToken();
     clearToken();
     setUser(null);
+    await clearLocalData();
     if (token) await apiFetch("/auth/logout", { method: "POST" }, token).catch(() => {});
   }, []);
 
