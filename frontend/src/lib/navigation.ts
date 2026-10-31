@@ -1,7 +1,7 @@
 import type { MissionType, Role } from "@/lib/types";
 
 /** Icône d'une activité (voir `nav-icons.tsx`). */
-export type NavIconName = "home" | "project" | "network" | "admin";
+export type NavIconName = "home" | "project" | "network" | "customer" | "admin";
 
 export interface NavItem {
   href: string;
@@ -53,6 +53,15 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/splitters", label: "Splitters", description: "Ajouter ou corriger un splitter.", roles: ["admin", "be_manager", "technician"], skills: ["drawing"] },
       { href: "/pco", label: "PCO", description: "Les boîtiers : chercher un PCO, voir son statut et ses coordonnées.", roles: ["admin", "be_manager", "technician"], skills: ["drawing", "survey"] },
       { href: "/olt", label: "OLT", description: "Les équipements de tête.", roles: ["admin", "dg", "dt", "supervisor", "coordinator", "be_manager"] },
+    ],
+  },
+  {
+    href: "/raccordement",
+    label: "Raccordement",
+    icon: "customer",
+    description: "Les clients à raccorder : importer leur liste, puis suivre leurs commandes.",
+    items: [
+      { href: "/clients/importer", label: "Importer les clients", description: "Charger la liste des clients (fichier CSV), relire les anomalies ligne par ligne, puis l'importer.", roles: ["admin", "coordinator"] },
     ],
   },
   {
