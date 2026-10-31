@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Import\CustomerImportAnalyzer;
 use App\Domain\Import\ImportFileException;
+use App\Domain\Import\ValidateCustomerImport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AnalyseCustomerImportRequest;
+use App\Http\Requests\ExcludeImportRowRequest;
 use App\Models\ImportBatch;
 use App\Models\ImportRow;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 /** Import des clients, premier temps : analyse du fichier, puis revue des lignes (rien n'est créé avant la validation). */
 class CustomerImportController extends Controller
@@ -54,6 +57,33 @@ class CustomerImportController extends Controller
             ],
             'meta' => ['current_page' => $rows->currentPage(), 'last_page' => $rows->lastPage(), 'total' => $rows->total()],
         ]);
+    }
+
+    /** La revue peut exclure une ligne de l'import (ou la reprendre) : une ligne refusée n'est jamais importable. */
+    public function exclude(ExcludeImportRowRequest $request, string $batch, string $row): JsonResponse
+    {
+        $model = ImportBatch::query()->where('type', 'customers')->findOrFail($batch);
+        $line = $model->rows()->whereKey($row)->firstOrFail();
+
+        if ($model->status !== 'analysed') {
+            throw ValidationException::withMessages(['excluded' => 'Ce fichier est déjà importé : ses lignes ne changent plus.']);
+        }
+        if ($line->status === 'rejected') {
+            throw ValidationException::withMessages(['excluded' => 'Une ligne refusée ne peut pas être importée : corrigez le fichier et analysez-le de nouveau.']);
+        }
+
+        $line->update(['excluded' => $request->boolean('excluded')]);
+
+        return response()->json(['data' => ['id' => $line->id, 'excluded' => $line->excluded]]);
+    }
+
+    /** Second temps : crée ou met à jour les commandes des lignes retenues, en une seule opération. */
+    public function validateBatch(Request $request, string $batch, ValidateCustomerImport $validate): JsonResponse
+    {
+        $model = ImportBatch::query()->where('type', 'customers')->findOrFail($batch);
+        $this->authorize('view', $model);
+
+        return response()->json(['data' => $validate->run($model, $request->user())]);
     }
 
     /** @return array<string, mixed> */
