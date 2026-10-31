@@ -43,10 +43,12 @@ class CustomerOrderController extends ApiResourceController
             ->when($request->query('zone_id'), fn ($q, $id) => $q->where('zone_id', $id))
             ->when($request->string('q')->trim()->value(), function ($q, $term) {
                 $like = '%'.mb_strtolower($term).'%';
+                $digits = preg_replace('/\D/', '', $term);
+
                 $q->where(fn ($w) => $w->whereRaw('lower(name) like ?', [$like])
                     ->orWhereRaw('lower(customer_ref) like ?', [$like])
-                    ->orWhere('phone_1', 'like', '%'.preg_replace('/\D/', '', $term).'%')
-                    ->orWhereRaw('lower(ft_line) like ?', [$like]));
+                    ->orWhereRaw('lower(ft_line) like ?', [$like])
+                    ->when($digits !== '', fn ($d) => $d->orWhere('phone_1', 'like', "%{$digits}%")));
             });
     }
 

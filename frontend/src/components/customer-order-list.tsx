@@ -38,6 +38,37 @@ const TEXTS: Record<Stage, { title: string; empty: string }> = {
   raccordes: { title: "Suivi raccordement", empty: "Aucun client raccordé pour l'instant." },
 };
 
+const STAGE_PAGES: Record<Stage, string> = { instances: "Instances", raccordables: "Raccordables", raccordes: "Suivi raccordement" };
+
+/** Recherche dans toutes les étapes : montre les clients trouvés ailleurs que dans la liste affichée, avec leur étape. */
+function OtherStageMatches({ q, stage }: { q: string; stage: Stage }) {
+  const result = useApi<Paged<CustomerOrder>>(`/customer-orders?${new URLSearchParams({ q, per_page: "50" })}`);
+  if (result.status !== "ok") return null;
+  const others = result.data.data.filter((o) => o.stage !== stage);
+  if (others.length === 0) return null;
+
+  return (
+    <section aria-label="Trouvés dans les autres étapes" className="space-y-2 rounded-xl border border-dashed border-slate-300 p-3">
+      <h2 className="text-sm font-semibold">Trouvés dans les autres étapes</h2>
+      <ul className="space-y-2">
+        {others.map((order) => (
+          <li key={order.id}>
+            <Link href={`/clients/${order.id}`} className="block space-y-1 rounded-lg bg-white p-3 hover:ring-1 hover:ring-primary">
+              <div className="flex items-start justify-between gap-3">
+                <p className="font-medium">{order.name}</p>
+                <Badge tone={ORDER_TONES[order.status.value]}>{order.status.label}</Badge>
+              </div>
+              <p className="text-sm text-slate-700">
+                {order.customer_ref} · dans {STAGE_PAGES[order.stage]}
+              </p>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 /** Une des trois listes du raccordement : instances (étude à faire), raccordables (étude faite), raccordés (installés). */
 export function CustomerOrderList({ stage }: { stage: Stage }) {
   const { user } = useAuth();
@@ -132,6 +163,8 @@ export function CustomerOrderList({ stage }: { stage: Stage }) {
           </>
         )}
       </AsyncList>
+
+      {q.length >= 2 && <OtherStageMatches q={q} stage={stage} />}
     </div>
   );
 }

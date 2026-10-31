@@ -50,6 +50,9 @@ class CustomerOrderApiTest extends TestCase
         $this->getJson('/api/v1/customer-orders?q=KONÉ')->assertJsonCount(1, 'data');
         $this->getJson('/api/v1/customer-orders?q=0707123456')->assertJsonCount(1, 'data')->assertJsonPath('data.0.name', 'Koné Awa');
         $this->getJson('/api/v1/customer-orders?q=rab002')->assertJsonCount(1, 'data');
+        // Un nom sans chiffre ne doit pas être pris pour un numéro de téléphone vide (qui correspondrait à tout le monde).
+        $this->getJson('/api/v1/customer-orders?q=Traoré')->assertJsonCount(1, 'data')->assertJsonPath('data.0.customer_ref', 'RAB002');
+        $this->getJson('/api/v1/customer-orders?q=Inconnu')->assertJsonCount(0, 'data');
     }
 
     public function test_stages_split_orders_into_instances_raccordables_and_raccordes(): void
@@ -73,6 +76,12 @@ class CustomerOrderApiTest extends TestCase
         $this->assertSame(['R4', 'R5', 'R6', 'R7'], $refs('raccordables'));
         $this->assertSame(['R8', 'R9'], $refs('raccordes'));
         $this->assertSame([], $refs('inconnu'));
+
+        // L'étape affichée sur chaque client est celle de la liste qui le contient.
+        foreach (['instances', 'raccordables', 'raccordes'] as $stage) {
+            $stages = collect($this->getJson("/api/v1/customer-orders?stage={$stage}&per_page=50")->json('data'))->pluck('stage')->unique()->all();
+            $this->assertSame([$stage], $stages);
+        }
     }
 
     public function test_detail_carries_the_status_history(): void
