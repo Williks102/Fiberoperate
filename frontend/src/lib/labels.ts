@@ -1,5 +1,5 @@
 import type { Tone } from "@/components/ui/badge";
-import type { MissionType, Pco, ProjectPhase, Role, ZoneStatus } from "@/lib/types";
+import type { MissionType, OrderStatusValue, Pco, ProjectPhase, Role, ZoneStatus } from "@/lib/types";
 
 export const ZONE_STATUS_LABELS: Record<ZoneStatus, string> = {
   planned: "Planifiée",
@@ -90,3 +90,17 @@ export function pcoTone(pco: Pick<Pco, "status" | "is_blocked">): Tone {
   if (pco.is_blocked) return "danger";
   return pco.status === "activated" ? "success" : pco.status === "spliced" || pco.status === "pulled" ? "info" : "neutral";
 }
+
+/** Couleur d'état d'une commande : en cours = information, reporté = attention, échec = danger, terminé = succès. */
+export const ORDER_TONES: Record<OrderStatusValue, Tone> = {
+  received: "neutral",
+  in_study: "info",
+  studied: "info",
+  appointment_set: "info",
+  installed: "success",
+  postponed: "warning",
+  failed: "danger",
+  activated: "success",
+};
+
+export const STUDY_RESULT_LABELS = { feasible: "Raccordable", not_feasible: "Non raccordable", customer_absent: "Client absent" } as const;

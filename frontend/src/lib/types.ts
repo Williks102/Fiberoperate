@@ -157,3 +157,30 @@ export interface Olt {
   name: string;
   notes: string | null;
 }
+
+export type OrderStatusValue = "received" | "in_study" | "studied" | "appointment_set" | "installed" | "postponed" | "failed" | "activated";
+
+export interface CustomerOrder {
+  id: string;
+  customer_ref: string;
+  account_number: string | null;
+  ft_line: string | null;
+  name: string;
+  phone_1: string | null;
+  phone_2: string | null;
+  address_raw: string | null;
+  declared_latitude: string | null;
+  declared_longitude: string | null;
+  distance_m: number | null;
+  status: { value: OrderStatusValue; label: string };
+  study_result: "feasible" | "not_feasible" | "customer_absent" | null;
+  initial_study: "done" | "to_do" | null;
+  initial_study_raw: string | null;
+  registered_at: string | null;
+  sent_to_contractor_at: string | null;
+  operator_line_status: string | null;
+  observation: string | null;
+  zone?: { id: string; code: string } | null;
+  pco?: { id: string; code: string } | null;
+  history?: { from: OrderStatusValue | null; to: OrderStatusValue; to_label: string; observation: string | null; author: string | null; at: string | null }[];
+}

@@ -59,9 +59,11 @@ export const NAV_GROUPS: NavGroup[] = [
     href: "/raccordement",
     label: "Raccordement",
     icon: "customer",
-    description: "Les clients à raccorder : importer leur liste, puis suivre leurs commandes.",
+    description: "Les clients à raccorder : instances, raccordables, puis raccordés.",
     items: [
-      { href: "/clients/importer", label: "Importer les clients", description: "Charger la liste des clients (fichier CSV), relire les anomalies ligne par ligne, puis l'importer.", roles: ["admin", "coordinator"] },
+      { href: "/instances", label: "Instances", description: "Les nouveaux clients dont l'étude est à réaliser (on y importe le fichier des instances).", roles: ["admin", "dg", "dt", "coordinator", "technician"], skills: ["study", "customer_connection"] },
+      { href: "/raccordables", label: "Raccordables", description: "Les clients dont l'étude est faite : installation à programmer, reportée ou à reprendre.", roles: ["admin", "dg", "dt", "coordinator", "technician"], skills: ["study", "customer_connection"] },
+      { href: "/suivi-raccordement", label: "Suivi raccordement", description: "La liste des clients raccordés.", roles: ["admin", "dg", "dt", "coordinator"] },
     ],
   },
   {

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BlockReasonController;
 use App\Http\Controllers\Api\V1\CustomerImportController;
+use App\Http\Controllers\Api\V1\CustomerOrderController;
 use App\Http\Controllers\Api\V1\JdvController;
 use App\Http\Controllers\Api\V1\NetworkImportController;
 use App\Http\Controllers\Api\V1\NotificationController;
@@ -60,6 +61,7 @@ Route::prefix('v1')->group(function () {
         Route::get('customer-imports/{batch}', [CustomerImportController::class, 'show']);
         Route::patch('customer-imports/{batch}/rows/{row}', [CustomerImportController::class, 'exclude']);
         Route::post('customer-imports/{batch}/validate', [CustomerImportController::class, 'validateBatch']);
+        Route::apiResource('customer-orders', CustomerOrderController::class)->only(['index', 'show']);
         Route::get('block-reasons', [BlockReasonController::class, 'index']);
     });
 });
