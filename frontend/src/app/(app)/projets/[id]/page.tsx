@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ProjectActions } from "@/components/project-actions";
+import { ProjectDocumentsPanel } from "@/components/project-documents-panel";
 import { ProjectQuotePanel } from "@/components/project-quote-panel";
 import { NetworkImportPanel } from "@/components/network-import-panel";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -57,6 +58,7 @@ function ProjectDetail({ project, reload }: { project: Project; reload: () => vo
       <ProjectActions project={project} onDone={reload} />
 
       <Characteristics project={project} />
+      <ProjectDocumentsPanel projectId={project.id} plaqueId={project.plaque_id} />
       {canViewQuote && <ProjectQuotePanel projectId={project.id} />}
       {canImport && <NetworkImportPanel projectId={project.id} onImported={reload} />}
 

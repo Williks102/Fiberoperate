@@ -32,6 +32,8 @@ describe("menu par activité", () => {
     expect(labels("coordinator")).toEqual(["Déploiement", "Administration"]);
     expect(labels("technician")).toEqual(["Déploiement"]);
     expect(groupsFor("technician", ["drawing"]).map((g) => g.label)).toEqual(["Projet", "Déploiement"]);
+    expect(groupsFor("technician", ["survey"]).map((g) => g.label)).toEqual(["Projet", "Déploiement"]);
+    expect(groupsFor("technician", ["deployment"]).map((g) => g.label)).toEqual(["Déploiement"]);
     expect(groupsFor("supervisor")[1].items.map((i) => i.href)).toEqual(["/plaques", "/olt"]);
     expect(groupsFor("technician")[0].items.map((i) => i.href)).toEqual(["/plaques"]);
     expect(labels("be_manager")).toEqual(["Projet", "Déploiement"]);
